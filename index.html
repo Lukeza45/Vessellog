@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VesselLog — Daily Operations</title>
+<title>Vessel Reporting — Daily Operations</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -298,7 +298,7 @@ select option{background:var(--card);}
 ═══════════════════════════════════════ -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo">VESSELLOG</div>
+    <div class="login-logo">VESSEL VFD RETROFIT DAILY REPORTING</div>
     <div class="login-tagline">// Marine Daily Operations System</div>
 
     <!-- DEMO BANNER -->
@@ -361,7 +361,7 @@ select option{background:var(--card);}
 <div id="app">
 
   <div class="topbar">
-    <div class="topbar-logo">VESSELLOG</div>
+    <div class="topbar-logo">VESSEL REPORT</div>
     <div class="topbar-right">
       <div class="topbar-info">
         <div id="user-display" style="color:var(--muted);font-style:italic;">—</div>
@@ -392,7 +392,7 @@ select option{background:var(--card);}
     <div class="pdf-header" id="pdf-header">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
         <div>
-          <div class="pdf-logo">VESSELLOG</div>
+          <div class="pdf-logo">VESSEL REPORT</div>
           <div class="pdf-doc-title">// Daily Operations Report</div>
         </div>
         <div class="pdf-meta" style="text-align:right;">
@@ -589,12 +589,9 @@ function checkIsOffice(email){ return email?.toLowerCase().endsWith('@oldendorff
 // VESSEL LIST — add/remove your vessels here
 // ═══════════════════════════════════════════════════════
 const VESSELS = [
-  'MV Pacific Star',
-  'MV Horizon Tide',
-  'MV Strait Runner',
-  'MV Delta King',
-  'MV Oldendorff Pioneer',
-  'MV Oldendorff Trader',
+  'MV Eva Oldendorff',
+  'MV Hugo Oldendorff',
+  'MV Heike Oldendorff',
   'Other'
 ];
 
@@ -1064,7 +1061,7 @@ async function exportWord(){
 
   const children = [
     // Title
-    new Paragraph({ children:[new TextRun({ text:'VESSELLOG', font:'Arial', size:56, bold:true, color:'00c896' })], spacing:{ after:60 } }),
+    new Paragraph({ children:[new TextRun({ text:'VESSEL REPORT', font:'Arial', size:56, bold:true, color:'00c896' })], spacing:{ after:60 } }),
     new Paragraph({ children:[new TextRun({ text:'Daily Operations Report', font:'Arial', size:24, color:'666666' })], spacing:{ after:40 } }),
     new Paragraph({ children:[new TextRun({ text:`Generated: ${new Date().toLocaleString()}`, font:'Arial', size:18, color:'888888' })], spacing:{ after:400 } }),
 
@@ -1445,7 +1442,7 @@ async function exportWordFromReport(r){
   }
 
   const children = [
-    new Paragraph({ children:[new TextRun({text:'VESSELLOG',font:'Arial',size:56,bold:true,color:'00c896'})], spacing:{after:60} }),
+    new Paragraph({ children:[new TextRun({text:'VESSEL REPORT',font:'Arial',size:56,bold:true,color:'00c896'})], spacing:{after:60} }),
     new Paragraph({ children:[new TextRun({text:'Daily Operations Report',font:'Arial',size:24,color:'666666'})], spacing:{after:40} }),
     new Paragraph({ children:[new TextRun({text:`Generated: ${new Date().toLocaleString()}`,font:'Arial',size:18,color:'888888'})], spacing:{after:400} }),
     heading('VESSEL & SHIFT INFO'),
@@ -1459,8 +1456,7 @@ async function exportWordFromReport(r){
     ]}),
     new Paragraph({ spacing:{before:360,after:120} }),
     heading('DAILY WORK ACTIVITIES'),
-    ...(r.work_activities||'').split('
-').filter(Boolean).map(l=>body(l)),
+    ...(r.work_activities||'').split('\n').filter(Boolean).map(l=>body(l)),
   ];
 
   if(equip.length){
@@ -1485,8 +1481,7 @@ async function exportWordFromReport(r){
   if(r.concerns?.trim()){
     children.push(new Paragraph({spacing:{before:360,after:120}}));
     children.push(heading('⚠ AREAS OF CONCERN / FINDINGS','cc4400'));
-    r.concerns.split('
-').filter(Boolean).forEach(l=>children.push(body(l)));
+    r.concerns.split('\n').filter(Boolean).forEach(l=>children.push(body(l)));
   }
 
   if(plan.length){
@@ -1498,8 +1493,7 @@ async function exportWordFromReport(r){
   if(r.remarks?.trim()){
     children.push(new Paragraph({spacing:{before:360,after:120}}));
     children.push(heading('REMARKS'));
-    r.remarks.split('
-').filter(Boolean).forEach(l=>children.push(body(l)));
+    r.remarks.split('\n').filter(Boolean).forEach(l=>children.push(body(l)));
   }
 
   if(photos.length){
