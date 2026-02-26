@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OLDENDORFF — Daily Operations</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   SCREEN STYLES
+═══════════════════════════════════════ */
+:root {
+  --bg: #0a0e14;
+  --surface: #121820;
+  --card: #1a2230;
+  --border: #243040;
+  --accent: #00c896;
+  --accent2: #0088ff;
+  --warn: #ff6b35;
+  --caution: #ffc800;
+  --text: #e8edf5;
+  --muted: #6a7a90;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-body: 'IBM Plex Sans', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:var(--font-body); min-height:100vh;
+  background-image: radial-gradient(ellipse at 20% 0%,rgba(0,200,150,.06) 0%,transparent 60%),
+                    radial-gradient(ellipse at 80% 100%,rgba(0,136,255,.05) 0%,transparent 60%); }
+
+.preview-banner { background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#000;
+  text-align:center; font-family:var(--font-mono); font-size:11px; font-weight:600;
+  letter-spacing:2px; padding:8px; text-transform:uppercase; }
+
+/* TOPBAR */
+.topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:0 24px;
+  display:flex; align-items:center; justify-content:space-between; height:56px;
+  position:sticky; top:0; z-index:100; }
+.topbar-logo { font-family:var(--font-display); font-size:26px; letter-spacing:2px; color:var(--accent); }
+.topbar-info { font-family:var(--font-mono); font-size:11px; color:var(--muted); text-align:right; line-height:1.6; }
+.role-switch { display:flex; align-items:center; gap:8px; background:var(--card);
+  border:1px solid var(--border); border-radius:4px; padding:6px 8px; }
+.role-btn { font-family:var(--font-mono); font-size:10px; font-weight:600; letter-spacing:1px;
+  text-transform:uppercase; padding:5px 12px; border-radius:3px; cursor:pointer;
+  border:none; transition:all .2s; background:transparent; color:var(--muted); }
+.role-btn.active { background:var(--accent); color:#000; }
+
+/* NAV */
+.nav-tabs { display:flex; gap:2px; background:var(--surface);
+  border-bottom:1px solid var(--border); padding:0 24px; overflow-x:auto; }
+.nav-tab { padding:14px 20px; font-family:var(--font-mono); font-size:12px; letter-spacing:1px;
+  text-transform:uppercase; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent;
+  white-space:nowrap; transition:all .2s; }
+.nav-tab:hover { color:var(--text); }
+.nav-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+/* MAIN */
+.main { padding:32px 24px; max-width:1100px; margin:0 auto; }
+.section-title { font-family:var(--font-display); font-size:32px; letter-spacing:2px; color:var(--text); margin-bottom:4px; }
+.section-sub { font-family:var(--font-mono); font-size:11px; color:var(--muted); letter-spacing:1px; margin-bottom:28px; }
+
+/* CARDS */
+.card { background:var(--card); border:1px solid var(--border); border-radius:4px; padding:28px; margin-bottom:20px; }
+.card.warn-card { border-color:rgba(255,107,53,.3); background:rgba(255,107,53,.03); }
+.card.plan-card { border-color:rgba(0,136,255,.25); background:rgba(0,136,255,.03); }
+.card.photo-card { border-color:rgba(255,200,0,.2); background:rgba(255,200,0,.02); }
+.card-title { font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:2px;
+  text-transform:uppercase; color:var(--accent); margin-bottom:20px;
+  display:flex; align-items:center; gap:10px; }
+.card-title::after { content:''; flex:1; height:1px; background:var(--border); }
+.card-title.orange { color:var(--warn); }
+.card-title.blue { color:var(--accent2); }
+.card-title.yellow { color:var(--caution); }
+
+/* FORM */
+.form-grid { display:grid; gap:16px; grid-template-columns:1fr 1fr; }
+.form-grid.three { grid-template-columns:1fr 1fr 1fr; }
+.form-grid.full { grid-template-columns:1fr; }
+.field { display:flex; flex-direction:column; gap:8px; }
+.field.span2 { grid-column:span 2; }
+.field.span3 { grid-column:span 3; }
+label { font-family:var(--font-mono); font-size:11px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+input, textarea, select { background:var(--bg); border:1px solid var(--border); color:var(--text);
+  font-family:var(--font-body); font-size:14px; padding:10px 14px; border-radius:3px;
+  outline:none; transition:border-color .2s; width:100%; }
+input:focus, textarea:focus, select:focus { border-color:var(--accent); }
+textarea { resize:vertical; min-height:100px; line-height:1.7; }
+select option { background:var(--card); }
+
+/* PROGRESS */
+.progress-wrap { background:var(--bg); border:1px solid var(--border); border-radius:3px; height:8px; overflow:hidden; margin-top:4px; }
+.progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:3px; transition:width .5s ease; }
+
+/* EQUIPMENT ROWS */
+.equip-list { display:flex; flex-direction:column; gap:12px; margin-bottom:16px; }
+.equip-row { display:grid; grid-template-columns:1fr 160px 1fr auto; gap:10px; align-items:end;
+  background:var(--bg); padding:14px; border-radius:3px; border:1px solid var(--border); }
+.remove-btn { background:none; border:1px solid var(--border); color:var(--muted); cursor:pointer;
+  width:36px; height:36px; border-radius:3px; font-size:16px; display:flex;
+  align-items:center; justify-content:center; transition:all .2s; }
+.remove-btn:hover { border-color:var(--warn); color:var(--warn); }
+
+/* CONCERNS LIST */
+.concern-list { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+.concern-row { display:grid; grid-template-columns:1fr 140px 140px auto; gap:10px; align-items:end;
+  background:var(--bg); padding:14px; border-radius:3px; border:1px solid rgba(255,107,53,.15); }
+
+/* JOB PLAN LIST */
+.plan-list { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+.plan-row { display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center;
+  background:var(--bg); padding:14px; border-radius:3px; border:1px solid rgba(0,136,255,.15); }
+.plan-num { font-family:var(--font-display); font-size:28px; color:var(--accent2); line-height:1; align-self:center; }
+
+/* PHOTO UPLOAD */
+.photo-drop-zone { border:2px dashed var(--border); border-radius:4px; padding:40px 20px;
+  text-align:center; cursor:pointer; transition:all .2s; position:relative; }
+.photo-drop-zone:hover, .photo-drop-zone.drag-over { border-color:var(--caution); background:rgba(255,200,0,.03); }
+.photo-drop-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; }
+.drop-icon { font-size:36px; margin-bottom:12px; opacity:.5; }
+.drop-text { font-family:var(--font-mono); font-size:12px; color:var(--muted); letter-spacing:1px; line-height:2; }
+.photo-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; margin-top:16px; }
+.photo-item { position:relative; border-radius:3px; overflow:hidden; aspect-ratio:4/3;
+  border:1px solid var(--border); background:var(--bg); }
+.photo-item img { width:100%; height:100%; object-fit:cover; display:block; }
+.photo-item .photo-remove { position:absolute; top:6px; right:6px; background:rgba(0,0,0,.7);
+  border:none; color:#fff; width:24px; height:24px; border-radius:2px; cursor:pointer;
+  font-size:12px; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .2s; }
+.photo-item:hover .photo-remove { opacity:1; }
+.photo-caption { position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,.6);
+  font-family:var(--font-mono); font-size:9px; color:#fff; padding:4px 6px;
+  letter-spacing:.5px; }
+.photo-caption input { background:transparent; border:none; color:#fff; font-family:var(--font-mono);
+  font-size:9px; width:100%; padding:0; letter-spacing:.5px; }
+.photo-caption input:focus { outline:none; }
+
+/* BADGES */
+.status-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:2px;
+  font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; }
+.badge-operational { background:rgba(0,200,150,.12); color:var(--accent); }
+.badge-faulty { background:rgba(255,107,53,.15); color:var(--warn); border:1px solid rgba(255,107,53,.2); }
+.badge-maintenance { background:rgba(0,136,255,.12); color:var(--accent2); }
+.badge-submitted { background:rgba(0,200,150,.12); color:var(--accent); }
+.badge-high { background:rgba(255,107,53,.15); color:var(--warn); }
+.badge-medium { background:rgba(255,200,0,.12); color:var(--caution); }
+.badge-low { background:rgba(0,200,150,.1); color:var(--accent); }
+
+/* BUTTONS */
+.btn { display:inline-flex; align-items:center; gap:8px; padding:12px 24px;
+  font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:1px;
+  text-transform:uppercase; border:none; border-radius:3px; cursor:pointer; transition:all .2s; }
+.btn-primary { background:var(--accent); color:#000; }
+.btn-primary:hover { background:#00e0aa; transform:translateY(-1px); }
+.btn-secondary { background:transparent; border:1px solid var(--border); color:var(--text); }
+.btn-secondary:hover { border-color:var(--accent); color:var(--accent); }
+.btn-pdf { background:rgba(255,200,0,.1); border:1px solid rgba(255,200,0,.3); color:var(--caution); }
+.btn-pdf:hover { background:var(--caution); color:#000; }
+.btn-sm { padding:8px 16px; font-size:11px; }
+.btn-warn { background:rgba(255,107,53,.1); border:1px solid rgba(255,107,53,.2); color:var(--warn); }
+
+/* STATS */
+.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:32px; }
+.stat-card { background:var(--card); border:1px solid var(--border); border-radius:4px; padding:20px; position:relative; overflow:hidden; }
+.stat-card::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; }
+.stat-card.s1::before { background:var(--accent); }
+.stat-card.s2::before { background:var(--accent2); }
+.stat-card.s3::before { background:var(--warn); }
+.stat-card.s4::before { background:var(--caution); }
+.stat-val { font-family:var(--font-display); font-size:48px; line-height:1; margin-bottom:6px; }
+.stat-label { font-family:var(--font-mono); font-size:10px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; }
+
+/* REPORT CARDS */
+.report-list { display:flex; flex-direction:column; gap:12px; }
+.report-item { background:var(--card); border:1px solid var(--border); border-radius:4px;
+  padding:20px 24px; cursor:pointer; transition:all .2s;
+  animation:fadeUp .3s ease both; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.report-item:hover { border-color:var(--accent); box-shadow:0 0 0 1px rgba(0,200,150,.1); }
+.report-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:10px; }
+.report-vessel { font-family:var(--font-display); font-size:20px; letter-spacing:1px; }
+.report-meta { font-family:var(--font-mono); font-size:11px; color:var(--muted); line-height:2; margin-top:2px; }
+.equip-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+.equip-tag { font-family:var(--font-mono); font-size:10px; padding:3px 8px; border-radius:2px;
+  border:1px solid var(--border); color:var(--muted); }
+.equip-tag.fault { border-color:rgba(255,107,53,.3); color:var(--warn); background:rgba(255,107,53,.05); }
+
+/* MODAL */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:500;
+  align-items:center; justify-content:center; padding:20px; }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--surface); border:1px solid var(--border); border-radius:4px;
+  max-width:720px; width:100%; max-height:90vh; overflow-y:auto; padding:36px;
+  position:relative; animation:modalIn .25s ease; }
+@keyframes modalIn { from{opacity:0;transform:scale(.96)} to{opacity:1;transform:scale(1)} }
+.modal-close { position:absolute; top:16px; right:16px; background:none; border:1px solid var(--border);
+  color:var(--muted); cursor:pointer; font-size:14px; width:32px; height:32px;
+  border-radius:3px; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+.modal-close:hover { border-color:var(--warn); color:var(--warn); }
+.divider { height:1px; background:var(--border); margin:24px 0; }
+
+/* TOAST */
+.toast { position:fixed; bottom:24px; right:24px; background:var(--accent); color:#000;
+  font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:1px;
+  padding:14px 20px; border-radius:3px; z-index:9999; transform:translateY(80px); opacity:0;
+  transition:all .3s cubic-bezier(.175,.885,.32,1.275); }
+.toast.show { transform:translateY(0); opacity:1; }
+.toast.err { background:var(--warn); color:#fff; }
+
+@media(max-width:768px){
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .form-grid,.form-grid.three{grid-template-columns:1fr;}
+  .field.span2,.field.span3{grid-column:span 1;}
+  .equip-row{grid-template-columns:1fr 1fr;}
+  .concern-row{grid-template-columns:1fr 1fr;}
+  .plan-row{grid-template-columns:auto 1fr auto;}
+  .main{padding:20px 16px;}
+}
+
+/* ═══════════════════════════════════════
+   PRINT / PDF STYLES
+═══════════════════════════════════════ */
+@media print {
+  * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+
+  .preview-banner, .topbar, .nav-tabs, .tab-actions,
+  .remove-btn, .btn, .photo-drop-zone,
+  .photo-item .photo-remove { display:none !important; }
+
+  body { background:#fff !important; color:#1a1a2e !important;
+    font-family:'IBM Plex Sans',sans-serif; font-size:11pt; }
+
+  .main { padding:0 !important; max-width:100% !important; }
+
+  .section-title { font-size:22pt; color:#1a1a2e !important; letter-spacing:1px; margin-bottom:2px; }
+  .section-sub { color:#666 !important; font-size:9pt; margin-bottom:20px; }
+
+  .card { background:#fff !important; border:1.5px solid #d0d8e8 !important;
+    border-radius:4px; padding:18px 20px; margin-bottom:16px; break-inside:avoid; }
+  .card.warn-card { border-color:#ff9966 !important; background:#fff9f7 !important; }
+  .card.plan-card { border-color:#80b8ff !important; background:#f5faff !important; }
+  .card.photo-card { border-color:#ffd966 !important; background:#fffdf5 !important; }
+
+  .card-title { color:#1a1a2e !important; font-size:9pt; border-bottom:1px solid #d0d8e8;
+    padding-bottom:8px; margin-bottom:14px; }
+  .card-title.orange { color:#cc4400 !important; }
+  .card-title.blue { color:#0055cc !important; }
+  .card-title.yellow { color:#996600 !important; }
+  .card-title::after { background:#d0d8e8 !important; }
+
+  label { color:#555 !important; font-size:8.5pt; }
+
+  input, textarea, select {
+    background:#f8f9fc !important; border:1px solid #d0d8e8 !important;
+    color:#1a1a2e !important; font-size:11pt; padding:8px 12px; border-radius:3px;
+  }
+
+  .form-grid { gap:12px; }
+  .form-grid.three { grid-template-columns:1fr 1fr 1fr; }
+  .form-grid { grid-template-columns:1fr 1fr; }
+
+  .progress-wrap { background:#e8ecf5 !important; border:1px solid #d0d8e8 !important; height:6px; }
+  .progress-fill { background:linear-gradient(90deg,#00c896,#0088ff) !important; }
+
+  .equip-row { background:#f8f9fc !important; border:1px solid #d0d8e8 !important; }
+  .concern-row { background:#fff9f7 !important; border:1px solid #ffccbb !important; }
+  .plan-row { background:#f5faff !important; border:1px solid #c0d8ff !important; }
+  .plan-num { color:#0055cc !important; }
+
+  .status-badge { font-size:9pt; }
+  .badge-operational { background:#e8fff8 !important; color:#006644 !important; border:1px solid #99ddc8 !important; }
+  .badge-faulty { background:#fff2ee !important; color:#cc3300 !important; border:1px solid #ffaa88 !important; }
+  .badge-maintenance { background:#eef5ff !important; color:#003399 !important; border:1px solid #99bbff !important; }
+  .badge-high { background:#fff2ee !important; color:#cc3300 !important; }
+  .badge-medium { background:#fffbee !important; color:#996600 !important; }
+  .badge-low { background:#e8fff8 !important; color:#006644 !important; }
+
+  /* PDF PHOTO GRID */
+  .photo-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .photo-item { break-inside:avoid; border:1px solid #d0d8e8 !important; }
+  .photo-item img { max-height:180px; object-fit:cover; }
+  .photo-caption { background:rgba(0,0,0,.55) !important; color:#fff !important; }
+  .photo-caption input { color:#fff !important; }
+
+  /* PDF HEADER */
+  .pdf-header { display:block !important; border-bottom:3px solid #1a1a2e;
+    padding-bottom:16px; margin-bottom:24px; }
+  .pdf-header-top { display:flex; justify-content:space-between; align-items:flex-start; }
+  .pdf-logo { font-family:'Bebas Neue',sans-serif; font-size:32pt; color:#1a1a2e !important; letter-spacing:3px; }
+  .pdf-company { font-size:9pt; color:#666 !important; line-height:1.6; text-align:right; }
+  .pdf-doc-title { font-size:11pt; color:#666 !important; letter-spacing:2px;
+    text-transform:uppercase; font-family:'IBM Plex Mono',monospace; margin-top:4px; }
+
+  /* STAT CARDS IN PDF */
+  .stats-row { grid-template-columns:repeat(4,1fr); gap:10px; }
+  .stat-card { border:1.5px solid #d0d8e8 !important; background:#f8f9fc !important; }
+  .stat-card::before { display:none; }
+  .stat-val { font-size:32pt; color:#1a1a2e !important; }
+  .stat-label { color:#666 !important; }
+
+  /* PAGE BREAKS */
+  .page-break { page-break-after:always; }
+  .no-break { break-inside:avoid; }
+
+  #tab-submit { display:block !important; }
+  #tab-history, #tab-dashboard, #tab-all-reports { display:none !important; }
+
+  .tab-content-wrapper { display:block !important; }
+}
+
+/* hide pdf-header on screen */
+.pdf-header { display:none; }
+</style>
+</head>
+<body>
+
+<div class="preview-banner">🔍 LIVE PREVIEW · Switch roles top-right · Fill in the form · Click EXPORT PDF to see the printed report</div>
+
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">OLDENDORFF VFD RETROFITT</div>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+      <div class="role-switch">
+        <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;white-space:nowrap;">View as:</span>
+        <button class="role-btn active" id="role-crew" onclick="setRole('crew')">CREW</button>
+        <button class="role-btn" id="role-office" onclick="setRole('office')">OFFICE</button>
+      </div>
+      <div class="topbar-info">
+        <div id="user-display" style="color:var(--muted);font-style:italic;">Not set</div>
+        <div id="live-clock" style="color:var(--accent);">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-tabs" id="nav-tabs">
+    <div class="nav-tab active" data-tab="submit" onclick="switchTab('submit')">Submit Report</div>
+    <div class="nav-tab" data-tab="history" onclick="switchTab('history')">My Reports</div>
+    <div class="nav-tab office-tab" data-tab="dashboard" onclick="switchTab('dashboard')" style="display:none;">Dashboard</div>
+    <div class="nav-tab office-tab" data-tab="all-reports" onclick="switchTab('all-reports')" style="display:none;">All Reports</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SUBMIT REPORT TAB
+  ══════════════════════════════════════════ -->
+  <div class="main" id="tab-submit">
+
+    <!-- PDF HEADER (shows only on print) -->
+    <div class="pdf-header" id="pdf-header">
+      <div class="pdf-header-top">
+        <div>
+          <div class="pdf-logo">VESSELLOG</div>
+          <div class="pdf-doc-title">// Daily Operations Report</div>
+        </div>
+        <div class="pdf-company">
+          <strong>Your Company Name</strong><br>
+          Marine Services Division<br>
+          Generated: <span id="pdf-gen-time">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">DAILY REPORT</div>
+    <div class="section-sub">// SUBMIT OPERATIONS FOR THE CURRENT SHIFT</div>
+
+    <!-- 1. VESSEL & SHIFT INFO -->
+    <div class="card no-break">
+      <div class="card-title">Vessel & Shift Info</div>
+      <div class="form-grid three">
+        <div class="field">
+          <label>Vessel Name *</label>
+          <input type="text" id="f-vessel" value="MV Pacific Star" placeholder="Vessel name">
+        </div>
+        <div class="field">
+          <label>Report Date *</label>
+          <input type="date" id="f-date">
+        </div>
+        <div class="field">
+          <label>Location / Port</label>
+          <input type="text" id="f-location" value="Pier 7, Batam" placeholder="Location">
+        </div>
+        <div class="field">
+          <label>Reported By *</label>
+          <input type="text" id="f-submitter" value="" placeholder="Your name" oninput="updateReportedBy(this.value)">
+        </div>
+        <div class="field">
+          <label>Hours Worked</label>
+          <input type="number" id="f-hours" value="9.5" min="0" max="24" step="0.5">
+        </div>
+        <div class="field">
+          <label>Completion % &nbsp;<span style="font-family:var(--font-mono);font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none;">— auto calculated</span></label>
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
+            <span id="pct-live" style="font-family:var(--font-display);font-size:28px;color:var(--accent);line-height:1;">—</span>
+            <span id="pct-breakdown" style="font-family:var(--font-mono);font-size:10px;color:var(--muted);text-align:right;line-height:1.8;"></span>
+          </div>
+          <div class="progress-wrap"><div class="progress-fill" id="pct-bar" style="width:0%"></div></div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:6px;letter-spacing:.5px;">
+            Based on equipment statuses: Operational + Ready for Testing = done &nbsp;·&nbsp; Faulty = blocked
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. DAILY WORK ACTIVITIES -->
+    <div class="card">
+      <div class="card-title">Daily Work Activities</div>
+      <div class="form-grid full">
+        <div class="field">
+          <label>Activities Performed Today *</label>
+          <textarea id="f-activities" rows="5">Completed hull cleaning on starboard side from Frame 10 to Frame 45. Conducted visual inspection of main deck plating. Replaced 3 corroded bolts on hatch cover No.2. Applied anti-corrosion coating on bulkhead sections B3 to B6. Scaffolding on port side extended to Frame 50.</textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. EQUIPMENT STATUS -->
+    <div class="card no-break">
+      <div class="card-title">Equipment / Materials Status</div>
+      <div class="equip-list" id="equip-list">
+        <div class="equip-row">
+          <div class="field"><label>Equipment Name</label><input type="text" value="Mobile Crane A"></div>
+          <div class="field"><label>Status</label><select onchange="autoCalcPct()"><option selected>Operational</option><option>Preparing</option><option>Pending</option><option>Faulty</option><option>Ready for Testing</option></select></div>
+          <div class="field"><label>Issues / Notes</label><input type="text" value="Running smoothly, boom joint greased"></div>
+          <button class="remove-btn" onclick="this.closest('.equip-row').remove();autoCalcPct()">✕</button>
+        </div>
+        <div class="equip-row">
+          <div class="field"><label>Equipment Name</label><input type="text" value="Air Compressor #2"></div>
+          <div class="field"><label>Status</label><select onchange="autoCalcPct()"><option>Operational</option><option>Preparing</option><option>Pending</option><option selected>Faulty</option><option>Ready for Testing</option></select></div>
+          <div class="field"><label>Issues / Notes</label><input type="text" value="Pressure drops to 80 PSI after 20min — needs service"></div>
+          <button class="remove-btn" onclick="this.closest('.equip-row').remove();autoCalcPct()">✕</button>
+        </div>
+        <div class="equip-row">
+          <div class="field"><label>Equipment Name</label><input type="text" value="Hydraulic Jack Set"></div>
+          <div class="field"><label>Status</label><select onchange="autoCalcPct()"><option>Operational</option><option>Preparing</option><option selected>Pending</option><option>Faulty</option><option>Ready for Testing</option></select></div>
+          <div class="field"><label>Issues / Notes</label><input type="text" value="Sent for hydraulic fluid change — returns tomorrow"></div>
+          <button class="remove-btn" onclick="this.closest('.equip-row').remove();autoCalcPct()">✕</button>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="addEquip()">+ Add Equipment</button>
+    </div>
+
+    <!-- 4. AREAS OF CONCERN / FINDINGS -->
+    <div class="card warn-card no-break">
+      <div class="card-title orange">⚠ Areas of Concern / Findings</div>
+      <div class="form-grid full">
+        <div class="field">
+          <label>Findings, Concerns & Actions Required</label>
+          <textarea id="f-concerns" rows="5" placeholder="Describe any findings, safety concerns, defects, or issues observed during the shift. Include recommended actions where applicable...">1. Hatch cover No.3 seal showing early deterioration — cracking along port edge. Recommend inspection before next voyage.
+2. Minor corrosion patch found on bulkhead Frame 38 (approx 0.3m²). Scheduled for spot blast and coat on Day 3.
+3. Air compressor #2 failed mid-shift — work slowed for 1.5 hours. Arrange replacement unit urgently, contact Suhaimi at workshop.</textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. JOB PLANNING FOR NEXT DAY -->
+    <div class="card plan-card no-break">
+      <div class="card-title blue">📋 Job Planning — Next Day</div>
+      <div class="plan-list" id="plan-list">
+        <div class="plan-row">
+          <div class="plan-num">1</div>
+          <div class="field"><label>Planned Task</label><input type="text" value="Continue hull cleaning — port side Frame 10 to Frame 45" oninput="autoCalcPct()"></div>
+          <button class="remove-btn" onclick="removePlan(this)">✕</button>
+        </div>
+        <div class="plan-row">
+          <div class="plan-num">2</div>
+          <div class="field"><label>Planned Task</label><input type="text" value="Replace air compressor — source from workshop" oninput="autoCalcPct()"></div>
+          <button class="remove-btn" onclick="removePlan(this)">✕</button>
+        </div>
+        <div class="plan-row">
+          <div class="plan-num">3</div>
+          <div class="field"><label>Planned Task</label><input type="text" value="Spot blast and coat bulkhead Frame 38 corrosion patch" oninput="autoCalcPct()"></div>
+          <button class="remove-btn" onclick="removePlan(this)">✕</button>
+        </div>
+      </div>
+      <button class="btn btn-sm" style="background:rgba(0,136,255,.1);border:1px solid rgba(0,136,255,.25);color:var(--accent2);" onclick="addPlan()">+ Add Planned Task</button>
+    </div>
+
+    <!-- 6. SITE PHOTOGRAPHS -->
+    <div class="card photo-card">
+      <div class="card-title yellow">📷 Site Photographs</div>
+      <div class="photo-drop-zone" id="drop-zone" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+        <input type="file" id="photo-input" accept="image/*" multiple onchange="handlePhotos(this.files)">
+        <div class="drop-icon">📸</div>
+        <div class="drop-text">
+          DRAG & DROP PHOTOS HERE<br>
+          <span style="color:var(--accent);font-weight:600;">or click to browse</span><br>
+          <span style="font-size:10px;opacity:.6;">JPG, PNG, HEIC · Multiple files supported</span>
+        </div>
+      </div>
+      <div class="photo-grid" id="photo-grid"></div>
+      <div id="photo-count" style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:10px;min-height:16px;"></div>
+    </div>
+
+    <!-- REMARKS -->
+    <div class="card">
+      <div class="card-title">Remarks</div>
+      <textarea id="f-remarks" rows="3" placeholder="General remarks...">Overall progress on track for vessel handover on Day 5 as planned.</textarea>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="tab-actions" style="display:flex;justify-content:flex-end;gap:12px;margin-top:8px;flex-wrap:wrap;">
+      <button class="btn btn-secondary" onclick="clearForm()">CLEAR</button>
+      <button class="btn btn-pdf" onclick="exportPDF()">⬇ EXPORT PDF</button>
+      <button class="btn btn-primary" onclick="showToast('✓ Report submitted! Office notified in real-time.')">SUBMIT REPORT →</button>
+    </div>
+  </div>
+
+  <!-- MY REPORTS TAB -->
+  <div class="main" id="tab-history" style="display:none;">
+    <div class="section-title">MY REPORTS</div>
+    <div class="section-sub">// SUBMITTED REPORTS — CLICK TO VIEW · EXPORT ANY REPORT AS PDF</div>
+    <div class="report-list" id="my-reports-list"></div>
+  </div>
+
+  <!-- DASHBOARD TAB (OFFICE) -->
+  <div class="main" id="tab-dashboard" style="display:none;">
+    <div class="section-title">OPERATIONS DASHBOARD</div>
+    <div class="section-sub">// REAL-TIME FLEET OVERVIEW — TODAY</div>
+    <div class="stats-row">
+      <div class="stat-card s1"><div class="stat-val" style="color:var(--accent);">5</div><div class="stat-label">Reports Today</div></div>
+      <div class="stat-card s2"><div class="stat-val" style="color:var(--accent2);">4</div><div class="stat-label">Vessels Active</div></div>
+      <div class="stat-card s3"><div class="stat-val" style="color:var(--warn);">3</div><div class="stat-label">Equipment Faults</div></div>
+      <div class="stat-card s4"><div class="stat-val" style="color:var(--caution);">46.5</div><div class="stat-label">Total Hours</div></div>
+    </div>
+    <div class="report-list" id="dashboard-list"></div>
+  </div>
+
+  <!-- ALL REPORTS TAB (OFFICE) -->
+  <div class="main" id="tab-all-reports" style="display:none;">
+    <div class="section-title">ALL REPORTS</div>
+    <div class="section-sub">// FULL HISTORICAL LOG</div>
+    <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;align-items:center;">
+      <input type="date" style="max-width:180px;">
+      <input type="text" id="vessel-filter" placeholder="Filter by vessel..." style="max-width:220px;" oninput="filterReports()">
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('vessel-filter').value='';renderAllReports(allReports)">CLEAR</button>
+      <span id="filter-count" style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-left:auto;"></span>
+    </div>
+    <div class="report-list" id="all-reports-list"></div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// CLOCK
+// ═══════════════════════════════════════
+function updateClock(){ document.getElementById('live-clock').textContent = new Date().toUTCString().replace('GMT','UTC'); }
+updateClock(); setInterval(updateClock,1000);
+document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+
+// ═══════════════════════════════════════
+// AUTO COMPLETION % — reads equipment statuses
+// ═══════════════════════════════════════
+function autoCalcPct(){
+  const rows = document.querySelectorAll('#equip-list .equip-row');
+  const total = rows.length;
+  if(total === 0){
+    document.getElementById('pct-live').textContent = '—';
+    document.getElementById('pct-bar').style.width = '0%';
+    document.getElementById('pct-breakdown').textContent = 'Add equipment to calculate';
+    return;
+  }
+  let done=0, faulty=0, pending=0, preparing=0, testing=0;
+  rows.forEach(row => {
+    const sel = row.querySelector('select');
+    if(!sel) return;
+    const v = sel.value;
+    if(v==='Operational') done++;
+    else if(v==='Ready for Testing') testing++;
+    else if(v==='Faulty') faulty++;
+    else if(v==='Pending') pending++;
+    else if(v==='Preparing') preparing++;
+  });
+  const pct = Math.round(((done + testing) / total) * 100);
+  document.getElementById('pct-live').textContent = pct + '%';
+  document.getElementById('pct-bar').style.width = pct + '%';
+  document.getElementById('pct-breakdown').innerHTML =
+    `✅ Operational: ${done} &nbsp; 🔬 Ready for Test: ${testing}<br>` +
+    `⚙️ Preparing: ${preparing} &nbsp; ⏳ Pending: ${pending} &nbsp; ❌ Faulty: ${faulty}`;
+
+  // Colour shift: red if faults dominate, amber mid, green full
+  const bar = document.getElementById('pct-bar');
+  if(pct === 100) bar.style.background = 'linear-gradient(90deg,#00c896,#00e0aa)';
+  else if(faulty > 0 && pct < 50) bar.style.background = 'linear-gradient(90deg,#ff6b35,#ffc800)';
+  else bar.style.background = 'linear-gradient(90deg,#00c896,#0088ff)';
+}
+autoCalcPct();
+
+// ═══════════════════════════════════════
+// REPORTED BY — live sync to topbar
+// ═══════════════════════════════════════
+function updateReportedBy(val){
+  const el = document.getElementById('user-display');
+  if(val.trim()){
+    el.textContent = val.trim();
+    el.style.color = ''; el.style.fontStyle = '';
+  } else {
+    el.textContent = 'Not set';
+    el.style.color = 'var(--muted)'; el.style.fontStyle = 'italic';
+  }
+}
+
+// ═══════════════════════════════════════
+// ROLE SWITCH
+// ═══════════════════════════════════════
+function setRole(role){
+  document.getElementById('role-crew').classList.toggle('active', role==='crew');
+  document.getElementById('role-office').classList.toggle('active', role==='office');
+  document.querySelectorAll('.office-tab').forEach(el => el.style.display = role==='office'?'block':'none');
+  if(role==='crew'){
+    const name = document.getElementById('f-submitter')?.value.trim();
+    updateReportedBy(name||'');
+    switchTab('submit');
+  }
+  else { document.getElementById('user-display').textContent='Office Admin · All Vessels'; switchTab('dashboard'); }
+}
+
+// ═══════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════
+function switchTab(tab){
+  ['submit','history','dashboard','all-reports'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t===tab?'block':'none';
+  });
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.toggle('active', el.dataset.tab===tab));
+  if(tab==='history') renderMyReports();
+  if(tab==='all-reports') renderAllReports(allReports);
+}
+
+// ═══════════════════════════════════════
+// EQUIPMENT
+// ═══════════════════════════════════════
+function addEquip(){
+  const row = document.createElement('div'); row.className='equip-row';
+  row.innerHTML=`
+    <div class="field"><label>Equipment Name</label><input type="text" placeholder="Equipment name"></div>
+    <div class="field"><label>Status</label><select onchange="autoCalcPct()"><option>Operational</option><option>Preparing</option><option>Pending</option><option>Faulty</option><option>Ready for Testing</option></select></div>
+    <div class="field"><label>Issues / Notes</label><input type="text" placeholder="Any issues..."></div>
+    <button class="remove-btn" onclick="this.closest('.equip-row').remove();autoCalcPct()">✕</button>`;
+  document.getElementById('equip-list').appendChild(row);
+  autoCalcPct();
+}
+
+// ═══════════════════════════════════════
+// JOB PLAN
+// ═══════════════════════════════════════
+let planCount = 3;
+function addPlan(){
+  planCount++;
+  const row = document.createElement('div'); row.className='plan-row';
+  row.innerHTML=`
+    <div class="plan-num">${planCount}</div>
+    <div class="field"><label>Planned Task</label><input type="text" placeholder="Describe the task..." oninput="autoCalcPct()"></div>
+    <button class="remove-btn" onclick="removePlan(this)">✕</button>`;
+  document.getElementById('plan-list').appendChild(row);
+}
+function removePlan(btn){ btn.closest('.plan-row').remove(); reNumberPlans(); }
+function reNumberPlans(){
+  document.querySelectorAll('#plan-list .plan-num').forEach((el,i) => el.textContent = i+1);
+  planCount = document.querySelectorAll('#plan-list .plan-row').length;
+}
+
+// ═══════════════════════════════════════
+// PHOTOS
+// ═══════════════════════════════════════
+let uploadedPhotos = [];
+
+function handlePhotos(files){
+  Array.from(files).forEach(file => {
+    if(!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      uploadedPhotos.push({ src: e.target.result, caption: file.name.replace(/\.[^.]+$/,''), name: file.name });
+      renderPhotos();
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('photo-input').value = '';
+}
+
+function renderPhotos(){
+  const grid = document.getElementById('photo-grid');
+  const count = document.getElementById('photo-count');
+  grid.innerHTML = uploadedPhotos.map((p,i) => `
+    <div class="photo-item">
+      <img src="${p.src}" alt="${p.caption}">
+      <button class="photo-remove" onclick="removePhoto(${i})">✕</button>
+      <div class="photo-caption"><input type="text" value="${p.caption}" placeholder="Add caption..." onchange="uploadedPhotos[${i}].caption=this.value"></div>
+    </div>`).join('');
+  count.textContent = uploadedPhotos.length ? `${uploadedPhotos.length} photo${uploadedPhotos.length!==1?'s':''} attached` : '';
+}
+
+function removePhoto(i){ uploadedPhotos.splice(i,1); renderPhotos(); }
+
+function onDragOver(e){ e.preventDefault(); document.getElementById('drop-zone').classList.add('drag-over'); }
+function onDragLeave(e){ document.getElementById('drop-zone').classList.remove('drag-over'); }
+function onDrop(e){
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag-over');
+  handlePhotos(e.dataTransfer.files);
+}
+
+// ═══════════════════════════════════════
+// PDF EXPORT
+// ═══════════════════════════════════════
+function exportPDF(){
+  // Update gen time
+  document.getElementById('pdf-gen-time').textContent = new Date().toLocaleString();
+  // Show PDF header
+  document.getElementById('pdf-header').style.display = 'block';
+  // Trigger browser print dialog
+  window.print();
+  // After print, hide header again
+  setTimeout(()=>{ document.getElementById('pdf-header').style.display='none'; }, 1000);
+}
+
+// ═══════════════════════════════════════
+// CLEAR FORM
+// ═══════════════════════════════════════
+function clearForm(){
+  ['f-vessel','f-location','f-submitter','f-hours','f-activities','f-concerns','f-remarks'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  updateReportedBy('');
+
+  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('equip-list').innerHTML='';
+  document.getElementById('concern-list') && (document.getElementById('concern-list').innerHTML='');
+  document.getElementById('plan-list').innerHTML=''; planCount=0;
+  uploadedPhotos=[]; renderPhotos();
+  autoCalcPct();
+  showToast('Form cleared');
+}
+
+// ═══════════════════════════════════════
+// DUMMY DATA
+// ═══════════════════════════════════════
+const allReports = [
+  { id:1, vessel_name:'MV Pacific Star', date:'2026-02-26', submitted_by:'Ahmad Razali',
+    location:'Pier 7, Batam', hours_worked:9.5, completion_pct:75,
+    work_activities:'Completed hull cleaning on starboard side Frame 10–45. Visual inspection of main deck plating. Replaced 3 corroded bolts on hatch cover No.2. Applied anti-corrosion coating on bulkheads B3–B6.',
+    remarks:'Recommend prioritising compressor replacement first thing tomorrow.',
+    concerns:`1. Hatch cover No.3 seal deterioration — cracking along port edge. Recommend inspection before next voyage.
+2. Air compressor #2 failed mid-shift — 1.5h delay. Arrange replacement unit urgently.`,
+    plan:[ 'Continue hull cleaning — port side', 'Replace air compressor', 'Spot blast Frame 38' ],
+    equipment_status:[
+      {equipment_name:'Mobile Crane A', status:'Operational', issues_noted:'Running smoothly'},
+      {equipment_name:'Air Compressor #2', status:'Faulty', issues_noted:'Pressure drops after 20min'},
+      {equipment_name:'Hydraulic Jack Set', status:'Under Maintenance', issues_noted:'Hydraulic fluid change'}
+    ]},
+  { id:2, vessel_name:'MV Horizon Tide', date:'2026-02-26', submitted_by:'Farizal Hamdan',
+    location:'Drydock 3, Tanjung Priok', hours_worked:10, completion_pct:90,
+    work_activities:'Propeller shaft inspection completed. Underwater hull blasting finished on port side. 12 sacrificial anodes installed. Rudder bearing clearance checked — within spec.',
+    remarks:'All works proceeding on schedule.',
+    concerns:`1. Underwater torch regulator valve leaking — tagged out, unsafe to use. Replacement valve required before next shift.`,
+    plan:[ 'Apply antifouling paint — starboard side', 'Sea chest valve inspection' ],
+    equipment_status:[
+      {equipment_name:'Hydraulic Platform', status:'Operational', issues_noted:''},
+      {equipment_name:'Underwater Torch Set', status:'Faulty', issues_noted:'Regulator valve leaking — unsafe'}
+    ]},
+  { id:3, vessel_name:'MV Strait Runner', date:'2026-02-26', submitted_by:'Ramli Osman',
+    location:'Anchorage B, Singapore', hours_worked:8, completion_pct:60,
+    work_activities:'Engine room bilge pump chamber cleaning done. Replaced 2 fuel oil filters. Started piping renewal on secondary cooling system. Calibrated flow meters.',
+    remarks:'Piping renewal taking longer — corroded fittings. May need extra half-day.',
+    concerns:`1. Secondary cooling pipe fittings heavily corroded — additional work scope needed. May require extra half-day to complete renewal.`,
+    plan:[ 'Complete cooling system piping renewal', 'Pressure test repaired section' ],
+    equipment_status:[
+      {equipment_name:'Portable Pump Unit', status:'Operational', issues_noted:''},
+      {equipment_name:'Pipe Threading Machine', status:'Operational', issues_noted:'Blade showing wear'}
+    ]},
+  { id:4, vessel_name:'MV Delta King', date:'2026-02-26', submitted_by:'Hazwan Zulkifli',
+    location:'Pier 12, Port Klang', hours_worked:9, completion_pct:100,
+    work_activities:'All 4 cargo holds inspected and cleaned. Hatch cover certificates issued after seal replacement. Final walkthrough with surveyor — passed.',
+    remarks:'All tasks completed ahead of schedule.',
+    concerns:``,
+    plan:[ 'Demobilisation and equipment return', 'Final documentation' ],
+    equipment_status:[
+      {equipment_name:'Industrial Vacuum Unit', status:'Operational', issues_noted:''},
+      {equipment_name:'Hatch Cover Tester', status:'Operational', issues_noted:'Certified'}
+    ]}
+];
+
+// ═══════════════════════════════════════
+// RENDER REPORT CARDS
+// ═══════════════════════════════════════
+function reportCard(r, delay){
+  const equip = r.equipment_status||[];
+  const faults = equip.filter(e=>e.status==='Faulty');
+  const concerns = r.concerns||'';
+  const hasConcerns = concerns.trim().length > 0;
+  return `
+    <div class="report-item" style="animation-delay:${delay||0}ms" onclick="openDetail(${r.id})">
+      <div class="report-header">
+        <div>
+          <div class="report-vessel">${r.vessel_name}</div>
+          <div class="report-meta">📅 ${r.date} &nbsp;·&nbsp; 👤 ${r.submitted_by} &nbsp;·&nbsp; ⏱ ${r.hours_worked}h &nbsp;·&nbsp; 📍 ${r.location}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+          <span class="status-badge badge-submitted">SUBMITTED</span>
+          ${faults.length?`<span class="status-badge badge-faulty">⚠ ${faults.length} FAULT${faults.length>1?'S':''}</span>`:''}
+          ${hasConcerns?`<span class="status-badge badge-medium">⚠ CONCERNS</span>`:''}
+        </div>
+      </div>
+      ${r.completion_pct!=null?`
+      <div style="margin-top:10px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:1px;">COMPLETION</span>
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent);">${r.completion_pct}%</span>
+        </div>
+        <div class="progress-wrap"><div class="progress-fill" style="width:${r.completion_pct}%"></div></div>
+      </div>`:''}
+      <div style="font-size:14px;color:var(--muted);margin-top:10px;line-height:1.6;">${r.work_activities.slice(0,140)}…</div>
+      ${equip.length?`<div class="equip-tags">${equip.map(e=>`<span class="equip-tag${e.status==='Faulty'?' fault':''}">${e.equipment_name} · ${e.status}</span>`).join('')}</div>`:''}
+    </div>`;
+}
+
+function renderMyReports(){
+  const mine = allReports.filter(r=>r.submitted_by==='Ahmad Razali');
+  document.getElementById('my-reports-list').innerHTML = mine.map((r,i)=>reportCard(r,i*60)).join('');
+}
+function renderAllReports(list){
+  document.getElementById('all-reports-list').innerHTML = list.map((r,i)=>reportCard(r,i*40)).join('');
+  document.getElementById('filter-count').textContent = `Showing ${list.length} report${list.length!==1?'s':''}`;
+}
+function filterReports(){
+  const q = document.getElementById('vessel-filter').value.toLowerCase();
+  renderAllReports(allReports.filter(r=>r.vessel_name.toLowerCase().includes(q)));
+}
+
+// ═══════════════════════════════════════
+// DETAIL MODAL
+// ═══════════════════════════════════════
+function openDetail(id){
+  const r = allReports.find(x=>x.id===id); if(!r) return;
+  const equip = r.equipment_status||[];
+  const concerns = r.concerns||[];
+  const plan = r.plan||[];
+  const statusColor = {'Operational':'badge-operational','Faulty':'badge-faulty','Under Maintenance':'badge-maintenance','Preparing':'badge-maintenance','Pending':'badge-medium','Ready for Testing':'badge-submitted'};
+
+  document.getElementById('modal-content').innerHTML = `
+    <div style="font-family:var(--font-display);font-size:28px;letter-spacing:2px;margin-bottom:2px;">${r.vessel_name}</div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:20px;">${r.date} · ${r.submitted_by} · ${r.location}</div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
+      ${mini('HOURS',r.hours_worked+'h','var(--accent)')}
+      ${mini('COMPLETION',r.completion_pct+'%',r.completion_pct===100?'var(--accent)':'var(--accent2)')}
+      ${mini('EQUIPMENT',equip.length+' units','var(--muted)')}
+    </div>
+    ${r.completion_pct!=null?`<div class="progress-wrap" style="height:6px;margin-bottom:20px;"><div class="progress-fill" style="width:${r.completion_pct}%"></div></div>`:''}
+
+    <div class="divider"></div>
+
+    <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Daily Work Activities</div>
+    <div style="font-size:14px;line-height:1.8;color:var(--text);margin-bottom:20px;">${r.work_activities}</div>
+
+    ${concerns.length?`
+    <div class="divider"></div>
+    <div style="font-family:var(--font-mono);font-size:10px;color:var(--warn);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">⚠ Areas of Concern / Findings</div>
+    <div style="font-size:14px;line-height:1.8;color:var(--text);white-space:pre-line;background:rgba(255,107,53,.04);border:1px solid rgba(255,107,53,.15);border-radius:3px;padding:16px;margin-bottom:16px;">${concerns}</div>`:''}
+
+    ${plan.length?`
+    <div class="divider"></div>
+    <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">📋 Next Day Plan</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+      ${plan.map((p,i)=>`
+        <div style="background:rgba(0,136,255,.05);border:1px solid rgba(0,136,255,.15);border-radius:3px;padding:10px 14px;display:flex;align-items:center;gap:12px;">
+          <span style="font-family:var(--font-display);font-size:20px;color:var(--accent2);min-width:24px;">${i+1}</span>
+          <span style="font-size:13px;">${p}</span>
+        </div>`).join('')}
+    </div>`:''}
+
+    ${equip.length?`
+    <div class="divider"></div>
+    <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">Equipment / Materials Status</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      ${equip.map(e=>`
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:12px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+          <div><div style="font-weight:500;margin-bottom:${e.issues_noted?'3px':'0'};">${e.equipment_name}</div>
+          ${e.issues_noted?`<div style="font-size:12px;color:var(--muted);">${e.issues_noted}</div>`:''}</div>
+          <span class="status-badge ${statusColor[e.status]||'badge-operational'}" style="white-space:nowrap;">${e.status}</span>
+        </div>`).join('')}
+    </div>`:''}
+
+    ${r.remarks?`
+    <div class="divider"></div>
+    <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Remarks</div>
+    <div style="font-size:14px;line-height:1.7;color:var(--caution);background:rgba(255,200,0,.04);border:1px solid rgba(255,200,0,.12);border-radius:3px;padding:14px;">${r.remarks}</div>`:''}
+  `;
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function mini(label,val,color){
+  return `<div style="background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:12px 14px;">
+    <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">${label}</div>
+    <div style="font-family:var(--font-display);font-size:26px;color:${color};line-height:1;">${val}</div>
+  </div>`;
+}
+
+function closeModal(){ document.getElementById('detail-modal').classList.remove('open'); }
+document.getElementById('detail-modal').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeModal(); });
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+function showToast(msg, err=false){
+  const t = document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(err?' err':''); t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+// INIT dashboard list
+renderAllReports(allReports);
+</script>
+</body>
+</html>
