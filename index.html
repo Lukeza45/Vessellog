@@ -16,6 +16,15 @@
   --font-mono:'IBM Plex Mono',monospace;
   --font-body:'IBM Plex Sans',sans-serif;
 }
+body.light-mode {
+  --bg:#f0f4f8; --surface:#ffffff; --card:#ffffff; --border:#d0dae8;
+  --text:#1a2230; --muted:#6a7a90;
+}
+body.light-mode{background-image:radial-gradient(ellipse at 20% 0%,rgba(0,200,150,.08) 0%,transparent 60%),
+  radial-gradient(ellipse at 80% 100%,rgba(0,136,255,.06) 0%,transparent 60%);}
+body.light-mode input,body.light-mode textarea,body.light-mode select{background:#f8fafc;}
+body.light-mode .login-box{box-shadow:0 4px 24px rgba(0,0,0,.1);}
+body.light-mode .report-item:hover{box-shadow:0 0 0 1px rgba(0,200,150,.2),0 2px 12px rgba(0,0,0,.06);}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;
   background-image:radial-gradient(ellipse at 20% 0%,rgba(0,200,150,.06) 0%,transparent 60%),
@@ -204,6 +213,23 @@ select option{background:var(--card);}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast.err{background:var(--warn);color:#fff;}
 
+/* ── LIGHTBOX ── */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:2000;
+  align-items:center;justify-content:center;cursor:zoom-out;}
+.lightbox.open{display:flex;}
+.lightbox img{max-width:92vw;max-height:90vh;object-fit:contain;border-radius:3px;
+  box-shadow:0 0 60px rgba(0,0,0,.8);}
+.lightbox-caption{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  font-family:var(--font-mono);font-size:12px;color:#fff;background:rgba(0,0,0,.6);
+  padding:6px 16px;border-radius:3px;letter-spacing:1px;}
+.lightbox-close{position:fixed;top:20px;right:24px;background:none;border:1px solid rgba(255,255,255,.2);
+  color:#fff;width:36px;height:36px;border-radius:3px;cursor:pointer;font-size:18px;
+  display:flex;align-items:center;justify-content:center;}
+.lightbox-nav{position:fixed;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);
+  border:1px solid rgba(255,255,255,.15);color:#fff;width:44px;height:44px;border-radius:3px;
+  cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;}
+.lightbox-prev{left:16px;}.lightbox-next{right:16px;}
+
 /* ── RESPONSIVE ── */
 @media(max-width:768px){
   .stats-row{grid-template-columns:1fr 1fr;}
@@ -341,13 +367,18 @@ select option{background:var(--card);}
         <div id="user-display" style="color:var(--muted);font-style:italic;">—</div>
         <div id="live-clock" style="color:var(--accent);">—</div>
       </div>
+      <button id="theme-toggle" onclick="toggleTheme()"
+        style="background:none;border:1px solid var(--border);color:var(--muted);
+        width:34px;height:34px;border-radius:3px;cursor:pointer;font-size:16px;
+        display:flex;align-items:center;justify-content:center;transition:all .2s;"
+        title="Toggle day/night mode">🌙</button>
       <button class="btn btn-secondary btn-sm" onclick="signOut()">LOGOUT</button>
     </div>
   </div>
 
   <div class="nav-tabs">
-    <div class="nav-tab active" data-tab="submit" onclick="switchTab('submit')">Submit Report</div>
-    <div class="nav-tab" data-tab="history" onclick="switchTab('history')">My Reports</div>
+    <div class="nav-tab crew-only active" data-tab="submit" onclick="switchTab('submit')">Submit Report</div>
+    <div class="nav-tab crew-only" data-tab="history" onclick="switchTab('history')">My Reports</div>
     <div class="nav-tab office-only" data-tab="dashboard" onclick="switchTab('dashboard')" style="display:none;">Dashboard</div>
     <div class="nav-tab office-only" data-tab="all-reports" onclick="switchTab('all-reports')" style="display:none;">All Reports</div>
   </div>
@@ -466,7 +497,12 @@ select option{background:var(--card);}
       <textarea id="f-remarks" rows="3" placeholder="General remarks..."></textarea>
     </div>
 
-    <div class="tab-actions" style="display:flex;justify-content:flex-end;gap:12px;margin-top:8px;flex-wrap:wrap;">
+    <div class="pdf-hide" style="font-family:var(--font-mono);font-size:11px;color:var(--caution);
+      text-align:right;margin-top:8px;padding:10px 14px;background:rgba(255,200,0,.06);
+      border:1px solid rgba(255,200,0,.15);border-radius:3px;">
+      ⚠ Export first if you need a Word copy — once submitted the form clears
+    </div>
+    <div class="tab-actions" style="display:flex;justify-content:flex-end;gap:12px;margin-top:10px;flex-wrap:wrap;">
       <button class="btn btn-secondary pdf-hide" onclick="clearForm()">CLEAR</button>
       <button class="btn btn-pdf" onclick="exportWord()">⬇ EXPORT WORD</button>
       <button class="btn btn-primary" id="submit-btn" onclick="submitReport()">SUBMIT REPORT →</button>
@@ -519,6 +555,15 @@ select option{background:var(--card);}
   </div>
 
 </div><!-- /app -->
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-nav lightbox-prev" onclick="event.stopPropagation();lightboxNav(-1)">‹</button>
+  <img id="lightbox-img" src="" alt="">
+  <button class="lightbox-nav lightbox-next" onclick="event.stopPropagation();lightboxNav(1)">›</button>
+  <div class="lightbox-caption" id="lightbox-caption"></div>
+</div>
 
 <!-- DETAIL MODAL -->
 <div class="modal-overlay" id="detail-modal">
@@ -721,9 +766,11 @@ function initApp(){
     wrap.replaceChild(sel, vesselField);
   }
 
-  // Office tabs
+  // Tab visibility — office sees only Dashboard + All Reports, crew sees Submit + My Reports
   if(isOffice){
     document.querySelectorAll('.office-only').forEach(el=>el.style.display='block');
+    document.querySelectorAll('.crew-only').forEach(el=>el.style.display='none');
+    switchTab('dashboard');
   }
 
   // Date
@@ -1231,6 +1278,8 @@ async function openDetail(id){
 
   const {data:r}=await sb.from('daily_reports').select('*,equipment_status(*)').eq('id',id).single();
   if(!r){ document.getElementById('modal-content').innerHTML='<p>Could not load report.</p>'; return; }
+  // Store current report for export
+  window._currentModalReport = r;
 
   const equip=r.equipment_status||[];
   const plan=r.next_day_plan?JSON.parse(r.next_day_plan):[];
@@ -1287,13 +1336,29 @@ async function openDetail(id){
       <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Remarks</div>
       <div style="font-size:14px;line-height:1.7;background:rgba(255,200,0,.04);border:1px solid rgba(255,200,0,.12);border-radius:3px;padding:14px;color:var(--caution);">${r.remarks}</div>`:''}
 
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);">
+      <button onclick="exportWordFromReport(window._currentModalReport)"
+        style="background:rgba(255,200,0,.1);border:1px solid rgba(255,200,0,.3);color:var(--caution);
+        font-family:var(--font-mono);font-size:11px;padding:10px 20px;border-radius:3px;cursor:pointer;letter-spacing:1px;">
+        ⬇ EXPORT WORD
+      </button>
+      ${isOffice?`
+      <button onclick="confirmDeleteModal(window._currentModalReport?.id, window._currentModalReport?.vessel_name, window._currentModalReport?.date)"
+        style="background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.25);color:var(--warn);
+        font-family:var(--font-mono);font-size:11px;padding:10px 20px;border-radius:3px;cursor:pointer;letter-spacing:1px;">
+        🗑 DELETE REPORT
+      </button>`:''}
+    </div>
+
     ${photos.length?`
       <div class="divider"></div>
       <div style="font-family:var(--font-mono);font-size:10px;color:var(--caution);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">📷 Pictures (${photos.length})</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;">
-        ${photos.map(p=>`
-          <div style="border-radius:3px;overflow:hidden;border:1px solid var(--border);aspect-ratio:4/3;position:relative;background:var(--bg);">
+        ${photos.map((p,pi)=>`
+          <div style="border-radius:3px;overflow:hidden;border:1px solid var(--border);aspect-ratio:4/3;position:relative;background:var(--bg);cursor:zoom-in;"
+            onclick="openLightbox(${JSON.stringify(photos)},${pi})">
             <img src="${p.src}" alt="${p.caption}" style="width:100%;height:100%;object-fit:cover;">
+            <div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);border-radius:2px;padding:2px 5px;font-family:var(--font-mono);font-size:9px;color:#fff;">🔍</div>
             ${p.caption?`<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);font-family:var(--font-mono);font-size:9px;color:#fff;padding:4px 6px;">${p.caption}</div>`:''}
           </div>`).join('')}
       </div>`:''}
@@ -1309,8 +1374,185 @@ function mini(label,val,color){
 
 
 // ═══════════════════════════════════════════════════════
+// LIGHTBOX
+// ═══════════════════════════════════════════════════════
+let lightboxPhotos = [];
+let lightboxIndex  = 0;
+
+function openLightbox(photos, index){
+  lightboxPhotos = photos;
+  lightboxIndex  = index;
+  showLightboxImage();
+  document.getElementById('lightbox').classList.add('open');
+  document.addEventListener('keydown', lightboxKeyHandler);
+}
+
+function showLightboxImage(){
+  const p = lightboxPhotos[lightboxIndex];
+  document.getElementById('lightbox-img').src = p.src;
+  document.getElementById('lightbox-caption').textContent =
+    p.caption ? `${p.caption}  (${lightboxIndex+1} / ${lightboxPhotos.length})` : `${lightboxIndex+1} / ${lightboxPhotos.length}`;
+}
+
+function lightboxNav(dir){
+  lightboxIndex = (lightboxIndex + dir + lightboxPhotos.length) % lightboxPhotos.length;
+  showLightboxImage();
+}
+
+function closeLightbox(e){
+  if(e && e.target !== e.currentTarget && !e.target.classList.contains('lightbox-close')) return;
+  document.getElementById('lightbox').classList.remove('open');
+  document.removeEventListener('keydown', lightboxKeyHandler);
+}
+
+function lightboxKeyHandler(e){
+  if(e.key === 'ArrowRight') lightboxNav(1);
+  else if(e.key === 'ArrowLeft') lightboxNav(-1);
+  else if(e.key === 'Escape') closeLightbox({target: document.getElementById('lightbox'), currentTarget: document.getElementById('lightbox')});
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPORT WORD FROM SAVED REPORT (modal)
+// ═══════════════════════════════════════════════════════
+async function exportWordFromReport(r){
+  if(!r){ showToast('No report loaded', true); return; }
+  const equip = r.equipment_status || [];
+  const plan  = r.next_day_plan ? JSON.parse(r.next_day_plan) : [];
+  const photos = r.photos_json ? JSON.parse(r.photos_json) : [];
+
+  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+          BorderStyle, WidthType, ShadingType } = docx;
+
+  const border   = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
+  const borders  = { top: border, bottom: border, left: border, right: border };
+  const cellMargins = { top: 80, bottom: 80, left: 120, right: 120 };
+  const tblWidth = { size: 9026, type: WidthType.DXA };
+
+  function heading(text, color='1a6b4a'){
+    return new Paragraph({ children:[new TextRun({ text, bold:true, size:26, font:'Arial', color })], spacing:{ before:280, after:120 } });
+  }
+  function body(text){
+    return new Paragraph({ children:[new TextRun({ text, size:22, font:'Arial' })], spacing:{ after:80 } });
+  }
+  function labelVal(label, val){
+    return new TableRow({ children:[
+      new TableCell({ borders, width:{size:2500,type:WidthType.DXA}, margins:cellMargins,
+        shading:{fill:'F0F4F8',type:ShadingType.CLEAR},
+        children:[new Paragraph({children:[new TextRun({text:label,bold:true,size:20,font:'Arial',color:'444444'})]})] }),
+      new TableCell({ borders, width:{size:6526,type:WidthType.DXA}, margins:cellMargins,
+        children:[new Paragraph({children:[new TextRun({text:String(val||'—'),size:20,font:'Arial'})]})] })
+    ]});
+  }
+
+  const children = [
+    new Paragraph({ children:[new TextRun({text:'VESSELLOG',font:'Arial',size:56,bold:true,color:'00c896'})], spacing:{after:60} }),
+    new Paragraph({ children:[new TextRun({text:'Daily Operations Report',font:'Arial',size:24,color:'666666'})], spacing:{after:40} }),
+    new Paragraph({ children:[new TextRun({text:`Generated: ${new Date().toLocaleString()}`,font:'Arial',size:18,color:'888888'})], spacing:{after:400} }),
+    heading('VESSEL & SHIFT INFO'),
+    new Table({ width:tblWidth, columnWidths:[2500,6526], rows:[
+      labelVal('Vessel Name', r.vessel_name),
+      labelVal('Report Date', r.date),
+      labelVal('Reported By', r.submitted_by),
+      labelVal('Location / Port', r.location),
+      labelVal('Hours Worked', r.hours_worked ? r.hours_worked+'h' : '—'),
+      labelVal('Completion %', r.completion_pct != null ? r.completion_pct+'%' : '—'),
+    ]}),
+    new Paragraph({ spacing:{before:360,after:120} }),
+    heading('DAILY WORK ACTIVITIES'),
+    ...(r.work_activities||'').split('
+').filter(Boolean).map(l=>body(l)),
+  ];
+
+  if(equip.length){
+    children.push(new Paragraph({spacing:{before:360,after:120}}));
+    children.push(heading('EQUIPMENT / MATERIALS STATUS'));
+    children.push(new Table({ width:tblWidth, columnWidths:[3500,2000,3526],
+      rows:[
+        new TableRow({children:[
+          new TableCell({borders,width:{size:3500,type:WidthType.DXA},margins:cellMargins,shading:{fill:'1a6b4a',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:'Equipment / Material',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] }),
+          new TableCell({borders,width:{size:2000,type:WidthType.DXA},margins:cellMargins,shading:{fill:'1a6b4a',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:'Status',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] }),
+          new TableCell({borders,width:{size:3526,type:WidthType.DXA},margins:cellMargins,shading:{fill:'1a6b4a',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:'Issues / Notes',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] }),
+        ]}),
+        ...equip.map(e=>new TableRow({children:[
+          new TableCell({borders,width:{size:3500,type:WidthType.DXA},margins:cellMargins,children:[new Paragraph({children:[new TextRun({text:e.equipment_name,size:20,font:'Arial'})]})] }),
+          new TableCell({borders,width:{size:2000,type:WidthType.DXA},margins:cellMargins,shading:{fill:e.status==='Faulty'?'fff2ee':e.status==='Operational'?'e8fff8':'fffbee',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:e.status,size:20,font:'Arial',color:e.status==='Faulty'?'cc3300':e.status==='Operational'?'006644':'996600'})]})] }),
+          new TableCell({borders,width:{size:3526,type:WidthType.DXA},margins:cellMargins,children:[new Paragraph({children:[new TextRun({text:e.issues_noted||'—',size:20,font:'Arial',color:'666666'})]})] }),
+        ]}))
+      ]
+    }));
+  }
+
+  if(r.concerns?.trim()){
+    children.push(new Paragraph({spacing:{before:360,after:120}}));
+    children.push(heading('⚠ AREAS OF CONCERN / FINDINGS','cc4400'));
+    r.concerns.split('
+').filter(Boolean).forEach(l=>children.push(body(l)));
+  }
+
+  if(plan.length){
+    children.push(new Paragraph({spacing:{before:360,after:120}}));
+    children.push(heading('JOB PLANNING — NEXT DAY','0055cc'));
+    plan.forEach((p,i)=>children.push(new Paragraph({children:[new TextRun({text:`${i+1}.  ${p}`,size:22,font:'Arial'})],spacing:{after:80}})));
+  }
+
+  if(r.remarks?.trim()){
+    children.push(new Paragraph({spacing:{before:360,after:120}}));
+    children.push(heading('REMARKS'));
+    r.remarks.split('
+').filter(Boolean).forEach(l=>children.push(body(l)));
+  }
+
+  if(photos.length){
+    children.push(new Paragraph({spacing:{before:360,after:120}}));
+    children.push(heading('PICTURES'));
+    children.push(body(`${photos.length} photo(s) attached — visible in the online report.`));
+  }
+
+  const doc = new Document({
+    styles:{default:{document:{run:{font:'Arial',size:22}}}},
+    sections:[{ properties:{page:{size:{width:11906,height:16838},margin:{top:1134,right:1134,bottom:1134,left:1134}}}, children }]
+  });
+
+  const buffer = await Packer.toBuffer(doc);
+  const blob = new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `VesselLog_${(r.vessel_name||'Report').replace(/\s+/g,'_')}_${r.date}.docx`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ Word document downloaded!');
+}
+
+// ═══════════════════════════════════════════════════════
+// DAY / NIGHT TOGGLE
+// ═══════════════════════════════════════════════════════
+function toggleTheme(){
+  const isLight = document.body.classList.toggle('light-mode');
+  document.getElementById('theme-toggle').textContent = isLight ? '🌑' : '🌙';
+  localStorage.setItem('vessellog-theme', isLight ? 'light' : 'dark');
+}
+// Restore theme on load
+(function(){
+  if(localStorage.getItem('vessellog-theme') === 'light'){
+    document.body.classList.add('light-mode');
+    // Button set after DOM ready
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const btn = document.getElementById('theme-toggle');
+      if(btn) btn.textContent = '🌑';
+    });
+  }
+})();
+
+// ═══════════════════════════════════════════════════════
 // DELETE REPORT (office only)
 // ═══════════════════════════════════════════════════════
+function confirmDeleteModal(id, vessel, date){
+  if(!id) return;
+  confirmDelete(id, vessel, date);
+  closeModal();
+}
+
 function confirmDelete(id, vessel, date){
   const confirmed = window.confirm(`DELETE this report?\n\nVessel: ${vessel}\nDate: ${date}\n\nThis cannot be undone.`);
   if(confirmed) deleteReport(id);
