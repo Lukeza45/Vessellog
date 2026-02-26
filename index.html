@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Oldendorff VFD — Daily Operations</title>
+<title>Vessel Report — Daily Operations</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -270,8 +270,23 @@ select option{background:var(--card);}
 ═══════════════════════════════════════ -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo">OLDENDORFF VFD RETROFIT PROJECT</div>
+    <div class="login-logo">VESSEL VFD DAILY REPORTING</div>
     <div class="login-tagline">// Marine Daily Operations System</div>
+
+    <!-- DEMO BANNER -->
+    <div id="demo-banner" style="background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.2);
+      border-radius:3px;padding:14px;margin-bottom:24px;font-family:var(--font-mono);font-size:11px;line-height:2;">
+      <div style="color:var(--accent);font-weight:600;letter-spacing:1px;margin-bottom:6px;">// EVALUATION ACCESS</div>
+      <div style="color:var(--muted);">
+        Demo crew account:<br>
+        <span style="color:var(--text);">Email: </span><span style="color:var(--accent);"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="71120314065f15141c1e31161c10181d5f121e1c">[email&#160;protected]</a></span><br>
+        <span style="color:var(--text);">Password: </span><span style="color:var(--accent);">VesselLog2026</span><br>
+      </div>
+      <div style="color:var(--muted);margin-top:8px;font-size:10px;border-top:1px solid rgba(0,200,150,.15);padding-top:8px;">
+        Or register your own account — select your vessel on registration.<br>
+        @oldendorff.com emails automatically get office dashboard access.
+      </div>
+    </div>
 
     <div class="login-tabs">
       <button class="login-tab active" id="tab-signin" onclick="setAuthMode('signin')">Sign In</button>
@@ -292,6 +307,15 @@ select option{background:var(--card);}
         <label>Your Name</label>
         <input type="text" id="auth-name" placeholder="e.g. Ahmad Razali">
       </div>
+      <div class="field" id="vessel-field" style="display:none;">
+        <label>Your Vessel</label>
+        <select id="auth-vessel">
+          <option value="">— Select your vessel —</option>
+        </select>
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:4px;">
+          You will only be able to submit and view reports for this vessel.
+        </div>
+      </div>
       <div id="remember-wrap" style="display:flex;align-items:center;gap:10px;margin-top:4px;">
         <input type="checkbox" id="remember-me" checked style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;">
         <label for="remember-me" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;cursor:pointer;">Stay logged in</label>
@@ -310,7 +334,7 @@ select option{background:var(--card);}
 <div id="app">
 
   <div class="topbar">
-    <div class="topbar-logo">VESSEL REPORT</div>
+    <div class="topbar-logo">VESSELL DAILY REPORTS</div>
     <div class="topbar-right">
       <div class="topbar-info">
         <div id="user-display" style="color:var(--muted);font-style:italic;">—</div>
@@ -336,7 +360,7 @@ select option{background:var(--card);}
     <div class="pdf-header" id="pdf-header">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
         <div>
-          <div class="pdf-logo">VESSELLOG</div>
+          <div class="pdf-logo">VESSELL DAILY REPORT</div>
           <div class="pdf-doc-title">// Daily Operations Report</div>
         </div>
         <div class="pdf-meta" style="text-align:right;">
@@ -453,8 +477,8 @@ select option{background:var(--card);}
        MY REPORTS
   ══════════════════ -->
   <div class="main" id="tab-history" style="display:none;">
-    <div class="section-title">MY REPORTS</div>
-    <div class="section-sub">// YOUR SUBMITTED DAILY REPORTS — CLICK TO VIEW FULL DETAIL</div>
+    <div class="section-title">MY VESSEL REPORTS</div>
+    <div class="section-sub" id="my-reports-sub">// ALL REPORTS FROM YOUR VESSEL — CLICK TO VIEW FULL DETAIL</div>
     <div id="my-reports-container">
       <div class="loading"><div class="spinner"></div>&nbsp;LOADING...</div>
     </div>
@@ -506,16 +530,35 @@ select option{background:var(--card);}
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ═══════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════
 const SUPABASE_URL     = 'https://amzyfqcxmaorvrhlplms.supabase.co';
 const SUPABASE_ANON_KEY= 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtenlmcWN4bWFvcnZyaGxwbG1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDIwMDIsImV4cCI6MjA4NzY3ODAwMn0.orFPAjE3vnF07i-RDiMQM6ky55tqZ30qEprGAqYWh6Q';
-const OFFICE_EMAILS    = ['luka.majstorovic@oldendorff.com'];
+// Anyone with @oldendorff.com email = office access
+// Everyone else = crew access
+function checkIsOffice(email){ return email?.toLowerCase().endsWith('@oldendorff.com'); }
+
+// ═══════════════════════════════════════════════════════
+// VESSEL LIST — add/remove your vessels here
+// ═══════════════════════════════════════════════════════
+const VESSELS = [
+  'Eva Oldendorff',
+  'Hugo #Oldendorff',
+  'Other'
+];
 
 const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    storageKey: 'vessellog-auth',
+    storage: window.localStorage,
+    autoRefreshToken: true,
+    detectSessionInUrl: false
+  }
+});
 
 // ═══════════════════════════════════════════════════════
 // STATE
@@ -535,10 +578,20 @@ function setAuthMode(mode){
   authMode = mode;
   document.getElementById('tab-signin').classList.toggle('active', mode==='signin');
   document.getElementById('tab-register').classList.toggle('active', mode==='register');
-  document.getElementById('name-field').style.display = mode==='register' ? 'flex' : 'none';
-  document.getElementById('remember-wrap').style.display = mode==='register' ? 'none' : 'flex';
-  document.getElementById('auth-btn').textContent = mode==='signin' ? 'SIGN IN' : 'CREATE ACCOUNT';
+  const isReg = mode==='register';
+  document.getElementById('name-field').style.display   = isReg ? 'flex' : 'none';
+  document.getElementById('vessel-field').style.display = isReg ? 'flex' : 'none';
+  document.getElementById('remember-wrap').style.display= isReg ? 'none' : 'flex';
+  document.getElementById('auth-btn').textContent = isReg ? 'CREATE ACCOUNT' : 'SIGN IN';
   document.getElementById('auth-msg').textContent = '';
+
+  // Populate vessel dropdown on first open
+  if(isReg){
+    const sel = document.getElementById('auth-vessel');
+    if(sel.options.length <= 1){
+      VESSELS.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); });
+    }
+  }
 }
 
 async function doAuth(){
@@ -550,13 +603,24 @@ async function doAuth(){
 
   if(!email || !pwd){ msg.textContent='Please enter email and password.'; return; }
   if(authMode==='register' && !name){ msg.textContent='Please enter your name.'; return; }
+  if(authMode==='register' && !checkIsOffice(email)){
+    const vessel = document.getElementById('auth-vessel').value;
+    if(!vessel){ msg.textContent='Please select your vessel.'; return; }
+  }
 
   btn.textContent = authMode==='signin' ? 'SIGNING IN...' : 'CREATING...';
   btn.disabled = true; msg.textContent = '';
 
   let result;
   if(authMode==='register'){
-    result = await sb.auth.signUp({ email, password:pwd, options:{ data:{ full_name:name } } });
+    const vessel = document.getElementById('auth-vessel').value;
+    result = await sb.auth.signUp({
+      email, password:pwd,
+      options:{ data:{
+        full_name: name,
+        vessel: checkIsOffice(email) ? null : vessel
+      }}
+    });
     if(!result.error){
       msg.style.color='var(--accent)';
       msg.textContent='Account created! Please check your email to confirm, then sign in.';
@@ -566,9 +630,9 @@ async function doAuth(){
   } else {
     const remember = document.getElementById('remember-me')?.checked !== false;
     result = await sb.auth.signInWithPassword({ email, password:pwd });
-    // If not remember me — sign out when browser closes (session storage only)
-    if(!remember && !result.error){
-      await sb.auth.updateSession({ access_token: result.data.session.access_token, refresh_token: '' });
+    if(!result.error && !remember){
+      // If not remember me - clear localStorage on tab close
+      window.addEventListener('beforeunload', ()=> sb.auth.signOut(), { once:true });
     }
   }
 
@@ -583,29 +647,53 @@ async function doAuth(){
 async function signOut(){
   if(realtimeSub) sb.removeChannel(realtimeSub);
   await sb.auth.signOut();
+  currentUser = null;
+  appInitialized = false;
+  uploadedPhotos = [];
+  planCount = 0;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('auth-email').value = '';
+  document.getElementById('auth-pwd').value = '';
+  document.getElementById('auth-msg').textContent = '';
+  // Reset office tabs back to hidden for next login
+  document.querySelectorAll('.office-only').forEach(el=>el.style.display='none');
+  setAuthMode('signin');
 }
 
 // Auth state listener
 sb.auth.onAuthStateChange((event, session) => {
-  if(session?.user){
+  if(event === 'SIGNED_IN' && session?.user){
     currentUser = session.user;
-    isOffice = OFFICE_EMAILS.includes(currentUser.email);
+    isOffice = checkIsOffice(currentUser.email);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
     initApp();
-  } else {
+  } else if(event === 'SIGNED_OUT'){
     currentUser = null;
-    document.getElementById('login-screen').style.display='flex';
-    document.getElementById('app').style.display='none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+  } else if(event === 'INITIAL_SESSION' && session?.user){
+    currentUser = session.user;
+    isOffice = checkIsOffice(currentUser.email);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initApp();
+  } else if(event === 'INITIAL_SESSION' && !session){
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
   }
 });
 
 // ═══════════════════════════════════════════════════════
 // INIT APP
 // ═══════════════════════════════════════════════════════
-function initApp(){
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('app').style.display='block';
+let appInitialized = false;
 
-  // Set user display from metadata name or email
+function initApp(){
+  if(appInitialized) return;
+  appInitialized = true;
+  // Set user display
   const name = currentUser.user_metadata?.full_name || currentUser.email;
   document.getElementById('user-display').textContent = name;
   document.getElementById('user-display').style.color='';
@@ -616,6 +704,27 @@ function initApp(){
   if(!nameField.value && currentUser.user_metadata?.full_name){
     nameField.value = currentUser.user_metadata.full_name;
     updateReportedBy(nameField.value);
+  }
+
+  // Handle vessel field — crew get locked to their vessel
+  const userVessel = currentUser.user_metadata?.vessel;
+  const vesselField = document.getElementById('f-vessel');
+
+  if(!isOffice && userVessel){
+    // Replace text input with locked display for crew
+    vesselField.value = userVessel;
+    vesselField.readOnly = true;
+    vesselField.style.cssText += ';background:var(--surface);color:var(--accent);cursor:not-allowed;border-color:rgba(0,200,150,.3);';
+    vesselField.title = 'Vessel is assigned to your account';
+  } else if(isOffice){
+    // Office gets dropdown of all vessels
+    const wrap = vesselField.parentNode;
+    const sel = document.createElement('select');
+    sel.id = 'f-vessel';
+    sel.innerHTML = '<option value="">— Select vessel —</option>' +
+      VESSELS.map(v=>`<option value="${v}">${v}</option>`).join('');
+    sel.style.cssText = vesselField.style.cssText;
+    wrap.replaceChild(sel, vesselField);
   }
 
   // Office tabs
@@ -634,10 +743,11 @@ function initApp(){
   if(document.querySelectorAll('#plan-list .plan-row').length===0) addPlan();
   autoCalcPct();
 
-  // Real-time for office
+  // Real-time for office — unique channel per session to support concurrent users
   if(isOffice){
-    realtimeSub = sb.channel('reports-live')
-      .on('postgres_changes',{event:'*',schema:'public',table:'daily_reports'},()=>{
+    const channelName = 'reports-live-' + currentUser.id.slice(0,8);
+    realtimeSub = sb.channel(channelName)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'daily_reports'},()=>{
         const dash = document.getElementById('tab-dashboard');
         const all  = document.getElementById('tab-all-reports');
         if(dash.style.display!=='none') loadDashboard();
@@ -881,12 +991,19 @@ function exportPDF(){
 async function loadMyReports(){
   const el=document.getElementById('my-reports-container');
   el.innerHTML='<div class="loading"><div class="spinner"></div>&nbsp;LOADING...</div>';
-  const {data,error}=await sb.from('daily_reports')
-    .select('*,equipment_status(*)')
-    .eq('user_id',currentUser.id)
-    .order('date',{ascending:false}).limit(60);
+
+  let q = sb.from('daily_reports').select('*,equipment_status(*)').order('date',{ascending:false}).limit(100);
+
+  if(!isOffice){
+    // Crew sees all reports from their vessel only
+    const userVessel = currentUser.user_metadata?.vessel;
+    if(userVessel) q = q.eq('vessel_name', userVessel);
+    else q = q.eq('user_id', currentUser.id); // fallback — own reports only
+  }
+
+  const {data,error}=await q;
   if(error||!data?.length){
-    el.innerHTML='<div class="empty-state">📋<br>No reports submitted yet.<br>Submit your first report above.</div>'; return;
+    el.innerHTML='<div class="empty-state">📋<br>No reports found for your vessel.<br>Submit the first report above.</div>'; return;
   }
   el.innerHTML='<div class="report-list">'+data.map((r,i)=>reportCard(r,i*50)).join('')+'</div>';
 }
@@ -1049,9 +1166,30 @@ function mini(label,val,color){
   </div>`;
 }
 
+
 function closeModal(){ document.getElementById('detail-modal').classList.remove('open'); }
 document.getElementById('detail-modal').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeModal(); });
+
+// ═══════════════════════════════════════════════════════
+// CLEAR FORM — also restores vessel lock after clear
+// ═══════════════════════════════════════════════════════
+function clearForm(){
+  ['f-location','f-hours','f-activities','f-concerns','f-remarks'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  // Restore vessel for crew (locked field stays, just clear others)
+  const vesselEl = document.getElementById('f-vessel');
+  if(vesselEl && !vesselEl.readOnly && vesselEl.tagName==='INPUT') vesselEl.value='';
+
+  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('equip-list').innerHTML='';
+  document.getElementById('plan-list').innerHTML=''; planCount=0;
+  uploadedPhotos=[]; renderPhotos();
+  addEquip(); addPlan(); autoCalcPct();
+}
+
 </script>
 </body>
 </html>
+
 
