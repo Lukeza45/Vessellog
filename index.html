@@ -187,7 +187,7 @@ select option{background:var(--card);}
   align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:4px;
-  max-width:720px;width:100%;max-height:90vh;overflow-y:auto;padding:36px;
+  max-width:980px;width:100%;max-height:92vh;overflow-y:auto;padding:40px;
   position:relative;animation:modalIn .25s ease;}
 @keyframes modalIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 .modal-close{position:absolute;top:16px;right:16px;background:none;border:1px solid var(--border);
@@ -463,7 +463,7 @@ select option{background:var(--card);}
       <div class="card-title orange">⚠ Areas of Concern / Findings</div>
       <div class="field">
         <label>Findings, Concerns & Actions Required</label>
-        <textarea id="f-concerns" rows="4" placeholder="Describe findings, safety concerns, defects, or issues. Include recommended actions..."></textarea>
+        <textarea id="f-concerns" rows="9" placeholder="Describe findings, safety concerns, defects, or issues. Include recommended actions..."></textarea>
       </div>
     </div>
 
@@ -545,7 +545,9 @@ select option{background:var(--card);}
     <div class="section-sub">// FULL HISTORICAL LOG — FILTER & SEARCH</div>
     <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;align-items:center;" class="pdf-hide">
       <input type="date" id="filter-date" style="max-width:180px;" oninput="loadAllReports()">
-      <input type="text" id="filter-vessel" placeholder="Filter by vessel..." style="max-width:220px;" oninput="loadAllReports()">
+      <select id="filter-vessel" style="max-width:220px;" onchange="loadAllReports()">
+        <option value="">All vessels</option>
+      </select>
       <button class="btn btn-secondary btn-sm" onclick="clearFilters()">CLEAR</button>
       <span id="filter-count" style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-left:auto;"></span>
     </div>
@@ -773,6 +775,12 @@ function initApp(){
     switchTab('dashboard');
   }
 
+  // Populate All Reports vessel filter dropdown
+  const fv = document.getElementById('filter-vessel');
+  if(fv && fv.options.length <= 1){
+    VESSELS.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; fv.appendChild(o); });
+  }
+
   // Date
   document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
 
@@ -995,26 +1003,45 @@ async function submitReport(){
     await sb.from('equipment_status').insert(equip.map(e=>({...e,report_id:report.id})));
   }
 
-  // ── Email notification via Supabase Edge Function → Resend ──
+  // ── Email notification via Resend API ──
   try {
-    await fetch(`https://amzyfqcxmaorvrhlplms.supabase.co/functions/v1/notify-office`, {
+    const _concerns = document.getElementById('f-concerns').value.trim();
+    const _location = document.getElementById('f-location').value.trim()||'—';
+    const _hours    = document.getElementById('f-hours').value||'—';
+    await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtenlmcWN4bWFvcnZyaGxwbG1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDIwMDIsImV4cCI6MjA4NzY3ODAwMn0.orFPAjE3vnF07i-RDiMQM6ky55tqZ30qEprGAqYWh6Q`
+        'Authorization': 'Bearer re_JrxetuGi_3JUmzt24r5Qi1Hdmohu6Vc8R'
       },
-      body: JSON.stringify({ record: {
-        id: report.id,
-        vessel_name: vessel,
-        submitted_by: reporter,
-        date: date,
-        location: document.getElementById('f-location').value.trim()||'—',
-        hours_worked: document.getElementById('f-hours').value||'—',
-        completion_pct: pct,
-        concerns: document.getElementById('f-concerns').value.trim()||null
-      }})
+      body: JSON.stringify({
+        from: 'VesselLog <onboarding@resend.dev>',
+        to: 'dlakavitaban@gmail.com',
+        subject: `📋 New Report: ${vessel} — ${date}`,
+        html: `
+          <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+            <div style="background:#0a0e14;padding:20px 28px;border-bottom:3px solid #00c896;">
+              <span style="font-size:28px;font-weight:900;color:#00c896;letter-spacing:3px;">VESSELLOG</span>
+            </div>
+            <div style="padding:28px;background:#f8fafc;border:1px solid #e0e8f0;">
+              <h2 style="margin:0 0 20px;color:#1a2230;">New Daily Report Submitted</h2>
+              <table style="width:100%;border-collapse:collapse;">
+                <tr><td style="padding:8px 12px;background:#eef2f8;font-weight:bold;width:35%;border:1px solid #d0dae8;">Vessel</td><td style="padding:8px 12px;border:1px solid #d0dae8;">${vessel}</td></tr>
+                <tr><td style="padding:8px 12px;background:#eef2f8;font-weight:bold;border:1px solid #d0dae8;">Date</td><td style="padding:8px 12px;border:1px solid #d0dae8;">${date}</td></tr>
+                <tr><td style="padding:8px 12px;background:#eef2f8;font-weight:bold;border:1px solid #d0dae8;">Reported By</td><td style="padding:8px 12px;border:1px solid #d0dae8;">${reporter}</td></tr>
+                <tr><td style="padding:8px 12px;background:#eef2f8;font-weight:bold;border:1px solid #d0dae8;">Location</td><td style="padding:8px 12px;border:1px solid #d0dae8;">${_location}</td></tr>
+                <tr><td style="padding:8px 12px;background:#eef2f8;font-weight:bold;border:1px solid #d0dae8;">Hours</td><td style="padding:8px 12px;border:1px solid #d0dae8;">${_hours}h</td></tr>
+                <tr><td style="padding:8px 12px;background:#eef2f8;font-weight:bold;border:1px solid #d0dae8;">Completion</td><td style="padding:8px 12px;border:1px solid #d0dae8;">${pct !== null ? pct+'%' : '—'}</td></tr>
+                ${_concerns ? `<tr><td style="padding:8px 12px;background:#fff2ee;font-weight:bold;color:#cc3300;border:1px solid #ffaa88;">⚠ Concerns</td><td style="padding:8px 12px;background:#fff8f6;color:#cc3300;border:1px solid #ffaa88;">${_concerns}</td></tr>` : ''}
+              </table>
+              <div style="margin-top:24px;text-align:center;">
+                <a href="https://vessellog.vercel.app" style="background:#00c896;color:#000;padding:12px 28px;border-radius:3px;text-decoration:none;font-weight:bold;font-family:monospace;letter-spacing:1px;">VIEW IN VESSELLOG →</a>
+              </div>
+            </div>
+          </div>`
+      })
     });
-  } catch(e){ /* silent — email failure should not block submission */ }
+  } catch(e){ /* silent — email failure does not block report submission */ }
 
   showToast('✓ Report submitted successfully.');
   btn.textContent='SUBMIT REPORT →'; btn.disabled=false;
@@ -1030,8 +1057,8 @@ async function submitReport(){
 // PDF EXPORT
 // ═══════════════════════════════════════════════════════
 async function exportWord(){
-  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-          HeadingLevel, AlignmentType, BorderStyle, WidthType, ShadingType, PageBreak } = window.docx;
+  const _docx = window.docx || docx;
+  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, AlignmentType, BorderStyle, WidthType, ShadingType, PageBreak } = _docx;
 
   const vessel   = document.getElementById('f-vessel').value || '—';
   const date     = document.getElementById('f-date').value || '—';
@@ -1201,6 +1228,14 @@ async function loadMyReports(){
 // ═══════════════════════════════════════════════════════
 // LOAD DASHBOARD
 // ═══════════════════════════════════════════════════════
+function getVesselClass(name){
+  if(!name) return 'Other';
+  const words = name.trim().split(/\s+/);
+  const map = {E:'E-Class',H:'H-Class',M:'M-Class',P:'P-Class',G:'G-Class'};
+  for(const w of words){ const c=map[w[0]?.toUpperCase()]; if(c) return c; }
+  return 'Other';
+}
+
 async function loadDashboard(){
   const today=new Date().toISOString().split('T')[0];
   const {data}=await sb.from('daily_reports').select('*,equipment_status(*)').eq('date',today).order('created_at',{ascending:false});
@@ -1213,7 +1248,26 @@ async function loadDashboard(){
 
   const el=document.getElementById('dashboard-container');
   if(!d.length){ el.innerHTML='<div class="empty-state">📡<br>No reports submitted today yet.</div>'; return; }
-  el.innerHTML='<div class="report-list">'+d.map((r,i)=>reportCard(r,i*50)).join('')+'</div>';
+
+  const classColors={'E-Class':'#00c896','H-Class':'#0088ff','M-Class':'#ffc800','P-Class':'#ff6b35','G-Class':'#a78bfa','Other':'#6a7a90'};
+  const classOrder=['E-Class','H-Class','M-Class','P-Class','G-Class','Other'];
+  const groups={};
+  d.forEach(r=>{ const c=getVesselClass(r.vessel_name); if(!groups[c]) groups[c]=[]; groups[c].push(r); });
+
+  let html='';
+  classOrder.forEach(cls=>{
+    if(!groups[cls]) return;
+    const col=classColors[cls];
+    html+=`<div style="margin-bottom:32px;">
+      <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:3px;
+        color:${col};padding:10px 16px;background:rgba(0,0,0,.15);border-left:3px solid ${col};
+        border-radius:0 3px 3px 0;margin-bottom:14px;">
+        // ${cls} &nbsp;<span style="color:var(--muted);font-weight:400;">${groups[cls].length} report${groups[cls].length!==1?'s':''}</span>
+      </div>
+      <div class="report-list">${groups[cls].map((r,i)=>reportCard(r,i*40)).join('')}</div>
+    </div>`;
+  });
+  el.innerHTML=html;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1224,9 +1278,9 @@ async function loadAllReports(){
   el.innerHTML='<div class="loading"><div class="spinner"></div>&nbsp;LOADING...</div>';
   let q=sb.from('daily_reports').select('*,equipment_status(*)').order('date',{ascending:false}).limit(200);
   const df=document.getElementById('filter-date')?.value;
-  const vf=document.getElementById('filter-vessel')?.value.trim();
+  const vf=document.getElementById('filter-vessel')?.value;
   if(df) q=q.eq('date',df);
-  if(vf) q=q.ilike('vessel_name','%'+vf+'%');
+  if(vf) q=q.eq('vessel_name',vf);
   const {data}=await q;
   const d=data||[];
   if(!d.length){ el.innerHTML='<div class="empty-state">📂<br>No reports found.</div>'; return; }
@@ -1430,8 +1484,8 @@ async function exportWordFromReport(r){
   const plan  = r.next_day_plan ? JSON.parse(r.next_day_plan) : [];
   const photos = r.photos_json ? JSON.parse(r.photos_json) : [];
 
-  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-          BorderStyle, WidthType, ShadingType } = window.docx;
+  const _docx = window.docx || docx;
+  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, BorderStyle, WidthType, ShadingType } = _docx;
 
   const border   = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
   const borders  = { top: border, bottom: border, left: border, right: border };
