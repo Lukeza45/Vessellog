@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VesselLog — Daily Operations</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -467,7 +468,7 @@ select option{background:var(--card);}
 
     <div class="tab-actions" style="display:flex;justify-content:flex-end;gap:12px;margin-top:8px;flex-wrap:wrap;">
       <button class="btn btn-secondary pdf-hide" onclick="clearForm()">CLEAR</button>
-      <button class="btn btn-pdf" onclick="exportPDF()">⬇ EXPORT PDF</button>
+      <button class="btn btn-pdf" onclick="exportWord()">⬇ EXPORT WORD</button>
       <button class="btn btn-primary" id="submit-btn" onclick="submitReport()">SUBMIT REPORT →</button>
     </div>
   </div>
@@ -650,18 +651,8 @@ async function doAuth(){
 async function signOut(){
   if(realtimeSub) sb.removeChannel(realtimeSub);
   await sb.auth.signOut();
-  currentUser = null;
-  appInitialized = false;
-  uploadedPhotos = [];
-  planCount = 0;
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('auth-email').value = '';
-  document.getElementById('auth-pwd').value = '';
-  document.getElementById('auth-msg').textContent = '';
-  // Reset office tabs back to hidden for next login
-  document.querySelectorAll('.office-only').forEach(el=>el.style.display='none');
-  setAuthMode('signin');
+  // Full page reload guarantees clean state — no stale flags or DOM
+  window.location.reload();
 }
 
 // Auth state listener
@@ -982,12 +973,150 @@ async function submitReport(){
 // ═══════════════════════════════════════════════════════
 // PDF EXPORT
 // ═══════════════════════════════════════════════════════
-function exportPDF(){
-  document.getElementById('pdf-gen-time').textContent=new Date().toLocaleString();
-  document.getElementById('pdf-reporter').textContent=document.getElementById('f-submitter').value||'—';
-  document.getElementById('pdf-header').style.display='block';
-  window.print();
-  setTimeout(()=>document.getElementById('pdf-header').style.display='none',1000);
+async function exportWord(){
+  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+          HeadingLevel, AlignmentType, BorderStyle, WidthType, ShadingType, PageBreak } = docx;
+
+  const vessel   = document.getElementById('f-vessel').value || '—';
+  const date     = document.getElementById('f-date').value || '—';
+  const reporter = document.getElementById('f-submitter').value || '—';
+  const location = document.getElementById('f-location').value || '—';
+  const hours    = document.getElementById('f-hours').value || '—';
+  const acts     = document.getElementById('f-activities').value || '';
+  const concerns = document.getElementById('f-concerns').value || '';
+  const remarks  = document.getElementById('f-remarks').value || '';
+  const pct      = document.getElementById('pct-live').textContent || '—';
+  const equip    = getEquipData();
+  const plan     = getPlanData();
+
+  const border   = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
+  const borders  = { top: border, bottom: border, left: border, right: border };
+  const cellMargins = { top: 80, bottom: 80, left: 120, right: 120 };
+  const tblWidth = { size: 9026, type: WidthType.DXA };
+
+  function heading(text, level='section'){
+    return new Paragraph({
+      children: [new TextRun({ text, bold: true, size: level==='main'?36:26, font:'Arial',
+        color: level==='main'?'1a6b4a': level==='warn'?'cc4400': level==='blue'?'0055cc':'1a2230' })],
+      spacing: { before: level==='main'?0:280, after: 120 }
+    });
+  }
+  function body(text){
+    return new Paragraph({ children: [new TextRun({ text, size: 22, font:'Arial' })],
+      spacing: { after: 80 } });
+  }
+  function labelVal(label, val){
+    return new TableRow({ children: [
+      new TableCell({ borders, width:{ size:2500, type:WidthType.DXA }, margins: cellMargins,
+        shading:{ fill:'F0F4F8', type:ShadingType.CLEAR },
+        children:[new Paragraph({ children:[new TextRun({ text:label, bold:true, size:20, font:'Arial', color:'444444' })] })] }),
+      new TableCell({ borders, width:{ size:6526, type:WidthType.DXA }, margins: cellMargins,
+        children:[new Paragraph({ children:[new TextRun({ text:String(val), size:20, font:'Arial' })] })] })
+    ]});
+  }
+
+  const children = [
+    // Title
+    new Paragraph({ children:[new TextRun({ text:'VESSELLOG', font:'Arial', size:56, bold:true, color:'00c896' })], spacing:{ after:60 } }),
+    new Paragraph({ children:[new TextRun({ text:'Daily Operations Report', font:'Arial', size:24, color:'666666' })], spacing:{ after:40 } }),
+    new Paragraph({ children:[new TextRun({ text:`Generated: ${new Date().toLocaleString()}`, font:'Arial', size:18, color:'888888' })], spacing:{ after:400 } }),
+
+    // Vessel & Shift Info
+    heading('VESSEL & SHIFT INFO', 'main'),
+    new Table({ width: tblWidth, columnWidths:[2500,6526], rows:[
+      labelVal('Vessel Name', vessel),
+      labelVal('Report Date', date),
+      labelVal('Reported By', reporter),
+      labelVal('Location / Port', location),
+      labelVal('Hours Worked', hours + (hours!=='—'?'h':'')),
+      labelVal('Completion %', pct),
+    ]}),
+
+    // Work Activities
+    new Paragraph({ spacing:{ before:360, after:120 } }),
+    heading('DAILY WORK ACTIVITIES', 'main'),
+    ...acts.split('\n').filter(Boolean).map(line => body(line)),
+    ...(acts?[]:[body('—')]),
+  ];
+
+  // Equipment
+  if(equip.length){
+    children.push(new Paragraph({ spacing:{ before:360, after:120 } }));
+    children.push(heading('EQUIPMENT / MATERIALS STATUS', 'main'));
+    children.push(new Table({ width: tblWidth, columnWidths:[3500,2000,3526],
+      rows:[
+        new TableRow({ children:[
+          new TableCell({ borders, width:{size:3500,type:WidthType.DXA}, margins:cellMargins,
+            shading:{fill:'1a6b4a',type:ShadingType.CLEAR},
+            children:[new Paragraph({children:[new TextRun({text:'Equipment / Material',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] }),
+          new TableCell({ borders, width:{size:2000,type:WidthType.DXA}, margins:cellMargins,
+            shading:{fill:'1a6b4a',type:ShadingType.CLEAR},
+            children:[new Paragraph({children:[new TextRun({text:'Status',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] }),
+          new TableCell({ borders, width:{size:3526,type:WidthType.DXA}, margins:cellMargins,
+            shading:{fill:'1a6b4a',type:ShadingType.CLEAR},
+            children:[new Paragraph({children:[new TextRun({text:'Issues / Notes',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] }),
+        ]}),
+        ...equip.map(e => new TableRow({ children:[
+          new TableCell({ borders, width:{size:3500,type:WidthType.DXA}, margins:cellMargins,
+            children:[new Paragraph({children:[new TextRun({text:e.equipment_name,size:20,font:'Arial'})]})] }),
+          new TableCell({ borders, width:{size:2000,type:WidthType.DXA}, margins:cellMargins,
+            shading:{fill: e.status==='Faulty'?'fff2ee': e.status==='Operational'?'e8fff8':'fffbee', type:ShadingType.CLEAR},
+            children:[new Paragraph({children:[new TextRun({text:e.status,size:20,font:'Arial',
+              color: e.status==='Faulty'?'cc3300': e.status==='Operational'?'006644':'996600'})]})] }),
+          new TableCell({ borders, width:{size:3526,type:WidthType.DXA}, margins:cellMargins,
+            children:[new Paragraph({children:[new TextRun({text:e.issues_noted||'—',size:20,font:'Arial',color:'666666'})]})] }),
+        ]}))
+      ]
+    }));
+  }
+
+  // Concerns
+  if(concerns.trim()){
+    children.push(new Paragraph({ spacing:{ before:360, after:120 } }));
+    children.push(heading('⚠ AREAS OF CONCERN / FINDINGS', 'warn'));
+    concerns.split('\n').filter(Boolean).forEach(line => children.push(body(line)));
+  }
+
+  // Next Day Plan
+  if(plan.length){
+    children.push(new Paragraph({ spacing:{ before:360, after:120 } }));
+    children.push(heading('JOB PLANNING — NEXT DAY', 'blue'));
+    plan.forEach((p,i) => children.push(
+      new Paragraph({ children:[new TextRun({text:`${i+1}.  ${p}`, size:22, font:'Arial'})], spacing:{after:80} })
+    ));
+  }
+
+  // Remarks
+  if(remarks.trim()){
+    children.push(new Paragraph({ spacing:{ before:360, after:120 } }));
+    children.push(heading('REMARKS', 'main'));
+    remarks.split('\n').filter(Boolean).forEach(line => children.push(body(line)));
+  }
+
+  // Photos note
+  if(uploadedPhotos.length){
+    children.push(new Paragraph({ spacing:{ before:360, after:120 } }));
+    children.push(heading('PICTURES', 'main'));
+    children.push(body(`${uploadedPhotos.length} photo(s) attached. Photos are stored in the system and visible in the online report.`));
+  }
+
+  const doc = new Document({
+    styles:{ default:{ document:{ run:{ font:'Arial', size:22 } } } },
+    sections:[{
+      properties:{ page:{ size:{ width:11906, height:16838 }, margin:{ top:1134, right:1134, bottom:1134, left:1134 } } },
+      children
+    }]
+  });
+
+  const buffer = await Packer.toBuffer(doc);
+  const blob = new Blob([buffer], { type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `VesselLog_${vessel.replace(/\s+/g,'_')}_${date}.docx`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ Word document downloaded!');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1083,6 +1212,13 @@ function reportCard(r,delay){
         <div class="progress-wrap" style="margin-bottom:10px;"><div class="progress-fill" style="width:${r.completion_pct}%"></div></div>`:''}
       <div style="font-size:14px;color:var(--muted);line-height:1.6;">${(r.work_activities||'').slice(0,140)}${(r.work_activities||'').length>140?'…':''}</div>
       ${equip.length?`<div class="equip-tags">${equip.map(e=>`<span class="equip-tag${e.status==='Faulty'?' fault':''}">${e.equipment_name} · ${e.status}</span>`).join('')}</div>`:''}
+      ${isOffice?`<div style="display:flex;justify-content:flex-end;margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">
+        <button onclick="event.stopPropagation();confirmDelete('${r.id}','${r.vessel_name}','${r.date}')"
+          style="background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);color:var(--warn);
+          font-family:var(--font-mono);font-size:11px;padding:6px 14px;border-radius:3px;cursor:pointer;letter-spacing:1px;">
+          🗑 DELETE
+        </button>
+      </div>`:''}
     </div>`;
 }
 
@@ -1171,6 +1307,27 @@ function mini(label,val,color){
   </div>`;
 }
 
+
+// ═══════════════════════════════════════════════════════
+// DELETE REPORT (office only)
+// ═══════════════════════════════════════════════════════
+function confirmDelete(id, vessel, date){
+  const confirmed = window.confirm(`DELETE this report?\n\nVessel: ${vessel}\nDate: ${date}\n\nThis cannot be undone.`);
+  if(confirmed) deleteReport(id);
+}
+
+async function deleteReport(id){
+  // Delete equipment first (cascade should handle it, but explicit is safer)
+  await sb.from('equipment_status').delete().eq('report_id', id);
+  const { error } = await sb.from('daily_reports').delete().eq('id', id);
+  if(error){ showToast('Delete failed: ' + error.message, true); return; }
+  showToast('✓ Report deleted.');
+  // Refresh whichever tab is active
+  const activeTab = document.querySelector('.nav-tab.active')?.dataset?.tab;
+  if(activeTab === 'all-reports') loadAllReports();
+  else if(activeTab === 'dashboard') loadDashboard();
+  else if(activeTab === 'history') loadMyReports();
+}
 
 function closeModal(){ document.getElementById('detail-modal').classList.remove('open'); }
 document.getElementById('detail-modal').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeModal(); });
