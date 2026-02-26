@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VesselLog — Daily Operations</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js" crossorigin="anonymous"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1012,7 +1012,7 @@ async function submitReport(){
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer re_JrxetuGi_3JUmzt24r5Qi1Hdmohu6Vc8R'
+        'Authorization': 'Bearer YOUR_RESEND_API_KEY'
       },
       body: JSON.stringify({
         from: 'VesselLog <onboarding@resend.dev>',
@@ -1193,8 +1193,7 @@ async function exportWord(){
   });
 
   try {
-    const buffer = await Packer.toBuffer(doc);
-    const blob = new Blob([buffer], { type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    const blob = await Packer.toBlob(doc);
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -1490,7 +1489,8 @@ async function exportWordFromReport(r){
   const plan  = r.next_day_plan ? JSON.parse(r.next_day_plan) : [];
   const photos = r.photos_json ? JSON.parse(r.photos_json) : [];
 
-  const _docx = window.docx || docx;
+  const _docx = window.docx || (typeof docx !== 'undefined' ? docx : null);
+  if(!_docx){ showToast('Word library not loaded. Please refresh the page and try again.', true); return; }
   const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, BorderStyle, WidthType, ShadingType } = _docx;
 
   const border   = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
@@ -1580,15 +1580,19 @@ async function exportWordFromReport(r){
     sections:[{ properties:{page:{size:{width:11906,height:16838},margin:{top:1134,right:1134,bottom:1134,left:1134}}}, children }]
   });
 
-  const buffer = await Packer.toBuffer(doc);
-  const blob = new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `VesselLog_${(r.vessel_name||'Report').replace(/\s+/g,'_')}_${r.date}.docx`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('✓ Word document downloaded!');
+  try {
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `VesselLog_${(r.vessel_name||'Report').replace(/\s+/g,'_')}_${r.date}.docx`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('✓ Word document downloaded!');
+  } catch(err){
+    showToast('Export failed: ' + err.message, true);
+    console.error('Word export error:', err);
+  }
 }
 
 // ═══════════════════════════════════════════════════════
