@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vessel Report — Daily Operations</title>
+<title>VesselLog — Daily Operations</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -110,7 +110,7 @@ select option{background:var(--card);}
 .photo-drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;}
 .drop-icon{font-size:36px;margin-bottom:12px;opacity:.5;}
 .drop-text{font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:1px;line-height:2;}
-.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:16px;}
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:16px;}
 .photo-item{position:relative;border-radius:3px;overflow:hidden;aspect-ratio:4/3;
   border:1px solid var(--border);background:var(--bg);}
 .photo-item img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -236,6 +236,7 @@ select option{background:var(--card);}
   .card-title::after{background:#d0d8e8!important;}
   label{color:#555!important;font-size:8.5pt;}
   input,textarea,select{background:#f8f9fc!important;border:1px solid #d0d8e8!important;color:#1a1a2e!important;font-size:10.5pt;padding:7px 10px;}
+  textarea{min-height:unset!important;height:auto!important;overflow:visible!important;}
   .form-grid.three{grid-template-columns:1fr 1fr 1fr;}
   .form-grid{grid-template-columns:1fr 1fr;}
   .equip-row{background:#f8f9fc!important;border:1px solid #d0d8e8!important;}
@@ -249,9 +250,9 @@ select option{background:var(--card);}
   .badge-pending{background:#fffbee!important;color:#996600!important;}
   .badge-preparing{background:#eef5ff!important;color:#003399!important;}
   .badge-testing{background:#e8fff8!important;color:#006644!important;}
-  .photo-grid{grid-template-columns:repeat(3,1fr);gap:10px;}
+  .photo-grid{grid-template-columns:repeat(2,1fr);gap:14px;}
   .photo-item{break-inside:avoid;border:1px solid #d0d8e8!important;}
-  .photo-item img{max-height:180px;object-fit:cover;}
+  .photo-item img{max-height:280px;object-fit:cover;}
   .photo-caption{background:rgba(0,0,0,.5)!important;}
   .pdf-header{display:block!important;border-bottom:3px solid #1a1a2e;padding-bottom:16px;margin-bottom:24px;}
   .pdf-logo{font-family:'Bebas Neue',sans-serif;font-size:30pt;color:#1a1a2e!important;letter-spacing:3px;}
@@ -270,7 +271,7 @@ select option{background:var(--card);}
 ═══════════════════════════════════════ -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo">VESSEL VFD DAILY REPORTING</div>
+    <div class="login-logo">VESSELLOG</div>
     <div class="login-tagline">// Marine Daily Operations System</div>
 
     <!-- DEMO BANNER -->
@@ -279,12 +280,11 @@ select option{background:var(--card);}
       <div style="color:var(--accent);font-weight:600;letter-spacing:1px;margin-bottom:6px;">// EVALUATION ACCESS</div>
       <div style="color:var(--muted);">
         Demo crew account:<br>
-        <span style="color:var(--text);">Email: </span><span style="color:var(--accent);"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="71120314065f15141c1e31161c10181d5f121e1c">[email&#160;protected]</a></span><br>
+        <span style="color:var(--text);">Email: </span><span style="color:var(--accent);">crew&#46;demo&#64;gmail&#46;com</span><br>
         <span style="color:var(--text);">Password: </span><span style="color:var(--accent);">VesselLog2026</span><br>
       </div>
       <div style="color:var(--muted);margin-top:8px;font-size:10px;border-top:1px solid rgba(0,200,150,.15);padding-top:8px;">
-        Or register your own account — select your vessel on registration.<br>
-        @oldendorff.com emails automatically get office dashboard access.
+        Or register your own account — select your vessel on registration.
       </div>
     </div>
 
@@ -334,7 +334,7 @@ select option{background:var(--card);}
 <div id="app">
 
   <div class="topbar">
-    <div class="topbar-logo">VESSELL DAILY REPORTS</div>
+    <div class="topbar-logo">VESSELLOG</div>
     <div class="topbar-right">
       <div class="topbar-info">
         <div id="user-display" style="color:var(--muted);font-style:italic;">—</div>
@@ -360,7 +360,7 @@ select option{background:var(--card);}
     <div class="pdf-header" id="pdf-header">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
         <div>
-          <div class="pdf-logo">VESSELL DAILY REPORT</div>
+          <div class="pdf-logo">VESSELLOG</div>
           <div class="pdf-doc-title">// Daily Operations Report</div>
         </div>
         <div class="pdf-meta" style="text-align:right;">
@@ -371,7 +371,6 @@ select option{background:var(--card);}
     </div>
 
     <div class="section-title">DAILY REPORT</div>
-    <div class="section-sub">// SUBMIT OPERATIONS FOR THE CURRENT SHIFT</div>
 
     <!-- 1. VESSEL & SHIFT INFO -->
     <div class="card">
@@ -415,8 +414,8 @@ select option{background:var(--card);}
     <div class="card">
       <div class="card-title">Daily Work Activities</div>
       <div class="field">
-        <label>Activities Performed Today *</label>
-        <textarea id="f-activities" rows="5" placeholder="Describe all work done this shift..."></textarea>
+        <label>Daily Work Activities</label>
+        <textarea id="f-activities" rows="9" placeholder="Describe all work done this shift..."></textarea>
       </div>
     </div>
 
@@ -445,7 +444,7 @@ select option{background:var(--card);}
 
     <!-- 6. SITE PHOTOGRAPHS -->
     <div class="card photo-card">
-      <div class="card-title yellow">📷 Site Photographs</div>
+      <div class="card-title yellow">📷 Pictures</div>
       <div class="photo-drop-zone" id="drop-zone"
         ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
         <input type="file" id="photo-input" accept="image/*" multiple onchange="handlePhotos(this.files)">
@@ -530,7 +529,7 @@ select option{background:var(--card);}
 
 <div class="toast" id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ═══════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -544,8 +543,12 @@ function checkIsOffice(email){ return email?.toLowerCase().endsWith('@oldendorff
 // VESSEL LIST — add/remove your vessels here
 // ═══════════════════════════════════════════════════════
 const VESSELS = [
-  'Eva Oldendorff',
-  'Hugo #Oldendorff',
+  'MV Pacific Star',
+  'MV Horizon Tide',
+  'MV Strait Runner',
+  'MV Delta King',
+  'MV Oldendorff Pioneer',
+  'MV Oldendorff Trader',
   'Other'
 ];
 
@@ -954,7 +957,19 @@ async function submitReport(){
     await sb.from('equipment_status').insert(equip.map(e=>({...e,report_id:report.id})));
   }
 
-  showToast('✓ Report submitted! Office notified.');
+  // Email notification to office — insert into notifications table
+  // Office receives email via Supabase webhook (set up separately)
+  // For now: log to notifications table so office sees it on dashboard
+  await sb.from('notifications').insert({
+    report_id: report.id,
+    vessel_name: vessel,
+    submitted_by: reporter,
+    date: date,
+    has_faults: getEquipData().some(e=>e.status==='Faulty'),
+    has_concerns: !!document.getElementById('f-concerns').value.trim()
+  }).select(); // ignore error if table doesn't exist yet
+
+  showToast('✓ Report submitted successfully.');
   btn.textContent='SUBMIT REPORT →'; btn.disabled=false;
   clearForm();
 }
@@ -962,17 +977,7 @@ async function submitReport(){
 // ═══════════════════════════════════════════════════════
 // CLEAR FORM
 // ═══════════════════════════════════════════════════════
-function clearForm(){
-  ['f-vessel','f-location','f-hours','f-activities','f-concerns','f-remarks'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value='';
-  });
-  // Keep reported-by as it's tied to the logged-in user
-  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
-  document.getElementById('equip-list').innerHTML='';
-  document.getElementById('plan-list').innerHTML=''; planCount=0;
-  uploadedPhotos=[]; renderPhotos();
-  addEquip(); addPlan(); autoCalcPct();
-}
+// clearForm defined below
 
 // ═══════════════════════════════════════════════════════
 // PDF EXPORT
@@ -1148,7 +1153,7 @@ async function openDetail(id){
 
     ${photos.length?`
       <div class="divider"></div>
-      <div style="font-family:var(--font-mono);font-size:10px;color:var(--caution);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">📷 Site Photographs (${photos.length})</div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:var(--caution);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">📷 Pictures (${photos.length})</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;">
         ${photos.map(p=>`
           <div style="border-radius:3px;overflow:hidden;border:1px solid var(--border);aspect-ratio:4/3;position:relative;background:var(--bg);">
@@ -1181,15 +1186,20 @@ function clearForm(){
   const vesselEl = document.getElementById('f-vessel');
   if(vesselEl && !vesselEl.readOnly && vesselEl.tagName==='INPUT') vesselEl.value='';
 
-  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+    document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('equip-list').innerHTML='';
   document.getElementById('plan-list').innerHTML=''; planCount=0;
   uploadedPhotos=[]; renderPhotos();
   addEquip(); addPlan(); autoCalcPct();
+  // Re-lock vessel field for crew after clear
+  const userVessel = currentUser?.user_metadata?.vessel;
+  if(!isOffice && userVessel){
+    const vf = document.getElementById('f-vessel');
+    if(vf){ vf.value=userVessel; vf.readOnly=true; }
+  }
 }
 
 </script>
 </body>
 </html>
-
 
