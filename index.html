@@ -1057,7 +1057,8 @@ async function submitReport(){
 // PDF EXPORT
 // ═══════════════════════════════════════════════════════
 async function exportWord(){
-  const _docx = window.docx || docx;
+  const _docx = window.docx || (typeof docx !== 'undefined' ? docx : null);
+  if(!_docx){ showToast('Word library not loaded. Please refresh the page and try again.', true); return; }
   const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, AlignmentType, BorderStyle, WidthType, ShadingType, PageBreak } = _docx;
 
   const vessel   = document.getElementById('f-vessel').value || '—';
@@ -1191,15 +1192,20 @@ async function exportWord(){
     }]
   });
 
-  const buffer = await Packer.toBuffer(doc);
-  const blob = new Blob([buffer], { type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `VesselLog_${vessel.replace(/\s+/g,'_')}_${date}.docx`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('✓ Word document downloaded!');
+  try {
+    const buffer = await Packer.toBuffer(doc);
+    const blob = new Blob([buffer], { type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `VesselLog_${vessel.replace(/\s+/g,'_')}_${date}.docx`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('✓ Word document downloaded!');
+  } catch(err){
+    showToast('Export failed: ' + err.message, true);
+    console.error('Word export error:', err);
+  }
 }
 
 // ═══════════════════════════════════════════════════════
