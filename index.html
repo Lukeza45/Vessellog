@@ -1012,7 +1012,7 @@ async function submitReport(){
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer YOUR_RESEND_API_KEY'
+        'Authorization': 'Bearer re_JrxetuGi_3JUmzt24r5Qi1Hdmohu6Vc8R'
       },
       body: JSON.stringify({
         from: 'VesselLog <onboarding@resend.dev>',
@@ -1059,7 +1059,7 @@ async function submitReport(){
 async function exportWord(){
   const _docx = window.docx || (typeof docx !== 'undefined' ? docx : null);
   if(!_docx){ showToast('Word library not loaded. Please refresh the page and try again.', true); return; }
-  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, AlignmentType, BorderStyle, WidthType, ShadingType, PageBreak } = _docx;
+  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, AlignmentType, BorderStyle, WidthType, ShadingType, PageBreak, ImageRun } = _docx;
 
   const vessel   = document.getElementById('f-vessel').value || '—';
   const date     = document.getElementById('f-date').value || '—';
@@ -1177,11 +1177,24 @@ async function exportWord(){
     remarks.split('\n').filter(Boolean).forEach(line => children.push(body(line)));
   }
 
-  // Photos note
+  // Photos — embed as actual images
   if(uploadedPhotos.length){
     children.push(new Paragraph({ spacing:{ before:360, after:120 } }));
     children.push(heading('PICTURES', 'main'));
-    children.push(body(`${uploadedPhotos.length} photo(s) attached. Photos are stored in the system and visible in the online report.`));
+    for(const p of uploadedPhotos){
+      try {
+        const base64 = p.src.split(',')[1];
+        const mimeMatch = p.src.match(/data:([^;]+);/);
+        const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+        const imgType = mimeType.includes('png') ? 'png' : 'jpg';
+        const binaryStr = atob(base64);
+        const bytes = new Uint8Array(binaryStr.length);
+        for(let i=0;i<binaryStr.length;i++) bytes[i]=binaryStr.charCodeAt(i);
+        children.push(new Paragraph({ children:[new ImageRun({ data: bytes.buffer, transformation:{ width:400, height:300 }, type: imgType })], spacing:{ after:80 } }));
+        if(p.caption) children.push(body(p.caption));
+        children.push(new Paragraph({ spacing:{ after:120 } }));
+      } catch(e){ children.push(body(`[Photo: ${p.caption||'image'}]`)); }
+    }
   }
 
   const doc = new Document({
@@ -1327,13 +1340,9 @@ function reportCard(r,delay){
         <div class="progress-wrap" style="margin-bottom:10px;"><div class="progress-fill" style="width:${r.completion_pct}%"></div></div>`:''}
       <div style="font-size:14px;color:var(--muted);line-height:1.6;">${(r.work_activities||'').slice(0,140)}${(r.work_activities||'').length>140?'…':''}</div>
       ${equip.length?`<div class="equip-tags">${equip.map(e=>`<span class="equip-tag${e.status==='Faulty'?' fault':''}">${e.equipment_name} · ${e.status}</span>`).join('')}</div>`:''}
-      ${isOffice?`<div style="display:flex;justify-content:flex-end;margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">
-        <button onclick="event.stopPropagation();confirmDelete('${r.id}','${r.vessel_name}','${r.date}')"
-          style="background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);color:var(--warn);
-          font-family:var(--font-mono);font-size:11px;padding:6px 14px;border-radius:3px;cursor:pointer;letter-spacing:1px;">
-          🗑 DELETE
-        </button>
-      </div>`:''}
+      <div style="display:flex;justify-content:flex-end;margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">
+        ${isOffice ? '<button onclick="event.stopPropagation();confirmDelete(\''+r.id+'\',\''+r.vessel_name.replace(/'/g,'')+'\',\''+r.date+'\')" style="background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);color:var(--warn);font-family:var(--font-mono);font-size:11px;padding:6px 14px;border-radius:3px;cursor:pointer;letter-spacing:1px;">🗑 DELETE</button>' : ''}
+      </div>
     </div>`;
 }
 
@@ -1491,7 +1500,7 @@ async function exportWordFromReport(r){
 
   const _docx = window.docx || (typeof docx !== 'undefined' ? docx : null);
   if(!_docx){ showToast('Word library not loaded. Please refresh the page and try again.', true); return; }
-  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, BorderStyle, WidthType, ShadingType } = _docx;
+  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, BorderStyle, WidthType, ShadingType, ImageRun } = _docx;
 
   const border   = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
   const borders  = { top: border, bottom: border, left: border, right: border };
@@ -1572,7 +1581,20 @@ async function exportWordFromReport(r){
   if(photos.length){
     children.push(new Paragraph({spacing:{before:360,after:120}}));
     children.push(heading('PICTURES'));
-    children.push(body(`${photos.length} photo(s) attached — visible in the online report.`));
+    for(const p of photos){
+      try {
+        const base64 = p.src.split(',')[1];
+        const mimeMatch = p.src.match(/data:([^;]+);/);
+        const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+        const imgType = mimeType.includes('png') ? 'png' : 'jpg';
+        const binaryStr = atob(base64);
+        const bytes = new Uint8Array(binaryStr.length);
+        for(let i=0;i<binaryStr.length;i++) bytes[i]=binaryStr.charCodeAt(i);
+        children.push(new Paragraph({ children:[new ImageRun({ data: bytes.buffer, transformation:{ width:400, height:300 }, type: imgType })], spacing:{ after:80 } }));
+        if(p.caption) children.push(body(p.caption));
+        children.push(new Paragraph({ spacing:{ after:120 } }));
+      } catch(e){ children.push(body(`[Photo: ${p.caption||'image'}]`)); }
+    }
   }
 
   const doc = new Document({
