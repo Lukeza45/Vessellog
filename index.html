@@ -1287,12 +1287,13 @@ async function openDetail(id){
 
   const {data:r}=await sb.from('daily_reports').select('*,equipment_status(*)').eq('id',id).single();
   if(!r){ document.getElementById('modal-content').innerHTML='<p>Could not load report.</p>'; return; }
-  // Store current report for export
+  // Store current report for export and lightbox
   window._currentModalReport = r;
+  window._modalPhotos = r.photos_json ? JSON.parse(r.photos_json) : [];
 
   const equip=r.equipment_status||[];
   const plan=r.next_day_plan?JSON.parse(r.next_day_plan):[];
-  const photos=r.photos_json?JSON.parse(r.photos_json):[];
+  const photos=window._modalPhotos;
   const sColor={'Operational':'badge-operational','Faulty':'badge-faulty','Pending':'badge-pending',
                 'Preparing':'badge-preparing','Ready for Testing':'badge-testing'};
 
@@ -1363,10 +1364,9 @@ async function openDetail(id){
       <div class="divider"></div>
       <div style="font-family:var(--font-mono);font-size:10px;color:var(--caution);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">📷 Pictures (${photos.length})</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;">
-        <script>window._modalPhotos = ${JSON.stringify(photos)};</script>
         ${photos.map((p,pi)=>`
           <div style="border-radius:3px;overflow:hidden;border:1px solid var(--border);aspect-ratio:4/3;position:relative;background:var(--bg);cursor:zoom-in;"
-            onclick="openLightbox(window._modalPhotos,${pi})">
+            onclick="openLightbox(${pi})">
             <img src="${p.src}" alt="${p.caption}" style="width:100%;height:100%;object-fit:cover;">
             <div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);border-radius:2px;padding:2px 5px;font-family:var(--font-mono);font-size:9px;color:#fff;">🔍</div>
             ${p.caption?`<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);font-family:var(--font-mono);font-size:9px;color:#fff;padding:4px 6px;">${p.caption}</div>`:''}
@@ -1389,8 +1389,8 @@ function mini(label,val,color){
 let lightboxPhotos = [];
 let lightboxIndex  = 0;
 
-function openLightbox(photos, index){
-  lightboxPhotos = photos;
+function openLightbox(index){
+  lightboxPhotos = window._modalPhotos || [];
   lightboxIndex  = index;
   showLightboxImage();
   document.getElementById('lightbox').classList.add('open');
