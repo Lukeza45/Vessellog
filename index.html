@@ -789,9 +789,9 @@ function initApp(){
   if(!isOffice && userVessel){
     // Replace text input with locked display for crew
     vesselField.value = userVessel;
-    vesselField.readOnly = true;
+    VESSELS.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; if(v===userVessel) o.selected=true; vesselField.appendChild(o); });
+    vesselField.disabled = true;
     vesselField.style.cssText += ';background:var(--surface);color:var(--accent);cursor:not-allowed;border-color:rgba(0,200,150,.3);';
-    vesselField.title = 'Vessel is assigned to your account';
   } else if(isOffice){
     // Office gets dropdown of all vessels
     const wrap = vesselField.parentNode;
@@ -1722,7 +1722,7 @@ function clearForm(){
   const userVessel = currentUser?.user_metadata?.vessel;
   if(!isOffice && userVessel){
     const vf = document.getElementById('f-vessel');
-    if(vf){ vf.value=userVessel; vf.readOnly=true; }
+    if(vf){ vf.value=userVessel; vf.disabled=true; }
   }
 }
 
