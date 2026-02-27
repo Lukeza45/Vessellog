@@ -1041,41 +1041,23 @@ async function submitReport(){
     const _concerns = document.getElementById('f-concerns').value.trim();
     const _location = document.getElementById('f-location').value.trim()||'—';
     const _hours    = document.getElementById('f-hours').value||'—';
-    await fetch('https://api.resend.com/emails', {
+    await fetch('https://amzyfqcxmaorvrhlplms.supabase.co/functions/v1/notify-office', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer re_JrxetuGi_3JUmzt24r5Qi1Hdmohu6Vc8R'
+        'Authorization': `Bearer ${eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtenlmcWN4bWFvcnZyaGxwbG1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDIwMDIsImV4cCI6MjA4NzY3ODAwMn0.orFPAjE3vnF07i-RDiMQM6ky55tqZ30qEprGAqYWh6Q}`
       },
       body: JSON.stringify({
-        from: 'VesselLog <onboarding@resend.dev>',
-        to: 'dlakavitaban@gmail.com',
-        subject: `📋 New Report: ${vessel} — ${date}`,
-        html: `
-          <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
-            <div style="background:#0a0e14;padding:20px 28px;border-bottom:3px solid #00c896;">
-              <span style="font-size:28px;font-weight:900;color:#00c896;letter-spacing:3px;">VESSELLOG</span>
-            </div>
-            <div style="padding:28px;background:#f8fafc;border:1px solid #e0e8f0;">
-              <h2 style="margin:0 0 20px;color:#1a2230;">New Daily Report Submitted</h2>
-              <table style="width:100%;border-collapse:collapse;">
-                <tr><td style="padding:8px 12px;background:#eef2f8;font-weight:bold;width:35%;border:1px solid #d0dae8;">Vessel</td><td style="padding:8px 12px;border:1px solid #d0dae8;">${vessel}</td></tr>
-                <tr><td style="padding:8px 12px;background:#eef2f8;font-weight:bold;border:1px solid #d0dae8;">Date</td><td style="padding:8px 12px;border:1px solid #d0dae8;">${date}</td></tr>
-                <tr><td style="padding:8px 12px;background:#eef2f8;font-weight:bold;border:1px solid #d0dae8;">Reported By</td><td style="padding:8px 12px;border:1px solid #d0dae8;">${reporter}</td></tr>
-                <tr><td style="padding:8px 12px;background:#eef2f8;font-weight:bold;border:1px solid #d0dae8;">Location</td><td style="padding:8px 12px;border:1px solid #d0dae8;">${_location}</td></tr>
-                <tr><td style="padding:8px 12px;background:#eef2f8;font-weight:bold;border:1px solid #d0dae8;">Hours</td><td style="padding:8px 12px;border:1px solid #d0dae8;">${_hours}h</td></tr>
-                <tr><td style="padding:8px 12px;background:#eef2f8;font-weight:bold;border:1px solid #d0dae8;">Completion</td><td style="padding:8px 12px;border:1px solid #d0dae8;">${pct !== null ? pct+'%' : '—'}</td></tr>
-                ${_concerns ? `<tr><td style="padding:8px 12px;background:#fff2ee;font-weight:bold;color:#cc3300;border:1px solid #ffaa88;">⚠ Concerns</td><td style="padding:8px 12px;background:#fff8f6;color:#cc3300;border:1px solid #ffaa88;">${_concerns}</td></tr>` : ''}
-              </table>
-              <div style="margin-top:24px;text-align:center;">
-                <a href="https://vessellog.vercel.app" style="background:#00c896;color:#000;padding:12px 28px;border-radius:3px;text-decoration:none;font-weight:bold;font-family:monospace;letter-spacing:1px;">VIEW IN VESSELLOG →</a>
-              </div>
-            </div>
-          </div>`
+        vessel_name: vessel,
+        date: date,
+        submitted_by: reporter,
+        location: document.getElementById('f-location').value.trim()||'—',
+        hours: document.getElementById('f-hours').value||'—',
+        completion_pct: pct,
+        concerns: document.getElementById('f-concerns').value.trim()||null
       })
     });
   } catch(e){ /* silent — email failure does not block report submission */ }
-
   showToast('✓ Report submitted successfully.');
   btn.textContent='SUBMIT REPORT →'; btn.disabled=false;
   clearForm();
