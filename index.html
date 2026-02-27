@@ -786,12 +786,10 @@ function initApp(){
   const userVessel = currentUser.user_metadata?.vessel;
   const vesselField = document.getElementById('f-vessel');
 
-  if(!isOffice && userVessel){
-    // Replace text input with locked display for crew
-    vesselField.value = userVessel;
+  if(!isOffice){
+    // Populate vessel dropdown for crew and pre-select their assigned vessel
     VESSELS.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; if(v===userVessel) o.selected=true; vesselField.appendChild(o); });
-    vesselField.disabled = true;
-    vesselField.style.cssText += ';background:var(--surface);color:var(--accent);cursor:not-allowed;border-color:rgba(0,200,150,.3);';
+    if(userVessel){ vesselField.disabled=true; vesselField.style.cssText+=';background:var(--surface);color:var(--accent);cursor:not-allowed;border-color:rgba(0,200,150,.3);'; }
   } else if(isOffice){
     // Office gets dropdown of all vessels
     const wrap = vesselField.parentNode;
