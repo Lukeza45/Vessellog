@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VesselLog — Daily Operations</title>
+<title>VFD Retrofit — Daily Reports</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js" crossorigin="anonymous"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -298,8 +298,8 @@ select option{background:var(--card);}
 ═══════════════════════════════════════ -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo">VESSELLOG</div>
-    <div class="login-tagline">// Marine Daily Operations System</div>
+    <div class="login-logo">VFD DAILY REPORTING</div>
+    <div class="login-tagline">// Retrofit Daily Work Report</div>
 
     <!-- DEMO BANNER -->
     <div id="demo-banner" style="background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.2);
@@ -361,7 +361,7 @@ select option{background:var(--card);}
 <div id="app">
 
   <div class="topbar">
-    <div class="topbar-logo">VESSELLOG</div>
+    <div class="topbar-logo">VFD RETROFIT DAILY REPORT</div>
     <div class="topbar-right">
       <div class="topbar-info">
         <div id="user-display" style="color:var(--muted);font-style:italic;">—</div>
@@ -392,7 +392,7 @@ select option{background:var(--card);}
     <div class="pdf-header" id="pdf-header">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
         <div>
-          <div class="pdf-logo">VESSELLOG</div>
+          <div class="pdf-logo">VFD RETROFIT DAILY REPORT</div>
           <div class="pdf-doc-title">// Daily Operations Report</div>
         </div>
         <div class="pdf-meta" style="text-align:right;">
@@ -406,7 +406,7 @@ select option{background:var(--card);}
 
     <!-- 1. VESSEL & SHIFT INFO -->
     <div class="card">
-      <div class="card-title">Vessel & Shift Info</div>
+      <div class="card-title">Vessel Info</div>
       <div class="form-grid three">
         <div class="field">
           <label>Vessel Name *</label>
@@ -591,12 +591,45 @@ function checkIsOffice(email){ return email?.toLowerCase().endsWith('@oldendorff
 // VESSEL LIST — add/remove your vessels here
 // ═══════════════════════════════════════════════════════
 const VESSELS = [
-  'MV Pacific Star',
-  'MV Horizon Tide',
-  'MV Strait Runner',
-  'MV Delta King',
-  'MV Oldendorff Pioneer',
-  'MV Oldendorff Trader',
+  'Magnus Oldendorff',
+  'Martha Oldendorff',
+  'Mina Oldendorff',
+  'Magdalena Oldendorff',
+  'Margret Oldendorff',
+  'Marlene Oldendorff',
+  'Helga Oldendorff',
+  'Hille Oldendorff',
+  'Hermine Oldendorff',
+  'Hedwig Oldendorff',
+  'Hanna Oldendorff',
+  'Hannes Oldendorff',
+  'Hugo Oldendorff',
+  'Heide Oldendorff',
+  'Hauke Oldendorff',
+  'Henry Oldendorff',
+  'Rik Oldendorff',
+  'Regina Oldendorff',
+  'Rixta Oldendorff',
+  'Richard Oldendorff ',
+  'Patricia Oldendorff',
+  'Paul Oldendorff',
+  'Penelope Oldendorff',
+  'Philipp Oldendorff',
+  'Kim Oldendorff',
+  'Klara Oldendorff',
+  'Kirsten Oldendorff',
+  'Eckert Oldendorff',
+  'Emma Oldendorff',
+  'Erna Oldendorff',
+  'Edgar Oldendorff',
+  'Eike Oldendorff',
+  'Eva Oldendorff',
+  'Georg Oldendorff',
+  'Gebe Oldendorff',
+  'Gretke Oldendorff',
+  'Gisela Oldendorff',
+  'Clivia Oldendorff',
+  'Chiara Oldendorff',
   'Other'
 ];
 
@@ -1101,7 +1134,7 @@ async function exportWord(){
 
   const children = [
     // Title
-    new Paragraph({ children:[new TextRun({ text:'VESSELLOG', font:'Arial', size:56, bold:true, color:'00c896' })], spacing:{ after:60 } }),
+    new Paragraph({ children:[new TextRun({ text:'VFD RETROFIT DAILY REPORT', font:'Arial', size:56, bold:true, color:'00c896' })], spacing:{ after:60 } }),
     new Paragraph({ children:[new TextRun({ text:'Daily Operations Report', font:'Arial', size:24, color:'666666' })], spacing:{ after:40 } }),
     new Paragraph({ children:[new TextRun({ text:`Generated: ${new Date().toLocaleString()}`, font:'Arial', size:18, color:'888888' })], spacing:{ after:400 } }),
 
