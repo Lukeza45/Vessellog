@@ -393,7 +393,7 @@ select option{background:var(--card);}
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
         <div>
           <div class="pdf-logo">VFD RETROFIT DAILY REPORT</div>
-          <div class="pdf-doc-title">// Daily Operations Report</div>
+          <div class="pdf-doc-title">// Daily Work Report</div>
         </div>
         <div class="pdf-meta" style="text-align:right;">
           Generated: <span id="pdf-gen-time">—</span><br>
@@ -404,13 +404,15 @@ select option{background:var(--card);}
 
     <div class="section-title">DAILY REPORT</div>
 
-    <!-- 1. VESSEL & SHIFT INFO -->
+    <!-- 1. VESSEL INFO -->
     <div class="card">
       <div class="card-title">Vessel Info</div>
       <div class="form-grid three">
         <div class="field">
           <label>Vessel Name *</label>
-          <input type="text" id="f-vessel" placeholder="e.g. MV Pacific Star">
+          <select id="f-vessel">
+            <option value="">— Select vessel —</option>
+          </select>
         </div>
         <div class="field">
           <label>Report Date *</label>
