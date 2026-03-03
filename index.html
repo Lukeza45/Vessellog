@@ -1036,11 +1036,8 @@ async function submitReport(){
     await sb.from('equipment_status').insert(equip.map(e=>({...e,report_id:report.id})));
   }
 
-  // ── Email notification via Resend API ──
+  // ── Email notification via Edge Function ──
   try {
-    const _concerns = document.getElementById('f-concerns').value.trim();
-    const _location = document.getElementById('f-location').value.trim()||'—';
-    const _hours    = document.getElementById('f-hours').value||'—';
     await fetch('https://amzyfqcxmaorvrhlplms.supabase.co/functions/v1/notify-office', {
       method: 'POST',
       headers: {
@@ -1048,13 +1045,13 @@ async function submitReport(){
         'Authorization': `Bearer ${eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtenlmcWN4bWFvcnZyaGxwbG1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDIwMDIsImV4cCI6MjA4NzY3ODAwMn0.orFPAjE3vnF07i-RDiMQM6ky55tqZ30qEprGAqYWh6Q}`
       },
       body: JSON.stringify({
-        vessel_name: vessel,
-        date: date,
-        submitted_by: reporter,
-        location: document.getElementById('f-location').value.trim()||'—',
-        hours: document.getElementById('f-hours').value||'—',
+        vessel_name:    vessel,
+        date:           date,
+        submitted_by:   reporter,
+        location:       document.getElementById('f-location').value.trim()||'—',
+        hours:          document.getElementById('f-hours').value||'—',
         completion_pct: pct,
-        concerns: document.getElementById('f-concerns').value.trim()||null
+        concerns:       document.getElementById('f-concerns').value.trim()||null
       })
     });
   } catch(e){ /* silent — email failure does not block report submission */ }
