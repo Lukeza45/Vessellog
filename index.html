@@ -1057,6 +1057,10 @@ async function submitReport(){
     if(fnError) console.log('Email fn error:', fnError);
   } catch(e){ console.log('Email error:', e); }
 
+  showToast('✓ Report submitted successfully.');
+  btn.textContent='SUBMIT REPORT →'; btn.disabled=false;
+  clearForm();
+}
 // ═══════════════════════════════════════════════════════
 // CLEAR FORM
 // ═══════════════════════════════════════════════════════
