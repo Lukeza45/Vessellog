@@ -1038,23 +1038,23 @@ async function submitReport(){
 
   // ── Email notification via Resend API ──
   try {
-    const _concerns = document.getElementById('f-concerns').value.trim();
-    const _location = document.getElementById('f-location').value.trim()||'—';
-    const _hours    = document.getElementById('f-hours').value||'—';
+    const _vessel   = currentUser.user_metadata?.vessel || document.getElementById('f-vessel')?.value.trim() || vessel || '—';
+    const _reporter = currentUser.user_metadata?.full_name || document.getElementById('f-submitter')?.value.trim() || reporter || '—';
+    const _date     = document.getElementById('f-date').value || date || '—';
     await fetch('https://amzyfqcxmaorvrhlplms.supabase.co/functions/v1/notify-office', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtenlmcWN4bWFvcnZyaGxwbG1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDIwMDIsImV4cCI6MjA4NzY3ODAwMn0.orFPAjE3vnF07i-RDiMQM6ky55tqZ30qEprGAqYWh6Q`
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtenlmcWN4bWFvcnZyaGxwbG1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDIwMDIsImV4cCI6MjA4NzY3ODAwMn0.orFPAjE3vnF07i-RDiMQM6ky55tqZ30qEprGAqYWh6Q'
       },
       body: JSON.stringify({
-        vessel_name: vessel,
-        date: date,
-        submitted_by: reporter,
-        location: document.getElementById('f-location').value.trim()||'—',
-        hours: document.getElementById('f-hours').value||'—',
+        vessel_name:    _vessel,
+        date:           _date,
+        submitted_by:   _reporter,
+        location:       document.getElementById('f-location').value.trim()||'—',
+        hours:          document.getElementById('f-hours').value||'—',
         completion_pct: pct,
-        concerns: document.getElementById('f-concerns').value.trim()||null
+        concerns:       document.getElementById('f-concerns').value.trim()||null
       })
     });
   } catch(e){ /* silent — email failure does not block report submission */ }
@@ -1062,7 +1062,6 @@ async function submitReport(){
   btn.textContent='SUBMIT REPORT →'; btn.disabled=false;
   clearForm();
 }
-
 // ═══════════════════════════════════════════════════════
 // CLEAR FORM
 // ═══════════════════════════════════════════════════════
