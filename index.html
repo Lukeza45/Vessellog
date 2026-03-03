@@ -995,25 +995,27 @@ async function submitReport(){
     await sb.from('equipment_status').insert(equip.map(e=>({...e,report_id:report.id})));
   }
 
-  // ── Email notification via Supabase Edge Function → Resend ──
+  // ── Email notification via Edge Function ──
   try {
-    await fetch(`https://amzyfqcxmaorvrhlplms.supabase.co/functions/v1/notify-office`, {
+    const _v = vessel || currentUser.user_metadata?.vessel || '—';
+    const _r = reporter || currentUser.user_metadata?.full_name || '—';
+    await fetch('https://amzyfqcxmaorvrhlplms.supabase.co/functions/v1/notify-office', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
       },
       body: JSON.stringify({
-        vessel_name:    vessel || currentUser.user_metadata?.vessel || '—',
+        vessel_name:    _v,
         date:           date,
-        submitted_by:   reporter || currentUser.user_metadata?.full_name || '—',
+        submitted_by:   _r,
         location:       document.getElementById('f-location').value.trim()||'—',
         hours:          document.getElementById('f-hours').value||'—',
         completion_pct: pct,
         concerns:       document.getElementById('f-concerns').value.trim()||null
       })
     });
-  } catch(e){ /* silent — email failure should not block submission */ }
+  } catch(e){ /* silent */ }
 
   showToast('✓ Report submitted successfully.');
   btn.textContent='SUBMIT REPORT →'; btn.disabled=false;
@@ -1230,12 +1232,7 @@ async function loadAllReports(){
   const d=data||[];
   if(!d.length){ el.innerHTML='<div class="empty-state">📂<br>No reports found.</div>'; return; }
   document.getElementById('filter-count').textContent=`Showing ${d.length} report${d.length!==1?'s':''}`;
-  // If specific vessel selected — flat list
-  if(vf){
-    el.innerHTML='<div class="report-list">'+d.map((r,i)=>reportCard(r,i*40)).join('')+'</div>';
-    return;
-  }
-  // Group by vessel class
+  if(vf){ el.innerHTML='<div class="report-list">'+d.map((r,i)=>reportCard(r,i*40)).join('')+'</div>'; return; }
   const classColors={'E-Class':'#00c896','H-Class':'#0088ff','M-Class':'#ffc800','P-Class':'#ff6b35','G-Class':'#a78bfa','Other':'#6a7a90'};
   const classOrder=['E-Class','H-Class','M-Class','P-Class','G-Class','Other'];
   const groups={};
@@ -1244,18 +1241,22 @@ async function loadAllReports(){
   classOrder.forEach(cls=>{
     if(!groups[cls]) return;
     const col=classColors[cls];
-    html+=`<div style="margin-bottom:32px;">
-      <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:3px;
-        color:${col};padding:10px 16px;background:rgba(0,0,0,.15);border-left:3px solid ${col};
-        border-radius:0 3px 3px 0;margin-bottom:14px;">
-        // ${cls}  <span style="color:var(--muted);font-weight:400;">${groups[cls].length} report${groups[cls].length!==1?'s':''}</span>
-      </div>
-      <div class="report-list">${groups[cls].map((r,i)=>reportCard(r,i*40)).join('')}</div>
-    </div>`;
+    html+=`<div style="margin-bottom:32px;"><div style="font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:3px;color:${col};padding:10px 16px;background:rgba(0,0,0,.15);border-left:3px solid ${col};border-radius:0 3px 3px 0;margin-bottom:14px;">// ${cls} <span style="color:var(--muted);font-weight:400;">${groups[cls].length} report${groups[cls].length!==1?'s':''}</span></div><div class="report-list">${groups[cls].map((r,i)=>reportCard(r,i*40)).join('')}</div></div>`;
   });
   el.innerHTML=html;
 }
 
+
+// ═══════════════════════════════════════════════════════
+// VESSEL CLASS HELPER
+// ═══════════════════════════════════════════════════════
+function getVesselClass(name){
+  if(!name) return 'Other';
+  const words = name.trim().split(/\s+/);
+  const map = {E:'E-Class',H:'H-Class',M:'M-Class',P:'P-Class',G:'G-Class'};
+  for(const w of words){ const c=map[w[0]?.toUpperCase()]; if(c) return c; }
+  return 'Other';
+}
 function clearFilters(){
   document.getElementById('filter-date').value='';
   document.getElementById('filter-vessel').value='';
@@ -1318,6 +1319,7 @@ async function openDetail(id){
   const sColor={'Operational':'badge-operational','Faulty':'badge-faulty','Pending':'badge-pending',
                 'Preparing':'badge-preparing','Ready for Testing':'badge-testing'};
 
+  window._modalPhotos = photos;
   document.getElementById('modal-content').innerHTML=`
     <div style="font-family:var(--font-display);font-size:28px;letter-spacing:2px;margin-bottom:2px;">${r.vessel_name}</div>
     <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:20px;">
@@ -1385,7 +1387,6 @@ async function openDetail(id){
       <div class="divider"></div>
       <div style="font-family:var(--font-mono);font-size:10px;color:var(--caution);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">📷 Pictures (${photos.length})</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;">
-        <script>window._modalPhotos = ${JSON.stringify(photos)};</script>
         ${photos.map((p,pi)=>`
           <div style="border-radius:3px;overflow:hidden;border:1px solid var(--border);aspect-ratio:4/3;position:relative;background:var(--bg);cursor:zoom-in;"
             onclick="openLightbox(window._modalPhotos,${pi})">
