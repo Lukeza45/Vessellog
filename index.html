@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VesselLog — Daily Operations</title>
+<title>VFD Retrofit — Daily Reports</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js" crossorigin="anonymous"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -187,7 +187,7 @@ select option{background:var(--card);}
   align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:4px;
-  max-width:720px;width:100%;max-height:90vh;overflow-y:auto;padding:36px;
+  max-width:980px;width:100%;max-height:92vh;overflow-y:auto;padding:40px;
   position:relative;animation:modalIn .25s ease;}
 @keyframes modalIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 .modal-close{position:absolute;top:16px;right:16px;background:none;border:1px solid var(--border);
@@ -298,8 +298,8 @@ select option{background:var(--card);}
 ═══════════════════════════════════════ -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo">VESSELLOG</div>
-    <div class="login-tagline">// Marine Daily Operations System</div>
+    <div class="login-logo">VFD RETROFIT DAILY REPORTING</div>
+    <div class="login-tagline">// Work Report</div>
 
     <!-- DEMO BANNER -->
     <div id="demo-banner" style="background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.2);
@@ -332,7 +332,7 @@ select option{background:var(--card);}
       </div>
       <div class="field" id="name-field" style="display:none;">
         <label>Your Name</label>
-        <input type="text" id="auth-name" placeholder="e.g. Ahmad Razali">
+        <input type="text" id="auth-name" placeholder="e.g. any name">
       </div>
       <div class="field" id="vessel-field" style="display:none;">
         <label>Your Vessel</label>
@@ -361,7 +361,7 @@ select option{background:var(--card);}
 <div id="app">
 
   <div class="topbar">
-    <div class="topbar-logo">VESSELLOG</div>
+    <div class="topbar-logo">VFD RETROFIT DAILY REPORT</div>
     <div class="topbar-right">
       <div class="topbar-info">
         <div id="user-display" style="color:var(--muted);font-style:italic;">—</div>
@@ -392,8 +392,8 @@ select option{background:var(--card);}
     <div class="pdf-header" id="pdf-header">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
         <div>
-          <div class="pdf-logo">VESSELLOG</div>
-          <div class="pdf-doc-title">// Daily Operations Report</div>
+          <div class="pdf-logo">VFD RETROFIT DAILY REPORT</div>
+          <div class="pdf-doc-title">// Daily Work Report</div>
         </div>
         <div class="pdf-meta" style="text-align:right;">
           Generated: <span id="pdf-gen-time">—</span><br>
@@ -404,13 +404,15 @@ select option{background:var(--card);}
 
     <div class="section-title">DAILY REPORT</div>
 
-    <!-- 1. VESSEL & SHIFT INFO -->
+    <!-- 1. VESSEL INFO -->
     <div class="card">
-      <div class="card-title">Vessel & Shift Info</div>
+      <div class="card-title">Vessel Info</div>
       <div class="form-grid three">
         <div class="field">
           <label>Vessel Name *</label>
-          <input type="text" id="f-vessel" placeholder="e.g. MV Pacific Star">
+          <select id="f-vessel">
+            <option value="">— Select vessel —</option>
+          </select>
         </div>
         <div class="field">
           <label>Report Date *</label>
@@ -463,7 +465,7 @@ select option{background:var(--card);}
       <div class="card-title orange">⚠ Areas of Concern / Findings</div>
       <div class="field">
         <label>Findings, Concerns & Actions Required</label>
-        <textarea id="f-concerns" rows="4" placeholder="Describe findings, safety concerns, defects, or issues. Include recommended actions..."></textarea>
+        <textarea id="f-concerns" rows="9" placeholder="Describe findings, safety concerns, defects, or issues. Include recommended actions..."></textarea>
       </div>
     </div>
 
@@ -545,7 +547,9 @@ select option{background:var(--card);}
     <div class="section-sub">// FULL HISTORICAL LOG — FILTER & SEARCH</div>
     <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;align-items:center;" class="pdf-hide">
       <input type="date" id="filter-date" style="max-width:180px;" oninput="loadAllReports()">
-      <input type="text" id="filter-vessel" placeholder="Filter by vessel..." style="max-width:220px;" oninput="loadAllReports()">
+      <select id="filter-vessel" style="max-width:220px;" onchange="loadAllReports()">
+        <option value="">All vessels</option>
+      </select>
       <button class="btn btn-secondary btn-sm" onclick="clearFilters()">CLEAR</button>
       <span id="filter-count" style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-left:auto;"></span>
     </div>
@@ -589,12 +593,45 @@ function checkIsOffice(email){ return email?.toLowerCase().endsWith('@oldendorff
 // VESSEL LIST — add/remove your vessels here
 // ═══════════════════════════════════════════════════════
 const VESSELS = [
-  'MV Pacific Star',
-  'MV Horizon Tide',
-  'MV Strait Runner',
-  'MV Delta King',
-  'MV Oldendorff Pioneer',
-  'MV Oldendorff Trader',
+  'Magnus Oldendorff',
+  'Martha Oldendorff',
+  'Mina Oldendorff',
+  'Magdalena Oldendorff',
+  'Margret Oldendorff',
+  'Marlene Oldendorff',
+  'Helga Oldendorff',
+  'Hille Oldendorff',
+  'Hermine Oldendorff',
+  'Hedwig Oldendorff',
+  'Hanna Oldendorff',
+  'Hannes Oldendorff',
+  'Hugo Oldendorff',
+  'Heide Oldendorff',
+  'Hauke Oldendorff',
+  'Henry Oldendorff',
+  'Rik Oldendorff',
+  'Regina Oldendorff',
+  'Rixta Oldendorff',
+  'Richard Oldendorff ',
+  'Patricia Oldendorff',
+  'Paul Oldendorff',
+  'Penelope Oldendorff',
+  'Philipp Oldendorff',
+  'Kim Oldendorff',
+  'Klara Oldendorff',
+  'Kirsten Oldendorff',
+  'Eckert Oldendorff',
+  'Emma Oldendorff',
+  'Erna Oldendorff',
+  'Edgar Oldendorff',
+  'Eike Oldendorff',
+  'Eva Oldendorff',
+  'Georg Oldendorff',
+  'Gebe Oldendorff',
+  'Gretke Oldendorff',
+  'Gisela Oldendorff',
+  'Clivia Oldendorff',
+  'Chiara Oldendorff',
   'Other'
 ];
 
@@ -749,12 +786,10 @@ function initApp(){
   const userVessel = currentUser.user_metadata?.vessel;
   const vesselField = document.getElementById('f-vessel');
 
-  if(!isOffice && userVessel){
-    // Replace text input with locked display for crew
-    vesselField.value = userVessel;
-    vesselField.readOnly = true;
-    vesselField.style.cssText += ';background:var(--surface);color:var(--accent);cursor:not-allowed;border-color:rgba(0,200,150,.3);';
-    vesselField.title = 'Vessel is assigned to your account';
+  if(!isOffice){
+    // Populate vessel dropdown for crew and pre-select their assigned vessel
+    VESSELS.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; if(v===userVessel) o.selected=true; vesselField.appendChild(o); });
+    if(userVessel){ vesselField.disabled=true; vesselField.style.cssText+=';background:var(--surface);color:var(--accent);cursor:not-allowed;border-color:rgba(0,200,150,.3);'; }
   } else if(isOffice){
     // Office gets dropdown of all vessels
     const wrap = vesselField.parentNode;
@@ -771,6 +806,12 @@ function initApp(){
     document.querySelectorAll('.office-only').forEach(el=>el.style.display='block');
     document.querySelectorAll('.crew-only').forEach(el=>el.style.display='none');
     switchTab('dashboard');
+  }
+
+  // Populate All Reports vessel filter dropdown
+  const fv = document.getElementById('filter-vessel');
+  if(fv && fv.options.length <= 1){
+    VESSELS.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; fv.appendChild(o); });
   }
 
   // Date
@@ -995,28 +1036,28 @@ async function submitReport(){
     await sb.from('equipment_status').insert(equip.map(e=>({...e,report_id:report.id})));
   }
 
-  // ── Email notification via Edge Function ──
+  // ── Email notification via Resend API ──
   try {
-    const _v = vessel || currentUser.user_metadata?.vessel || '—';
-    const _r = reporter || currentUser.user_metadata?.full_name || '—';
+    const _concerns = document.getElementById('f-concerns').value.trim();
+    const _location = document.getElementById('f-location').value.trim()||'—';
+    const _hours    = document.getElementById('f-hours').value||'—';
     await fetch('https://amzyfqcxmaorvrhlplms.supabase.co/functions/v1/notify-office', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+        'Authorization': `Bearer ${eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtenlmcWN4bWFvcnZyaGxwbG1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDIwMDIsImV4cCI6MjA4NzY3ODAwMn0.orFPAjE3vnF07i-RDiMQM6ky55tqZ30qEprGAqYWh6Q}`
       },
       body: JSON.stringify({
-        vessel_name:    _v,
-        date:           date,
-        submitted_by:   _r,
-        location:       document.getElementById('f-location').value.trim()||'—',
-        hours:          document.getElementById('f-hours').value||'—',
+        vessel_name: vessel,
+        date: date,
+        submitted_by: reporter,
+        location: document.getElementById('f-location').value.trim()||'—',
+        hours: document.getElementById('f-hours').value||'—',
         completion_pct: pct,
-        concerns:       document.getElementById('f-concerns').value.trim()||null
+        concerns: document.getElementById('f-concerns').value.trim()||null
       })
     });
-  } catch(e){ /* silent */ }
-
+  } catch(e){ /* silent — email failure does not block report submission */ }
   showToast('✓ Report submitted successfully.');
   btn.textContent='SUBMIT REPORT →'; btn.disabled=false;
   clearForm();
@@ -1031,8 +1072,9 @@ async function submitReport(){
 // PDF EXPORT
 // ═══════════════════════════════════════════════════════
 async function exportWord(){
-  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-          HeadingLevel, AlignmentType, BorderStyle, WidthType, ShadingType, PageBreak } = window.docx;
+  const _docx = window.docx || (typeof docx !== 'undefined' ? docx : null);
+  if(!_docx){ showToast('Word library not loaded. Please refresh the page and try again.', true); return; }
+  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, AlignmentType, BorderStyle, WidthType, ShadingType, PageBreak, ImageRun } = _docx;
 
   const vessel   = document.getElementById('f-vessel').value || '—';
   const date     = document.getElementById('f-date').value || '—';
@@ -1074,7 +1116,7 @@ async function exportWord(){
 
   const children = [
     // Title
-    new Paragraph({ children:[new TextRun({ text:'VESSELLOG', font:'Arial', size:56, bold:true, color:'00c896' })], spacing:{ after:60 } }),
+    new Paragraph({ children:[new TextRun({ text:'VFD RETROFIT DAILY REPORT', font:'Arial', size:56, bold:true, color:'00c896' })], spacing:{ after:60 } }),
     new Paragraph({ children:[new TextRun({ text:'Daily Operations Report', font:'Arial', size:24, color:'666666' })], spacing:{ after:40 } }),
     new Paragraph({ children:[new TextRun({ text:`Generated: ${new Date().toLocaleString()}`, font:'Arial', size:18, color:'888888' })], spacing:{ after:400 } }),
 
@@ -1150,11 +1192,24 @@ async function exportWord(){
     remarks.split('\n').filter(Boolean).forEach(line => children.push(body(line)));
   }
 
-  // Photos note
+  // Photos — embed as actual images
   if(uploadedPhotos.length){
     children.push(new Paragraph({ spacing:{ before:360, after:120 } }));
     children.push(heading('PICTURES', 'main'));
-    children.push(body(`${uploadedPhotos.length} photo(s) attached. Photos are stored in the system and visible in the online report.`));
+    for(const p of uploadedPhotos){
+      try {
+        const base64 = p.src.split(',')[1];
+        const mimeMatch = p.src.match(/data:([^;]+);/);
+        const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+        const imgType = mimeType.includes('png') ? 'png' : 'jpg';
+        const binaryStr = atob(base64);
+        const bytes = new Uint8Array(binaryStr.length);
+        for(let i=0;i<binaryStr.length;i++) bytes[i]=binaryStr.charCodeAt(i);
+        children.push(new Paragraph({ children:[new ImageRun({ data: bytes.buffer, transformation:{ width:400, height:300 }, type: imgType })], spacing:{ after:80 } }));
+        if(p.caption) children.push(body(p.caption));
+        children.push(new Paragraph({ spacing:{ after:120 } }));
+      } catch(e){ children.push(body(`[Photo: ${p.caption||'image'}]`)); }
+    }
   }
 
   const doc = new Document({
@@ -1165,15 +1220,19 @@ async function exportWord(){
     }]
   });
 
-  const buffer = await Packer.toBuffer(doc);
-  const blob = new Blob([buffer], { type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `VesselLog_${vessel.replace(/\s+/g,'_')}_${date}.docx`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('✓ Word document downloaded!');
+  try {
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `VesselLog_${vessel.replace(/\s+/g,'_')}_${date}.docx`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('✓ Word document downloaded!');
+  } catch(err){
+    showToast('Export failed: ' + err.message, true);
+    console.error('Word export error:', err);
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1202,6 +1261,14 @@ async function loadMyReports(){
 // ═══════════════════════════════════════════════════════
 // LOAD DASHBOARD
 // ═══════════════════════════════════════════════════════
+function getVesselClass(name){
+  if(!name) return 'Other';
+  const words = name.trim().split(/\s+/);
+  const map = {E:'E-Class',H:'H-Class',M:'M-Class',P:'P-Class',G:'G-Class'};
+  for(const w of words){ const c=map[w[0]?.toUpperCase()]; if(c) return c; }
+  return 'Other';
+}
+
 async function loadDashboard(){
   const today=new Date().toISOString().split('T')[0];
   const {data}=await sb.from('daily_reports').select('*,equipment_status(*)').eq('date',today).order('created_at',{ascending:false});
@@ -1214,7 +1281,26 @@ async function loadDashboard(){
 
   const el=document.getElementById('dashboard-container');
   if(!d.length){ el.innerHTML='<div class="empty-state">📡<br>No reports submitted today yet.</div>'; return; }
-  el.innerHTML='<div class="report-list">'+d.map((r,i)=>reportCard(r,i*50)).join('')+'</div>';
+
+  const classColors={'E-Class':'#00c896','H-Class':'#0088ff','M-Class':'#ffc800','P-Class':'#ff6b35','G-Class':'#a78bfa','Other':'#6a7a90'};
+  const classOrder=['E-Class','H-Class','M-Class','P-Class','G-Class','Other'];
+  const groups={};
+  d.forEach(r=>{ const c=getVesselClass(r.vessel_name); if(!groups[c]) groups[c]=[]; groups[c].push(r); });
+
+  let html='';
+  classOrder.forEach(cls=>{
+    if(!groups[cls]) return;
+    const col=classColors[cls];
+    html+=`<div style="margin-bottom:32px;">
+      <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:3px;
+        color:${col};padding:10px 16px;background:rgba(0,0,0,.15);border-left:3px solid ${col};
+        border-radius:0 3px 3px 0;margin-bottom:14px;">
+        // ${cls} &nbsp;<span style="color:var(--muted);font-weight:400;">${groups[cls].length} report${groups[cls].length!==1?'s':''}</span>
+      </div>
+      <div class="report-list">${groups[cls].map((r,i)=>reportCard(r,i*40)).join('')}</div>
+    </div>`;
+  });
+  el.innerHTML=html;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1232,31 +1318,9 @@ async function loadAllReports(){
   const d=data||[];
   if(!d.length){ el.innerHTML='<div class="empty-state">📂<br>No reports found.</div>'; return; }
   document.getElementById('filter-count').textContent=`Showing ${d.length} report${d.length!==1?'s':''}`;
-  if(vf){ el.innerHTML='<div class="report-list">'+d.map((r,i)=>reportCard(r,i*40)).join('')+'</div>'; return; }
-  const classColors={'E-Class':'#00c896','H-Class':'#0088ff','M-Class':'#ffc800','P-Class':'#ff6b35','G-Class':'#a78bfa','Other':'#6a7a90'};
-  const classOrder=['E-Class','H-Class','M-Class','P-Class','G-Class','Other'];
-  const groups={};
-  d.forEach(r=>{ const c=getVesselClass(r.vessel_name); if(!groups[c]) groups[c]=[]; groups[c].push(r); });
-  let html='';
-  classOrder.forEach(cls=>{
-    if(!groups[cls]) return;
-    const col=classColors[cls];
-    html+=`<div style="margin-bottom:32px;"><div style="font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:3px;color:${col};padding:10px 16px;background:rgba(0,0,0,.15);border-left:3px solid ${col};border-radius:0 3px 3px 0;margin-bottom:14px;">// ${cls} <span style="color:var(--muted);font-weight:400;">${groups[cls].length} report${groups[cls].length!==1?'s':''}</span></div><div class="report-list">${groups[cls].map((r,i)=>reportCard(r,i*40)).join('')}</div></div>`;
-  });
-  el.innerHTML=html;
+  el.innerHTML='<div class="report-list">'+d.map((r,i)=>reportCard(r,i*40)).join('')+'</div>';
 }
 
-
-// ═══════════════════════════════════════════════════════
-// VESSEL CLASS HELPER
-// ═══════════════════════════════════════════════════════
-function getVesselClass(name){
-  if(!name) return 'Other';
-  const words = name.trim().split(/\s+/);
-  const map = {E:'E-Class',H:'H-Class',M:'M-Class',P:'P-Class',G:'G-Class'};
-  for(const w of words){ const c=map[w[0]?.toUpperCase()]; if(c) return c; }
-  return 'Other';
-}
 function clearFilters(){
   document.getElementById('filter-date').value='';
   document.getElementById('filter-vessel').value='';
@@ -1291,13 +1355,9 @@ function reportCard(r,delay){
         <div class="progress-wrap" style="margin-bottom:10px;"><div class="progress-fill" style="width:${r.completion_pct}%"></div></div>`:''}
       <div style="font-size:14px;color:var(--muted);line-height:1.6;">${(r.work_activities||'').slice(0,140)}${(r.work_activities||'').length>140?'…':''}</div>
       ${equip.length?`<div class="equip-tags">${equip.map(e=>`<span class="equip-tag${e.status==='Faulty'?' fault':''}">${e.equipment_name} · ${e.status}</span>`).join('')}</div>`:''}
-      ${isOffice?`<div style="display:flex;justify-content:flex-end;margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">
-        <button onclick="event.stopPropagation();confirmDelete('${r.id}','${r.vessel_name}','${r.date}')"
-          style="background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);color:var(--warn);
-          font-family:var(--font-mono);font-size:11px;padding:6px 14px;border-radius:3px;cursor:pointer;letter-spacing:1px;">
-          🗑 DELETE
-        </button>
-      </div>`:''}
+      <div style="display:flex;justify-content:flex-end;margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">
+        ${isOffice ? '<button onclick="event.stopPropagation();confirmDelete(\''+r.id+'\',\''+r.vessel_name.replace(/'/g,'')+'\',\''+r.date+'\')" style="background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);color:var(--warn);font-family:var(--font-mono);font-size:11px;padding:6px 14px;border-radius:3px;cursor:pointer;letter-spacing:1px;">🗑 DELETE</button>' : ''}
+      </div>
     </div>`;
 }
 
@@ -1310,16 +1370,16 @@ async function openDetail(id){
 
   const {data:r}=await sb.from('daily_reports').select('*,equipment_status(*)').eq('id',id).single();
   if(!r){ document.getElementById('modal-content').innerHTML='<p>Could not load report.</p>'; return; }
-  // Store current report for export
+  // Store current report for export and lightbox
   window._currentModalReport = r;
+  window._modalPhotos = r.photos_json ? JSON.parse(r.photos_json) : [];
 
   const equip=r.equipment_status||[];
   const plan=r.next_day_plan?JSON.parse(r.next_day_plan):[];
-  const photos=r.photos_json?JSON.parse(r.photos_json):[];
+  const photos=window._modalPhotos;
   const sColor={'Operational':'badge-operational','Faulty':'badge-faulty','Pending':'badge-pending',
                 'Preparing':'badge-preparing','Ready for Testing':'badge-testing'};
 
-  window._modalPhotos = photos;
   document.getElementById('modal-content').innerHTML=`
     <div style="font-family:var(--font-display);font-size:28px;letter-spacing:2px;margin-bottom:2px;">${r.vessel_name}</div>
     <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:20px;">
@@ -1389,7 +1449,7 @@ async function openDetail(id){
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;">
         ${photos.map((p,pi)=>`
           <div style="border-radius:3px;overflow:hidden;border:1px solid var(--border);aspect-ratio:4/3;position:relative;background:var(--bg);cursor:zoom-in;"
-            onclick="openLightbox(window._modalPhotos,${pi})">
+            onclick="openLightbox(${pi})">
             <img src="${p.src}" alt="${p.caption}" style="width:100%;height:100%;object-fit:cover;">
             <div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);border-radius:2px;padding:2px 5px;font-family:var(--font-mono);font-size:9px;color:#fff;">🔍</div>
             ${p.caption?`<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);font-family:var(--font-mono);font-size:9px;color:#fff;padding:4px 6px;">${p.caption}</div>`:''}
@@ -1412,8 +1472,8 @@ function mini(label,val,color){
 let lightboxPhotos = [];
 let lightboxIndex  = 0;
 
-function openLightbox(photos, index){
-  lightboxPhotos = photos;
+function openLightbox(index){
+  lightboxPhotos = window._modalPhotos || [];
   lightboxIndex  = index;
   showLightboxImage();
   document.getElementById('lightbox').classList.add('open');
@@ -1453,8 +1513,9 @@ async function exportWordFromReport(r){
   const plan  = r.next_day_plan ? JSON.parse(r.next_day_plan) : [];
   const photos = r.photos_json ? JSON.parse(r.photos_json) : [];
 
-  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-          BorderStyle, WidthType, ShadingType } = window.docx;
+  const _docx = window.docx || (typeof docx !== 'undefined' ? docx : null);
+  if(!_docx){ showToast('Word library not loaded. Please refresh the page and try again.', true); return; }
+  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, BorderStyle, WidthType, ShadingType, ImageRun } = _docx;
 
   const border   = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
   const borders  = { top: border, bottom: border, left: border, right: border };
@@ -1535,7 +1596,20 @@ async function exportWordFromReport(r){
   if(photos.length){
     children.push(new Paragraph({spacing:{before:360,after:120}}));
     children.push(heading('PICTURES'));
-    children.push(body(`${photos.length} photo(s) attached — visible in the online report.`));
+    for(const p of photos){
+      try {
+        const base64 = p.src.split(',')[1];
+        const mimeMatch = p.src.match(/data:([^;]+);/);
+        const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+        const imgType = mimeType.includes('png') ? 'png' : 'jpg';
+        const binaryStr = atob(base64);
+        const bytes = new Uint8Array(binaryStr.length);
+        for(let i=0;i<binaryStr.length;i++) bytes[i]=binaryStr.charCodeAt(i);
+        children.push(new Paragraph({ children:[new ImageRun({ data: bytes.buffer, transformation:{ width:400, height:300 }, type: imgType })], spacing:{ after:80 } }));
+        if(p.caption) children.push(body(p.caption));
+        children.push(new Paragraph({ spacing:{ after:120 } }));
+      } catch(e){ children.push(body(`[Photo: ${p.caption||'image'}]`)); }
+    }
   }
 
   const doc = new Document({
@@ -1543,15 +1617,19 @@ async function exportWordFromReport(r){
     sections:[{ properties:{page:{size:{width:11906,height:16838},margin:{top:1134,right:1134,bottom:1134,left:1134}}}, children }]
   });
 
-  const buffer = await Packer.toBuffer(doc);
-  const blob = new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `VesselLog_${(r.vessel_name||'Report').replace(/\s+/g,'_')}_${r.date}.docx`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('✓ Word document downloaded!');
+  try {
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `VesselLog_${(r.vessel_name||'Report').replace(/\s+/g,'_')}_${r.date}.docx`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('✓ Word document downloaded!');
+  } catch(err){
+    showToast('Export failed: ' + err.message, true);
+    console.error('Word export error:', err);
+  }
 }
 
 // ═══════════════════════════════════════════════════════
