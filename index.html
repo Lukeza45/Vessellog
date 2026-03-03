@@ -1038,7 +1038,10 @@ async function submitReport(){
 
   // ── Email notification via Edge Function ──
   try {
-    console.log('EMAIL DEBUG:', {vessel_name: vessel, date: date, submitted_by: reporter});
+    const emailVessel = vessel || currentUser.user_metadata?.vessel || '—';
+    const emailDate = date || document.getElementById('f-date').value || '—';
+    const emailReporter = reporter || currentUser.user_metadata?.full_name || '—';
+    
     await fetch('https://amzyfqcxmaorvrhlplms.supabase.co/functions/v1/notify-office', {
       method: 'POST',
       headers: {
@@ -1046,20 +1049,16 @@ async function submitReport(){
         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
       },
       body: JSON.stringify({
-        vessel_name:    vessel,
-        date:           date,
-        submitted_by:   reporter,
+        vessel_name:    emailVessel,
+        date:           emailDate,
+        submitted_by:   emailReporter,
         location:       document.getElementById('f-location').value.trim()||'—',
         hours:          document.getElementById('f-hours').value||'—',
         completion_pct: pct,
         concerns:       document.getElementById('f-concerns').value.trim()||null
       })
     });
-  } catch(e){ /* silent — email failure does not block report submission */ }
-  showToast('✓ Report submitted successfully.');
-  btn.textContent='SUBMIT REPORT →'; btn.disabled=false;
-  clearForm();
-}
+  } catch(e){ console.log('Email error:', e); }
 
 // ═══════════════════════════════════════════════════════
 // CLEAR FORM
