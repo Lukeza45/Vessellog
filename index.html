@@ -221,8 +221,10 @@ select option{background:var(--card);}
     <div class="topbar-right">
       <div class="topbar-info">
         <div id="user-display" style="color:var(--muted);font-style:italic;">—</div>
+        <div id="vessel-display" style="color:var(--accent);font-size:10px;letter-spacing:1px;display:none;">—</div>
         <div id="live-clock" style="color:var(--accent);">—</div>
       </div>
+      <button id="vessel-switch-btn" onclick="openVesselSwitcher()" style="display:none;background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.25);color:var(--accent);font-family:var(--font-mono);font-size:11px;padding:6px 12px;border-radius:3px;cursor:pointer;letter-spacing:1px;white-space:nowrap;" title="Switch vessel">⚓ SWITCH VESSEL</button>
       <button id="theme-toggle" onclick="toggleTheme()" style="background:none;border:1px solid var(--border);color:var(--muted);width:34px;height:34px;border-radius:3px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;" title="Toggle day/night">🌙</button>
       <button class="btn btn-secondary btn-sm" onclick="signOut()">LOGOUT</button>
     </div>
@@ -353,7 +355,29 @@ select option{background:var(--card);}
   <button class="lightbox-nav lightbox-next" onclick="event.stopPropagation();lightboxNav(1)">›</button>
   <div class="lightbox-caption" id="lightbox-caption"></div>
 </div>
+  
+<!-- VESSEL SWITCHER MODAL -->
+<div id="vessel-switcher-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:600;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;width:100%;max-width:420px;padding:36px;position:relative;animation:modalIn .25s ease;">
+    <div style="font-family:var(--font-display);font-size:24px;letter-spacing:2px;margin-bottom:4px;">SWITCH VESSEL</div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:24px;">Select your new assigned vessel</div>
+    <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Current vessel</div>
+    <div id="vs-current" style="font-family:var(--font-display);font-size:22px;color:var(--accent);margin-bottom:20px;">—</div>
+    <div class="field" style="margin-bottom:20px;">
+      <label>New Vessel</label>
+      <select id="vs-new-vessel"><option value="">— Select vessel —</option></select>
+    </div>
+    <div style="background:rgba(255,200,0,.06);border:1px solid rgba(255,200,0,.15);border-radius:3px;padding:12px 14px;font-family:var(--font-mono);font-size:10px;color:var(--caution);line-height:1.8;margin-bottom:20px;">
+      ⚠ After switching you will only see reports for your new vessel. Previously submitted reports stay on record.
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="closeVesselSwitcher()" class="btn btn-secondary btn-sm">CANCEL</button>
+      <button onclick="confirmVesselSwitch()" class="btn btn-primary btn-sm">CONFIRM SWITCH →</button>
+    </div>
+  </div>
+</div>
 
+  
 <!-- DETAIL MODAL -->
 <div class="modal-overlay" id="detail-modal">
   <div class="modal">
@@ -470,6 +494,7 @@ function initApp(){
   document.getElementById('user-display').textContent=name;
   document.getElementById('user-display').style.color='';
   document.getElementById('user-display').style.fontStyle='';
+  if(!isOffice&&userVessel){const vd=document.getElementById('vessel-display');if(vd){vd.textContent='⚓ '+userVessel;vd.style.display='block';}}
   const nameField=document.getElementById('f-submitter');
   if(!nameField.value&&currentUser.user_metadata?.full_name){
     nameField.value=currentUser.user_metadata.full_name;
@@ -1089,6 +1114,39 @@ async function deleteReport(id){
 }
 
 function closeModal(){document.getElementById('detail-modal').classList.remove('open');}
+// ═══ VESSEL SWITCHER ═══
+(function waitForInit(){
+  const t=setInterval(()=>{
+    if(typeof currentUser!=='undefined'&&currentUser&&!isOffice){
+      const btn=document.getElementById('vessel-switch-btn');
+      if(btn)btn.style.display='block';
+      clearInterval(t);
+    }
+  },500);
+})();
+function openVesselSwitcher(){
+  const overlay=document.getElementById('vessel-switcher-overlay');
+  overlay.style.display='flex';
+  document.getElementById('vs-current').textContent=currentUser?.user_metadata?.vessel||'—';
+  const sel=document.getElementById('vs-new-vessel');
+  if(sel.options.length<=1){VESSELS.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o);});}
+  sel.value='';
+}
+function closeVesselSwitcher(){
+  document.getElementById('vessel-switcher-overlay').style.display='none';
+}
+async function confirmVesselSwitch(){
+  const newVessel=document.getElementById('vs-new-vessel').value;
+  if(!newVessel){showToast('Please select a vessel.',true);return;}
+  const current=currentUser?.user_metadata?.vessel;
+  if(newVessel===current){showToast('That is already your current vessel.',true);return;}
+  if(!confirm('Switch from "'+current+'" to "'+newVessel+'"?\n\nYou will only see reports for '+newVessel+' after switching.'))return;
+  const{error}=await sb.auth.updateUser({data:{vessel:newVessel}});
+  if(error){showToast('Error: '+error.message,true);return;}
+  showToast('✓ Vessel switched to '+newVessel+'. Reloading...');
+  closeVesselSwitcher();
+  setTimeout(()=>window.location.reload(),1500);
+}  
 document.getElementById('detail-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
 </script>
 </body>
