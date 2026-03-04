@@ -849,7 +849,8 @@ async function loadAllReports(){
 
       months.forEach((ym,mi)=>{
         const reports=grouped[cls][vessel][ym];
-        const isFirstMonth=mi===0;
+        const todayStr=new Date().toISOString().split('T')[0];
+        const isFirstMonth=mi===0&&reports.some(r=>r.date===todayStr);
         const monthId='mth-'+vesselId+'-'+ym;
 
         html+=`<div style="margin-bottom:6px;margin-left:16px;">
