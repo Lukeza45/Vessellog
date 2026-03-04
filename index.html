@@ -795,20 +795,21 @@ async function loadAllReports(){
   if(!d.length){el.innerHTML='<div class="empty-state">📂<br>No reports found.</div>';return;}
   document.getElementById('filter-count').textContent=`Showing ${d.length} report${d.length!==1?'s':''}`;
 
-  // If keyword or vessel filter active — flat list, no grouping
   if(vf||kw||df){el.innerHTML='<div class="report-list">'+d.map((r,i)=>reportCard(r,i*40)).join('')+'</div>';return;}
 
   const classColors={'C-Class':'#ff4d9e','E-Class':'#00c896','G-Class':'#a78bfa','H-Class':'#0088ff','M-Class':'#ffc800','P-Class':'#ff6b35','R-Class':'#00d4ff','Other':'#6a7a90'};
   const classOrder=['C-Class','E-Class','G-Class','H-Class','M-Class','P-Class','R-Class','Other'];
 
-  // Group by class → then by month
+  // Group: class → vessel → month
   const grouped={};
   d.forEach(r=>{
     const cls=getVesselClass(r.vessel_name);
-    const month=r.date?r.date.slice(0,7):'0000-00'; // YYYY-MM
+    const vessel=r.vessel_name||'Unknown';
+    const month=r.date?r.date.slice(0,7):'0000-00';
     if(!grouped[cls])grouped[cls]={};
-    if(!grouped[cls][month])grouped[cls][month]=[];
-    grouped[cls][month].push(r);
+    if(!grouped[cls][vessel])grouped[cls][vessel]={};
+    if(!grouped[cls][vessel][month])grouped[cls][vessel][month]=[];
+    grouped[cls][vessel][month].push(r);
   });
 
   function monthLabel(ym){
@@ -820,52 +821,67 @@ async function loadAllReports(){
   classOrder.forEach(cls=>{
     if(!grouped[cls])return;
     const col=classColors[cls];
-    const months=Object.keys(grouped[cls]).sort((a,b)=>b.localeCompare(a));
-    const totalClass=months.reduce((s,m)=>s+grouped[cls][m].length,0);
+    const vessels=Object.keys(grouped[cls]).sort();
+    const totalClass=vessels.reduce((s,v)=>s+Object.values(grouped[cls][v]).reduce((s2,arr)=>s2+arr.length,0),0);
+    const classId='cls-'+cls.replace(/\s/g,'_');
 
     html+=`<div style="margin-bottom:36px;">
-      <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:3px;color:${col};padding:10px 16px;background:rgba(0,0,0,.15);border-left:3px solid ${col};border-radius:0 3px 3px 0;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
-        <span>// ${cls}</span>
-        <span style="color:var(--muted);font-weight:400;">${totalClass} report${totalClass!==1?'s':''}</span>
-      </div>`;
+      <div onclick="toggleSection('${classId}')" style="font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:3px;color:${col};padding:10px 16px;background:rgba(0,0,0,.15);border-left:3px solid ${col};border-radius:0 3px 3px 0;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;">
+        <span><span id="${classId}-arrow" style="margin-right:8px;">▾</span>// ${cls}</span>
+        <span style="color:var(--muted);font-weight:400;">${vessels.length} vessel${vessels.length!==1?'s':''} · ${totalClass} report${totalClass!==1?'s':''}</span>
+      </div>
+      <div id="${classId}">`;
 
-    months.forEach((ym,mi)=>{
-      const reports=grouped[cls][ym];
-      const isFirst=mi===0;
-      const monthId='month-'+cls.replace(/\s/g,'-')+'-'+ym;
-      html+=`
-        <div style="margin-bottom:10px;margin-left:16px;">
-          <div onclick="toggleMonth('${monthId}')"
-            style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:var(--card);border:1px solid var(--border);border-radius:3px;cursor:pointer;margin-bottom:6px;transition:border-color .2s;"
-            onmouseover="this.style.borderColor='${col}'" onmouseout="this.style.borderColor='var(--border)'">
-            <span style="font-family:var(--font-mono);font-size:11px;color:var(--text);letter-spacing:1px;">
-              <span id="${monthId}-arrow" style="margin-right:8px;display:inline-block;transition:transform .2s;">${isFirst?'▾':'▸'}</span>
-              ${monthLabel(ym)}
+    vessels.forEach((vessel,vi)=>{
+      const months=Object.keys(grouped[cls][vessel]).sort((a,b)=>b.localeCompare(a));
+      const totalVessel=months.reduce((s,m)=>s+grouped[cls][vessel][m].length,0);
+      const vesselId='vsl-'+cls.replace(/\s/g,'_')+'-'+vessel.replace(/\s/g,'_');
+      const isFirstVessel=vi===0;
+
+      html+=`<div style="margin-bottom:12px;margin-left:16px;">
+        <div onclick="toggleSection('${vesselId}')" style="display:flex;justify-content:space-between;align-items:center;padding:9px 16px;background:var(--surface);border:1px solid ${col}40;border-left:3px solid ${col};border-radius:0 3px 3px 0;cursor:pointer;margin-bottom:6px;transition:background .2s;" onmouseover="this.style.background='${col}18'" onmouseout="this.style.background='var(--surface)'">
+          <span style="font-family:var(--font-display);font-size:17px;color:var(--text);letter-spacing:1px;">
+            <span id="${vesselId}-arrow" style="font-family:var(--font-mono);font-size:11px;margin-right:8px;color:${col};">${isFirstVessel?'▾':'▸'}</span>${vessel}
+          </span>
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted);">${totalVessel} report${totalVessel!==1?'s':''}</span>
+        </div>
+        <div id="${vesselId}" style="display:${isFirstVessel?'block':'none'};">`;
+
+      months.forEach((ym,mi)=>{
+        const reports=grouped[cls][vessel][ym];
+        const isFirstMonth=mi===0;
+        const monthId='mth-'+vesselId+'-'+ym;
+
+        html+=`<div style="margin-bottom:6px;margin-left:16px;">
+          <div onclick="toggleSection('${monthId}')" style="display:flex;justify-content:space-between;align-items:center;padding:7px 14px;background:var(--card);border:1px solid var(--border);border-radius:3px;cursor:pointer;margin-bottom:4px;transition:border-color .2s;" onmouseover="this.style.borderColor='${col}'" onmouseout="this.style.borderColor='var(--border)'">
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:1px;">
+              <span id="${monthId}-arrow" style="margin-right:6px;">${isFirstMonth?'▾':'▸'}</span>${monthLabel(ym)}
             </span>
             <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted);">${reports.length} report${reports.length!==1?'s':''}</span>
           </div>
-          <div id="${monthId}" style="display:${isFirst?'block':'none'};">
+          <div id="${monthId}" style="display:${isFirstMonth?'block':'none'};">
             <div class="report-list">${reports.map((r,i)=>reportCard(r,i*30)).join('')}</div>
           </div>
         </div>`;
+      });
+
+      html+=`</div></div>`;
     });
 
-    html+='</div>';
+    html+=`</div></div>`;
   });
 
   el.innerHTML=html;
 }
 
-function toggleMonth(id){
+function toggleSection(id){
   const el=document.getElementById(id);
   const arrow=document.getElementById(id+'-arrow');
   if(!el)return;
   const open=el.style.display==='block';
   el.style.display=open?'none':'block';
-  if(arrow)arrow.style.transform=open?'':'rotate(0deg)';
   if(arrow)arrow.textContent=open?'▸':'▾';
 }
-
 function clearFilters(){
   document.getElementById('filter-date').value='';
   document.getElementById('filter-vessel').value='';
