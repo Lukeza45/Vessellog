@@ -783,7 +783,7 @@ async function loadDashboard(){
 async function loadAllReports(){
   const el=document.getElementById('all-reports-container');
   el.innerHTML='<div class="loading"><div class="spinner"></div>&nbsp;LOADING...</div>';
-  let q=sb.from('daily_reports').select('*,equipment_status(*)').order('date',{ascending:false}).limit(200);
+  let q=sb.from('daily_reports').select('*,equipment_status(*)').order('date',{ascending:false}).limit(500);
   const df=document.getElementById('filter-date')?.value;
   const vf=document.getElementById('filter-vessel')?.value;
   const kw=(document.getElementById('filter-keyword')?.value||'').trim().toLowerCase();
@@ -794,18 +794,76 @@ async function loadAllReports(){
   if(kw)d=d.filter(r=>(r.work_activities||'').toLowerCase().includes(kw)||(r.concerns||'').toLowerCase().includes(kw)||(r.vessel_name||'').toLowerCase().includes(kw)||(r.submitted_by||'').toLowerCase().includes(kw)||(r.location||'').toLowerCase().includes(kw));
   if(!d.length){el.innerHTML='<div class="empty-state">📂<br>No reports found.</div>';return;}
   document.getElementById('filter-count').textContent=`Showing ${d.length} report${d.length!==1?'s':''}`;
-  if(vf||kw){el.innerHTML='<div class="report-list">'+d.map((r,i)=>reportCard(r,i*40)).join('')+'</div>';return;}
+
+  // If keyword or vessel filter active — flat list, no grouping
+  if(vf||kw||df){el.innerHTML='<div class="report-list">'+d.map((r,i)=>reportCard(r,i*40)).join('')+'</div>';return;}
+
   const classColors={'C-Class':'#ff4d9e','E-Class':'#00c896','G-Class':'#a78bfa','H-Class':'#0088ff','M-Class':'#ffc800','P-Class':'#ff6b35','R-Class':'#00d4ff','Other':'#6a7a90'};
   const classOrder=['C-Class','E-Class','G-Class','H-Class','M-Class','P-Class','R-Class','Other'];
-  const groups={};
-  d.forEach(r=>{const c=getVesselClass(r.vessel_name);if(!groups[c])groups[c]=[];groups[c].push(r);});
+
+  // Group by class → then by month
+  const grouped={};
+  d.forEach(r=>{
+    const cls=getVesselClass(r.vessel_name);
+    const month=r.date?r.date.slice(0,7):'0000-00'; // YYYY-MM
+    if(!grouped[cls])grouped[cls]={};
+    if(!grouped[cls][month])grouped[cls][month]=[];
+    grouped[cls][month].push(r);
+  });
+
+  function monthLabel(ym){
+    const[y,m]=ym.split('-');
+    return new Date(y,m-1,1).toLocaleString('default',{month:'long',year:'numeric'});
+  }
+
   let html='';
   classOrder.forEach(cls=>{
-    if(!groups[cls])return;
+    if(!grouped[cls])return;
     const col=classColors[cls];
-    html+=`<div style="margin-bottom:32px;"><div style="font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:3px;color:${col};padding:10px 16px;background:rgba(0,0,0,.15);border-left:3px solid ${col};border-radius:0 3px 3px 0;margin-bottom:14px;">// ${cls} <span style="color:var(--muted);font-weight:400;">${groups[cls].length} report${groups[cls].length!==1?'s':''}</span></div><div class="report-list">${groups[cls].map((r,i)=>reportCard(r,i*40)).join('')}</div></div>`;
+    const months=Object.keys(grouped[cls]).sort((a,b)=>b.localeCompare(a));
+    const totalClass=months.reduce((s,m)=>s+grouped[cls][m].length,0);
+
+    html+=`<div style="margin-bottom:36px;">
+      <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:3px;color:${col};padding:10px 16px;background:rgba(0,0,0,.15);border-left:3px solid ${col};border-radius:0 3px 3px 0;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+        <span>// ${cls}</span>
+        <span style="color:var(--muted);font-weight:400;">${totalClass} report${totalClass!==1?'s':''}</span>
+      </div>`;
+
+    months.forEach((ym,mi)=>{
+      const reports=grouped[cls][ym];
+      const isFirst=mi===0;
+      const monthId='month-'+cls.replace(/\s/g,'-')+'-'+ym;
+      html+=`
+        <div style="margin-bottom:10px;margin-left:16px;">
+          <div onclick="toggleMonth('${monthId}')"
+            style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:var(--card);border:1px solid var(--border);border-radius:3px;cursor:pointer;margin-bottom:6px;transition:border-color .2s;"
+            onmouseover="this.style.borderColor='${col}'" onmouseout="this.style.borderColor='var(--border)'">
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--text);letter-spacing:1px;">
+              <span id="${monthId}-arrow" style="margin-right:8px;display:inline-block;transition:transform .2s;">${isFirst?'▾':'▸'}</span>
+              ${monthLabel(ym)}
+            </span>
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted);">${reports.length} report${reports.length!==1?'s':''}</span>
+          </div>
+          <div id="${monthId}" style="display:${isFirst?'block':'none'};">
+            <div class="report-list">${reports.map((r,i)=>reportCard(r,i*30)).join('')}</div>
+          </div>
+        </div>`;
+    });
+
+    html+='</div>';
   });
+
   el.innerHTML=html;
+}
+
+function toggleMonth(id){
+  const el=document.getElementById(id);
+  const arrow=document.getElementById(id+'-arrow');
+  if(!el)return;
+  const open=el.style.display==='block';
+  el.style.display=open?'none':'block';
+  if(arrow)arrow.style.transform=open?'':'rotate(0deg)';
+  if(arrow)arrow.textContent=open?'▸':'▾';
 }
 
 function clearFilters(){
