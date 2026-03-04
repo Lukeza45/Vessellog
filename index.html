@@ -8,134 +8,74 @@
 <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js" crossorigin="anonymous"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#0a0e14; --surface:#121820; --card:#1a2230; --border:#243040;
-  --accent:#00c896; --accent2:#0088ff; --warn:#ff6b35; --caution:#ffc800;
-  --text:#e8edf5; --muted:#6a7a90;
-  --font-display:'Bebas Neue',sans-serif;
-  --font-mono:'IBM Plex Mono',monospace;
-  --font-body:'IBM Plex Sans',sans-serif;
-}
-body.light-mode {
-  --bg:#f0f4f8; --surface:#ffffff; --card:#ffffff; --border:#c8d4e4;
-  --text:#0d1520; --muted:#3a4a60;
-}
-body.light-mode{background-image:radial-gradient(ellipse at 20% 0%,rgba(0,200,150,.08) 0%,transparent 60%),
-  radial-gradient(ellipse at 80% 100%,rgba(0,136,255,.06) 0%,transparent 60%);}
+:root{--bg:#0a0e14;--surface:#121820;--card:#1a2230;--border:#243040;--accent:#00c896;--accent2:#0088ff;--warn:#ff6b35;--caution:#ffc800;--text:#e8edf5;--muted:#6a7a90;--font-display:'Bebas Neue',sans-serif;--font-mono:'IBM Plex Mono',monospace;--font-body:'IBM Plex Sans',sans-serif;}
+body.light-mode{--bg:#f0f4f8;--surface:#fff;--card:#fff;--border:#c8d4e4;--text:#0d1520;--muted:#3a4a60;}
+body.light-mode{background-image:radial-gradient(ellipse at 20% 0%,rgba(0,200,150,.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(0,136,255,.06) 0%,transparent 60%);}
 body.light-mode input,body.light-mode textarea,body.light-mode select{background:#f8fafc;}
 body.light-mode .login-box{box-shadow:0 4px 24px rgba(0,0,0,.1);}
 body.light-mode .report-item:hover{box-shadow:0 0 0 1px rgba(0,200,150,.2),0 2px 12px rgba(0,0,0,.06);}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;
-  background-image:radial-gradient(ellipse at 20% 0%,rgba(0,200,150,.06) 0%,transparent 60%),
-                   radial-gradient(ellipse at 80% 100%,rgba(0,136,255,.05) 0%,transparent 60%);}
-
-/* ── LOGIN ── */
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,200,150,.06) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(0,136,255,.05) 0%,transparent 60%);}
 #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
-.login-box{background:var(--surface);border:1px solid var(--border);border-radius:4px;
-  padding:48px 40px;width:100%;max-width:420px;position:relative;overflow:hidden;}
-.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:48px 40px;width:100%;max-width:420px;position:relative;overflow:hidden;}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
 .login-logo{font-family:var(--font-display);font-size:44px;letter-spacing:3px;color:var(--accent);margin-bottom:2px;}
-.login-tagline{font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:2px;
-  text-transform:uppercase;margin-bottom:36px;}
+.login-tagline{font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:36px;}
 .login-tabs{display:flex;gap:0;margin-bottom:28px;border:1px solid var(--border);border-radius:3px;overflow:hidden;}
-.login-tab{flex:1;padding:10px;font-family:var(--font-mono);font-size:11px;font-weight:600;
-  letter-spacing:1px;text-transform:uppercase;text-align:center;cursor:pointer;
-  background:transparent;border:none;color:var(--muted);transition:all .2s;}
+.login-tab{flex:1;padding:10px;font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-align:center;cursor:pointer;background:transparent;border:none;color:var(--muted);transition:all .2s;}
 .login-tab.active{background:var(--accent);color:#000;}
-
-/* ── TOPBAR ── */
 #app{display:none;}
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;
-  display:flex;align-items:center;justify-content:space-between;height:56px;
-  position:sticky;top:0;z-index:100;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;}
 .topbar-logo{font-family:var(--font-display);font-size:26px;letter-spacing:2px;color:var(--accent);}
 .topbar-right{display:flex;align-items:center;gap:14px;}
 .topbar-info{font-family:var(--font-mono);font-size:11px;color:var(--muted);text-align:right;line-height:1.6;}
-
-/* ── NAV ── */
-.nav-tabs{display:flex;gap:2px;background:var(--surface);border-bottom:1px solid var(--border);
-  padding:0 24px;overflow-x:auto;}
-.nav-tab{padding:14px 20px;font-family:var(--font-mono);font-size:12px;letter-spacing:1px;
-  text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;
-  white-space:nowrap;transition:all .2s;}
+.nav-tabs{display:flex;gap:2px;background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;overflow-x:auto;}
+.nav-tab{padding:14px 20px;font-family:var(--font-mono);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;}
 .nav-tab:hover{color:var(--text);}
 .nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
-
-/* ── LAYOUT ── */
 .main{padding:32px 24px;max-width:1100px;margin:0 auto;}
 .section-title{font-family:var(--font-display);font-size:32px;letter-spacing:2px;color:var(--text);margin-bottom:4px;}
 .section-sub{font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:28px;}
-
-/* ── CARDS ── */
 .card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:28px;margin-bottom:20px;}
 .card.warn-card{border-color:rgba(255,107,53,.3);background:rgba(255,107,53,.03);}
 .card.plan-card{border-color:rgba(0,136,255,.25);background:rgba(0,136,255,.03);}
 .card.photo-card{border-color:rgba(255,200,0,.2);background:rgba(255,200,0,.02);}
-.card-title{font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:2px;
-  text-transform:uppercase;color:var(--accent);margin-bottom:20px;
-  display:flex;align-items:center;gap:10px;}
+.card-title{font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
 .card-title::after{content:'';flex:1;height:1px;background:var(--border);}
 .card-title.orange{color:var(--warn);}
 .card-title.blue{color:var(--accent2);}
 .card-title.yellow{color:var(--caution);}
-
-/* ── FORMS ── */
 .form-grid{display:grid;gap:16px;grid-template-columns:1fr 1fr;}
 .form-grid.three{grid-template-columns:1fr 1fr 1fr;}
 .form-grid.full{grid-template-columns:1fr;}
 .field{display:flex;flex-direction:column;gap:8px;}
 label{font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
-input,textarea,select{background:var(--bg);border:1px solid var(--border);color:var(--text);
-  font-family:var(--font-body);font-size:14px;padding:10px 14px;border-radius:3px;
-  outline:none;transition:border-color .2s;width:100%;}
+input,textarea,select{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--font-body);font-size:14px;padding:10px 14px;border-radius:3px;outline:none;transition:border-color .2s;width:100%;}
 input:focus,textarea:focus,select:focus{border-color:var(--accent);}
 textarea{resize:vertical;min-height:100px;line-height:1.7;}
 select option{background:var(--card);}
-
-/* ── PROGRESS ── */
 .progress-wrap{background:var(--bg);border:1px solid var(--border);border-radius:3px;height:8px;overflow:hidden;margin-top:4px;}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .5s ease;}
-
-/* ── EQUIPMENT ── */
 .equip-list{display:flex;flex-direction:column;gap:12px;margin-bottom:16px;}
-.equip-row{display:grid;grid-template-columns:1fr 170px 1fr auto;gap:10px;align-items:end;
-  background:var(--bg);padding:14px;border-radius:3px;border:1px solid var(--border);}
-.remove-btn{background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;
-  width:36px;height:36px;border-radius:3px;font-size:16px;display:flex;
-  align-items:center;justify-content:center;transition:all .2s;}
+.equip-row{display:grid;grid-template-columns:1fr 170px 1fr auto;gap:10px;align-items:end;background:var(--bg);padding:14px;border-radius:3px;border:1px solid var(--border);}
+.remove-btn{background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;width:36px;height:36px;border-radius:3px;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
 .remove-btn:hover{border-color:var(--warn);color:var(--warn);}
-
-/* ── JOB PLAN ── */
 .plan-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
-.plan-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;
-  background:var(--bg);padding:14px;border-radius:3px;border:1px solid rgba(0,136,255,.15);}
+.plan-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;background:var(--bg);padding:14px;border-radius:3px;border:1px solid rgba(0,136,255,.15);}
 .plan-num{font-family:var(--font-display);font-size:28px;color:var(--accent2);line-height:1;}
-
-/* ── PHOTO UPLOAD ── */
-.photo-drop-zone{border:2px dashed var(--border);border-radius:4px;padding:40px 20px;
-  text-align:center;cursor:pointer;transition:all .2s;position:relative;}
+.photo-drop-zone{border:2px dashed var(--border);border-radius:4px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
 .photo-drop-zone:hover,.photo-drop-zone.drag-over{border-color:var(--caution);background:rgba(255,200,0,.03);}
 .photo-drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;}
 .drop-icon{font-size:36px;margin-bottom:12px;opacity:.5;}
 .drop-text{font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:1px;line-height:2;}
 .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:16px;}
-.photo-item{position:relative;border-radius:3px;overflow:hidden;aspect-ratio:4/3;
-  border:1px solid var(--border);background:var(--bg);}
+.photo-item{position:relative;border-radius:3px;overflow:hidden;aspect-ratio:4/3;border:1px solid var(--border);background:var(--bg);}
 .photo-item img{width:100%;height:100%;object-fit:cover;display:block;}
-.photo-remove{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.7);
-  border:none;color:#fff;width:24px;height:24px;border-radius:2px;cursor:pointer;
-  font-size:12px;display:flex;align-items:center;justify-content:center;opacity:1;transition:opacity .2s;}
-.photo-caption{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);
-  font-family:var(--font-mono);font-size:9px;color:#fff;padding:4px 6px;letter-spacing:.5px;}
-.photo-caption input{background:transparent;border:none;color:#fff;font-family:var(--font-mono);
-  font-size:9px;width:100%;padding:0;}
+.photo-remove{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.7);border:none;color:#fff;width:24px;height:24px;border-radius:2px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.photo-caption{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);font-family:var(--font-mono);font-size:9px;color:#fff;padding:4px 6px;letter-spacing:.5px;}
+.photo-caption input{background:transparent;border:none;color:#fff;font-family:var(--font-mono);font-size:9px;width:100%;padding:0;}
 .photo-caption input:focus{outline:none;}
-
-/* ── BADGES ── */
-.status-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:2px;
-  font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;}
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:2px;font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;}
 .badge-operational{background:rgba(0,200,150,.12);color:var(--accent);}
 .badge-faulty{background:rgba(255,107,53,.15);color:var(--warn);border:1px solid rgba(255,107,53,.2);}
 .badge-pending{background:rgba(255,200,0,.12);color:var(--caution);}
@@ -143,11 +83,7 @@ select option{background:var(--card);}
 .badge-testing{background:rgba(0,200,150,.08);color:#00a878;border:1px solid rgba(0,200,150,.2);}
 .badge-submitted{background:rgba(0,200,150,.12);color:var(--accent);}
 .badge-concerns{background:rgba(255,200,0,.12);color:var(--caution);}
-
-/* ── BUTTONS ── */
-.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;
-  font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:1px;
-  text-transform:uppercase;border:none;border-radius:3px;cursor:pointer;transition:all .2s;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:3px;cursor:pointer;transition:all .2s;}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;}
 .btn-primary{background:var(--accent);color:#000;}
 .btn-primary:hover:not(:disabled){background:#00e0aa;transform:translateY(-1px);}
@@ -156,9 +92,6 @@ select option{background:var(--card);}
 .btn-pdf{background:rgba(255,200,0,.1);border:1px solid rgba(255,200,0,.3);color:var(--caution);}
 .btn-pdf:hover:not(:disabled){background:var(--caution);color:#000;}
 .btn-sm{padding:8px 16px;font-size:11px;}
-.btn-danger{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.2);color:var(--warn);}
-
-/* ── STATS ── */
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px;}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:20px;position:relative;overflow:hidden;}
 .stat-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;}
@@ -168,90 +101,51 @@ select option{background:var(--card);}
 .stat-card.s4::before{background:var(--caution);}
 .stat-val{font-family:var(--font-display);font-size:48px;line-height:1;margin-bottom:6px;}
 .stat-label{font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
-
-/* ── REPORT CARDS ── */
 .report-list{display:flex;flex-direction:column;gap:12px;}
-.report-item{background:var(--card);border:1px solid var(--border);border-radius:4px;
-  padding:20px 24px;cursor:pointer;transition:all .2s;animation:fadeUp .3s ease both;}
+.report-item{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:20px 24px;cursor:pointer;transition:all .2s;animation:fadeUp .3s ease both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .report-item:hover{border-color:var(--accent);box-shadow:0 0 0 1px rgba(0,200,150,.1);}
 .report-vessel{font-family:var(--font-display);font-size:20px;letter-spacing:1px;}
 .report-meta{font-family:var(--font-mono);font-size:11px;color:var(--muted);line-height:2;margin-top:2px;}
 .equip-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
-.equip-tag{font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:2px;
-  border:1px solid var(--border);color:var(--muted);}
+.equip-tag{font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:2px;border:1px solid var(--border);color:var(--muted);}
 .equip-tag.fault{border-color:rgba(255,107,53,.3);color:var(--warn);background:rgba(255,107,53,.05);}
-
-/* ── MODAL ── */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;
-  align-items:center;justify-content:center;padding:20px;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:4px;
-  max-width:980px;width:100%;max-height:92vh;overflow-y:auto;padding:40px;
-  position:relative;animation:modalIn .25s ease;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:4px;max-width:980px;width:100%;max-height:92vh;overflow-y:auto;padding:40px;position:relative;animation:modalIn .25s ease;}
 @keyframes modalIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
-.modal-close{position:absolute;top:16px;right:16px;background:none;border:1px solid var(--border);
-  color:var(--muted);cursor:pointer;font-size:14px;width:32px;height:32px;
-  border-radius:3px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:14px;width:32px;height:32px;border-radius:3px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
 .modal-close:hover{border-color:var(--warn);color:var(--warn);}
 .divider{height:1px;background:var(--border);margin:24px 0;}
-
-/* ── LOADING ── */
-.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);
-  border-radius:50%;animation:spin .7s linear infinite;display:inline-block;}
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading{display:flex;align-items:center;justify-content:center;gap:10px;padding:60px;
-  font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:2px;}
-.empty-state{text-align:center;padding:60px 20px;font-family:var(--font-mono);
-  font-size:12px;color:var(--muted);letter-spacing:1px;line-height:2.5;}
-
-/* ── TOAST ── */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--accent);color:#000;
-  font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:1px;
-  padding:14px 20px;border-radius:3px;z-index:9999;transform:translateY(80px);opacity:0;
-  transition:all .3s cubic-bezier(.175,.885,.32,1.275);}
+.loading{display:flex;align-items:center;justify-content:center;gap:10px;padding:60px;font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:2px;}
+.empty-state{text-align:center;padding:60px 20px;font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:1px;line-height:2.5;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--accent);color:#000;font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:1px;padding:14px 20px;border-radius:3px;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.175,.885,.32,1.275);}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast.err{background:var(--warn);color:#fff;}
-
-/* ── LIGHTBOX ── */
-.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:2000;
-  align-items:center;justify-content:center;cursor:zoom-out;}
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:2000;align-items:center;justify-content:center;cursor:zoom-out;}
 .lightbox.open{display:flex;}
-.lightbox img{max-width:92vw;max-height:90vh;object-fit:contain;border-radius:3px;
-  box-shadow:0 0 60px rgba(0,0,0,.8);}
-.lightbox-caption{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-  font-family:var(--font-mono);font-size:12px;color:#fff;background:rgba(0,0,0,.6);
-  padding:6px 16px;border-radius:3px;letter-spacing:1px;}
-.lightbox-close{position:fixed;top:20px;right:24px;background:none;border:1px solid rgba(255,255,255,.2);
-  color:#fff;width:36px;height:36px;border-radius:3px;cursor:pointer;font-size:18px;
-  display:flex;align-items:center;justify-content:center;}
-.lightbox-nav{position:fixed;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);
-  border:1px solid rgba(255,255,255,.15);color:#fff;width:44px;height:44px;border-radius:3px;
-  cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;}
+.lightbox img{max-width:92vw;max-height:90vh;object-fit:contain;border-radius:3px;box-shadow:0 0 60px rgba(0,0,0,.8);}
+.lightbox-caption{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);font-family:var(--font-mono);font-size:12px;color:#fff;background:rgba(0,0,0,.6);padding:6px 16px;border-radius:3px;letter-spacing:1px;}
+.lightbox-close{position:fixed;top:20px;right:24px;background:none;border:1px solid rgba(255,255,255,.2);color:#fff;width:36px;height:36px;border-radius:3px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
+.lightbox-nav{position:fixed;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);color:#fff;width:44px;height:44px;border-radius:3px;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;}
 .lightbox-prev{left:16px;}.lightbox-next{right:16px;}
-
-/* ── RESPONSIVE ── */
+.comment-bubble{background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:12px 14px;margin-bottom:8px;}
 @media(max-width:768px){
   .stats-row{grid-template-columns:1fr 1fr;}
   .form-grid,.form-grid.three{grid-template-columns:1fr;}
   .equip-row{grid-template-columns:1fr 1fr;}
   .equip-row>*:nth-child(3){grid-column:span 2;}
-  .plan-row{grid-template-columns:auto 1fr auto;}
   .main{padding:20px 16px;}
   .topbar{padding:0 16px;}
 }
-
-/* ═══════════════════════════════════════
-   PRINT / PDF
-═══════════════════════════════════════ */
 @media print{
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  #login-screen,.topbar,.nav-tabs,.tab-actions,.remove-btn,.btn,
-  .photo-drop-zone,.photo-remove,.pdf-hide{display:none!important;}
-  body{background:#fff!important;color:#1a1a2e!important;font-family:'IBM Plex Sans',sans-serif;font-size:11pt;}
+  #login-screen,.topbar,.nav-tabs,.tab-actions,.remove-btn,.btn,.photo-drop-zone,.photo-remove,.pdf-hide{display:none!important;}
+  body{background:#fff!important;color:#1a1a2e!important;font-size:11pt;}
   .main{padding:0!important;max-width:100%!important;}
-  .section-title{font-size:20pt;color:#1a1a2e!important;margin-bottom:2px;}
-  .section-sub{color:#666!important;font-size:9pt;margin-bottom:16px;}
+  .section-title{font-size:20pt;color:#1a1a2e!important;}
   .card{background:#fff!important;border:1.5px solid #d0d8e8!important;padding:16px 20px;margin-bottom:14px;break-inside:avoid;}
   .card.warn-card{border-color:#ff9966!important;background:#fff9f7!important;}
   .card.plan-card{border-color:#80b8ff!important;background:#f5faff!important;}
@@ -271,95 +165,57 @@ select option{background:var(--card);}
   .plan-num{color:#0055cc!important;}
   .progress-wrap{background:#e8ecf5!important;border:1px solid #d0d8e8!important;height:6px;}
   .progress-fill{background:linear-gradient(90deg,#00c896,#0088ff)!important;}
-  .status-badge{font-size:9pt;}
-  .badge-operational{background:#e8fff8!important;color:#006644!important;border:1px solid #99ddc8!important;}
-  .badge-faulty{background:#fff2ee!important;color:#cc3300!important;border:1px solid #ffaa88!important;}
-  .badge-pending{background:#fffbee!important;color:#996600!important;}
-  .badge-preparing{background:#eef5ff!important;color:#003399!important;}
-  .badge-testing{background:#e8fff8!important;color:#006644!important;}
+  .badge-operational{background:#e8fff8!important;color:#006644!important;}
+  .badge-faulty{background:#fff2ee!important;color:#cc3300!important;}
   .photo-grid{grid-template-columns:repeat(2,1fr);gap:14px;}
   .photo-item{break-inside:avoid;border:1px solid #d0d8e8!important;}
   .photo-item img{max-height:280px;object-fit:cover;}
-  .photo-caption{background:rgba(0,0,0,.5)!important;}
   .pdf-header{display:block!important;border-bottom:3px solid #1a1a2e;padding-bottom:16px;margin-bottom:24px;}
   .pdf-logo{font-family:'Bebas Neue',sans-serif;font-size:30pt;color:#1a1a2e!important;letter-spacing:3px;}
   .pdf-doc-title{font-family:'IBM Plex Mono',monospace;font-size:10pt;color:#666!important;letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
-  .pdf-meta{font-size:9pt;color:#666!important;line-height:1.8;}
   #tab-submit{display:block!important;}
-  #tab-history,#tab-dashboard,#tab-all-reports{display:none!important;}
+  #tab-history,#tab-dashboard,#tab-all-reports,#tab-faults{display:none!important;}
 }
 .pdf-header{display:none;}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════
-     LOGIN SCREEN
-═══════════════════════════════════════ -->
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">VFD RETROFIT DAILY REPORTING</div>
     <div class="login-tagline">// Work Report</div>
-
-    <!-- DEMO BANNER -->
-    <div id="demo-banner" style="background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.2);
-      border-radius:3px;padding:14px;margin-bottom:24px;font-family:var(--font-mono);font-size:11px;line-height:2;">
+    <div id="demo-banner" style="background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.2);border-radius:3px;padding:14px;margin-bottom:24px;font-family:var(--font-mono);font-size:11px;line-height:2;">
       <div style="color:var(--accent);font-weight:600;letter-spacing:1px;margin-bottom:6px;">// EVALUATION ACCESS</div>
-      <div style="color:var(--muted);">
-        Demo crew account:<br>
-        <span style="color:var(--text);">Email: </span><span style="color:var(--accent);">crew&#46;demo&#64;gmail&#46;com</span><br>
-        <span style="color:var(--text);">Password: </span><span style="color:var(--accent);">VesselLog2026</span><br>
-      </div>
-      <div style="color:var(--muted);margin-top:8px;font-size:10px;border-top:1px solid rgba(0,200,150,.15);padding-top:8px;">
-        Or register your own account — select your vessel on registration.
-      </div>
+      <div style="color:var(--muted);">Demo crew account:<br><span style="color:var(--text);">Email: </span><span style="color:var(--accent);">crew&#46;demo&#64;gmail&#46;com</span><br><span style="color:var(--text);">Password: </span><span style="color:var(--accent);">VesselLog2026</span></div>
+      <div style="color:var(--muted);margin-top:8px;font-size:10px;border-top:1px solid rgba(0,200,150,.15);padding-top:8px;">Or register your own account — select your vessel on registration.</div>
     </div>
-
     <div class="login-tabs">
       <button class="login-tab active" id="tab-signin" onclick="setAuthMode('signin')">Sign In</button>
       <button class="login-tab" id="tab-register" onclick="setAuthMode('register')">Register</button>
     </div>
-
     <div class="form-grid full" style="gap:14px;">
-      <div class="field">
-        <label>Email</label>
-        <input type="email" id="auth-email" placeholder="your@email.com" autocomplete="email">
-      </div>
-      <div class="field">
-        <label>Password</label>
-        <input type="password" id="auth-pwd" placeholder="••••••••" autocomplete="current-password"
-          onkeydown="if(event.key==='Enter') doAuth()">
-      </div>
-      <div class="field" id="name-field" style="display:none;">
-        <label>Your Name</label>
-        <input type="text" id="auth-name" placeholder="e.g. any name">
-      </div>
+      <div class="field"><label>Email</label><input type="email" id="auth-email" placeholder="your@email.com" autocomplete="email"></div>
+      <div class="field"><label>Password</label><input type="password" id="auth-pwd" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doAuth()"></div>
+      <div class="field" id="name-field" style="display:none;"><label>Your Name</label><input type="text" id="auth-name" placeholder="e.g. John Smith"></div>
       <div class="field" id="vessel-field" style="display:none;">
         <label>Your Vessel</label>
-        <select id="auth-vessel">
-          <option value="">— Select your vessel —</option>
-        </select>
-        <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:4px;">
-          You will only be able to submit and view reports for this vessel.
-        </div>
+        <select id="auth-vessel"><option value="">— Select your vessel —</option></select>
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:4px;">You will only be able to submit and view reports for this vessel.</div>
       </div>
       <div id="remember-wrap" style="display:flex;align-items:center;gap:10px;margin-top:4px;">
         <input type="checkbox" id="remember-me" checked style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;">
-        <label for="remember-me" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;cursor:pointer;">Stay logged in</label>
+        <label for="remember-me" style="cursor:pointer;">Stay logged in</label>
       </div>
-      <button class="btn btn-primary" id="auth-btn" onclick="doAuth()" style="width:100%;justify-content:center;margin-top:4px;">
-        SIGN IN
-      </button>
+      <button class="btn btn-primary" id="auth-btn" onclick="doAuth()" style="width:100%;justify-content:center;margin-top:4px;">SIGN IN</button>
       <div id="auth-msg" style="font-family:var(--font-mono);font-size:11px;min-height:16px;text-align:center;color:var(--warn);"></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     APP
-═══════════════════════════════════════ -->
+<!-- APP -->
 <div id="app">
-
   <div class="topbar">
     <div class="topbar-logo">VFD RETROFIT DAILY REPORT</div>
     <div class="topbar-right">
@@ -367,69 +223,36 @@ select option{background:var(--card);}
         <div id="user-display" style="color:var(--muted);font-style:italic;">—</div>
         <div id="live-clock" style="color:var(--accent);">—</div>
       </div>
-      <button id="theme-toggle" onclick="toggleTheme()"
-        style="background:none;border:1px solid var(--border);color:var(--muted);
-        width:34px;height:34px;border-radius:3px;cursor:pointer;font-size:16px;
-        display:flex;align-items:center;justify-content:center;transition:all .2s;"
-        title="Toggle day/night mode">🌙</button>
+      <button id="theme-toggle" onclick="toggleTheme()" style="background:none;border:1px solid var(--border);color:var(--muted);width:34px;height:34px;border-radius:3px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;" title="Toggle day/night">🌙</button>
       <button class="btn btn-secondary btn-sm" onclick="signOut()">LOGOUT</button>
     </div>
   </div>
 
   <div class="nav-tabs">
     <div class="nav-tab crew-only active" data-tab="submit" onclick="switchTab('submit')">Submit Report</div>
-    <div class="nav-tab crew-only" data-tab="history" onclick="switchTab('history')">My Reports</div>
+    <div class="nav-tab crew-only" data-tab="history" onclick="switchTab('history')">My Reports <span id="history-badge" style="background:var(--accent);color:#000;font-size:9px;padding:2px 6px;border-radius:10px;margin-left:4px;display:none;">0</span></div>
     <div class="nav-tab office-only" data-tab="dashboard" onclick="switchTab('dashboard')" style="display:none;">Dashboard</div>
     <div class="nav-tab office-only" data-tab="all-reports" onclick="switchTab('all-reports')" style="display:none;">All Reports</div>
+    <div class="nav-tab office-only" data-tab="faults" onclick="switchTab('faults')" style="display:none;">⚠ Fault Tracker</div>
   </div>
 
-  <!-- ══════════════════
-       SUBMIT REPORT
-  ══════════════════ -->
+  <!-- SUBMIT -->
   <div class="main" id="tab-submit">
-
-    <!-- PDF Header (print only) -->
-    <div class="pdf-header" id="pdf-header">
+    <div class="pdf-header">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div>
-          <div class="pdf-logo">VFD RETROFIT DAILY REPORT</div>
-          <div class="pdf-doc-title">// Daily Work Report</div>
-        </div>
-        <div class="pdf-meta" style="text-align:right;">
-          Generated: <span id="pdf-gen-time">—</span><br>
-          Reported by: <span id="pdf-reporter">—</span>
-        </div>
+        <div><div class="pdf-logo">VFD RETROFIT DAILY REPORT</div><div class="pdf-doc-title">// Daily Work Report</div></div>
+        <div style="font-family:var(--font-mono);font-size:9pt;color:#666;text-align:right;">Generated: <span id="pdf-gen-time">—</span><br>By: <span id="pdf-reporter">—</span></div>
       </div>
     </div>
-
     <div class="section-title">DAILY REPORT</div>
-
-    <!-- 1. VESSEL INFO -->
     <div class="card">
       <div class="card-title">Vessel Info</div>
       <div class="form-grid three">
-        <div class="field">
-          <label>Vessel Name *</label>
-          <select id="f-vessel">
-            <option value="">— Select vessel —</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Report Date *</label>
-          <input type="date" id="f-date">
-        </div>
-        <div class="field">
-          <label>Location / Port</label>
-          <input type="text" id="f-location" placeholder="e.g. Pier 7, Batam">
-        </div>
-        <div class="field">
-          <label>Reported By *</label>
-          <input type="text" id="f-submitter" placeholder="Your name" oninput="updateReportedBy(this.value)">
-        </div>
-        <div class="field">
-          <label>Hours Worked</label>
-          <input type="number" id="f-hours" min="0" max="24" step="0.5" placeholder="e.g. 8">
-        </div>
+        <div class="field"><label>Vessel Name *</label><select id="f-vessel"><option value="">— Select vessel —</option></select></div>
+        <div class="field"><label>Report Date *</label><input type="date" id="f-date"></div>
+        <div class="field"><label>Location / Port</label><input type="text" id="f-location" placeholder="e.g. Pier 7, Batam"></div>
+        <div class="field"><label>Reported By *</label><input type="text" id="f-submitter" placeholder="Your name" oninput="updateReportedBy(this.value)"></div>
+        <div class="field"><label>Hours Worked</label><input type="number" id="f-hours" min="0" max="24" step="0.5" placeholder="e.g. 8"></div>
         <div class="field">
           <label>Completion % <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none;">— auto calculated</span></label>
           <div style="background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
@@ -437,71 +260,40 @@ select option{background:var(--card);}
             <span id="pct-breakdown" style="font-family:var(--font-mono);font-size:10px;color:var(--muted);text-align:right;line-height:1.8;"></span>
           </div>
           <div class="progress-wrap"><div class="progress-fill" id="pct-bar" style="width:0%"></div></div>
-          <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:5px;">
-            Operational + Ready for Testing counts as done · Faulty = blocked
-          </div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:5px;">Operational + Ready for Testing counts as done · Faulty = blocked</div>
         </div>
       </div>
     </div>
-
-    <!-- 2. DAILY WORK ACTIVITIES -->
     <div class="card">
       <div class="card-title">Daily Work Activities</div>
-      <div class="field">
-        <label>Daily Work Activities</label>
-        <textarea id="f-activities" rows="9" placeholder="Describe all work done this shift..."></textarea>
-      </div>
+      <div class="field"><label>Daily Work Activities</label><textarea id="f-activities" rows="9" placeholder="Describe all work done this shift..."></textarea></div>
     </div>
-
-    <!-- 3. EQUIPMENT / MATERIALS STATUS -->
     <div class="card">
       <div class="card-title">Equipment / Materials Status</div>
       <div class="equip-list" id="equip-list"></div>
       <button class="btn btn-secondary btn-sm" onclick="addEquip()">+ Add Equipment / Material</button>
     </div>
-
-    <!-- 4. AREAS OF CONCERN / FINDINGS -->
     <div class="card warn-card">
       <div class="card-title orange">⚠ Areas of Concern / Findings</div>
-      <div class="field">
-        <label>Findings, Concerns & Actions Required</label>
-        <textarea id="f-concerns" rows="9" placeholder="Describe findings, safety concerns, defects, or issues. Include recommended actions..."></textarea>
-      </div>
+      <div class="field"><label>Findings, Concerns & Actions Required</label><textarea id="f-concerns" rows="9" placeholder="Describe findings, safety concerns, defects, or issues. Include recommended actions..."></textarea></div>
     </div>
-
-    <!-- 5. JOB PLANNING NEXT DAY -->
     <div class="card plan-card">
       <div class="card-title blue">📋 Job Planning — Next Day</div>
       <div class="plan-list" id="plan-list"></div>
       <button class="btn btn-sm" style="background:rgba(0,136,255,.1);border:1px solid rgba(0,136,255,.25);color:var(--accent2);" onclick="addPlan()">+ Add Planned Task</button>
     </div>
-
-    <!-- 6. SITE PHOTOGRAPHS -->
     <div class="card photo-card">
       <div class="card-title yellow">📷 Pictures</div>
-      <div class="photo-drop-zone" id="drop-zone"
-        ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+      <div class="photo-drop-zone" id="drop-zone" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
         <input type="file" id="photo-input" accept="image/*" multiple onchange="handlePhotos(this.files)">
         <div class="drop-icon">📸</div>
-        <div class="drop-text">
-          DRAG & DROP PHOTOS HERE<br>
-          <span style="color:var(--accent);font-weight:600;">or click to browse</span><br>
-          <span style="font-size:10px;opacity:.6;">JPG · PNG · HEIC · Multiple files OK</span>
-        </div>
+        <div class="drop-text">DRAG & DROP PHOTOS HERE<br><span style="color:var(--accent);font-weight:600;">or click to browse</span><br><span style="font-size:10px;opacity:.6;">JPG · PNG · HEIC · Multiple files OK</span></div>
       </div>
       <div class="photo-grid" id="photo-grid"></div>
       <div id="photo-count" style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:10px;min-height:16px;"></div>
     </div>
-
-    <!-- 7. REMARKS -->
-    <div class="card">
-      <div class="card-title">Remarks</div>
-      <textarea id="f-remarks" rows="3" placeholder="General remarks..."></textarea>
-    </div>
-
-    <div class="pdf-hide" style="font-family:var(--font-mono);font-size:11px;color:var(--caution);
-      text-align:right;margin-top:8px;padding:10px 14px;background:rgba(255,200,0,.06);
-      border:1px solid rgba(255,200,0,.15);border-radius:3px;">
+    <div class="card"><div class="card-title">Remarks</div><textarea id="f-remarks" rows="3" placeholder="General remarks..."></textarea></div>
+    <div class="pdf-hide" style="font-family:var(--font-mono);font-size:11px;color:var(--caution);text-align:right;margin-top:8px;padding:10px 14px;background:rgba(255,200,0,.06);border:1px solid rgba(255,200,0,.15);border-radius:3px;">
       ⚠ Export first if you need a Word copy — once submitted the form clears
     </div>
     <div class="tab-actions" style="display:flex;justify-content:flex-end;gap:12px;margin-top:10px;flex-wrap:wrap;">
@@ -511,20 +303,14 @@ select option{background:var(--card);}
     </div>
   </div>
 
-  <!-- ══════════════════
-       MY REPORTS
-  ══════════════════ -->
+  <!-- MY REPORTS -->
   <div class="main" id="tab-history" style="display:none;">
     <div class="section-title">MY VESSEL REPORTS</div>
-    <div class="section-sub" id="my-reports-sub">// ALL REPORTS FROM YOUR VESSEL — CLICK TO VIEW FULL DETAIL</div>
-    <div id="my-reports-container">
-      <div class="loading"><div class="spinner"></div>&nbsp;LOADING...</div>
-    </div>
+    <div class="section-sub">// ALL REPORTS FROM YOUR VESSEL — CLICK TO VIEW FULL DETAIL</div>
+    <div id="my-reports-container"><div class="loading"><div class="spinner"></div>&nbsp;LOADING...</div></div>
   </div>
 
-  <!-- ══════════════════
-       DASHBOARD (OFFICE)
-  ══════════════════ -->
+  <!-- DASHBOARD -->
   <div class="main" id="tab-dashboard" style="display:none;">
     <div class="section-title">OPERATIONS DASHBOARD</div>
     <div class="section-sub">// REAL-TIME FLEET OVERVIEW — TODAY &nbsp;·&nbsp; AUTO-REFRESHES ON NEW SUBMISSION</div>
@@ -534,31 +320,30 @@ select option{background:var(--card);}
       <div class="stat-card s3"><div class="stat-val" style="color:var(--warn);" id="stat-faults">—</div><div class="stat-label">Equipment Faults</div></div>
       <div class="stat-card s4"><div class="stat-val" style="color:var(--caution);" id="stat-hours">—</div><div class="stat-label">Total Hours</div></div>
     </div>
-    <div id="dashboard-container">
-      <div class="loading"><div class="spinner"></div>&nbsp;LOADING...</div>
-    </div>
+    <div id="dashboard-container"><div class="loading"><div class="spinner"></div>&nbsp;LOADING...</div></div>
   </div>
 
-  <!-- ══════════════════
-       ALL REPORTS (OFFICE)
-  ══════════════════ -->
+  <!-- ALL REPORTS -->
   <div class="main" id="tab-all-reports" style="display:none;">
     <div class="section-title">ALL REPORTS</div>
     <div class="section-sub">// FULL HISTORICAL LOG — FILTER & SEARCH</div>
     <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;align-items:center;" class="pdf-hide">
       <input type="date" id="filter-date" style="max-width:180px;" oninput="loadAllReports()">
-      <select id="filter-vessel" style="max-width:220px;" onchange="loadAllReports()">
-        <option value="">All vessels</option>
-      </select>
+      <select id="filter-vessel" style="max-width:220px;" onchange="loadAllReports()"><option value="">All vessels</option></select>
+      <input type="text" id="filter-keyword" placeholder="Search keyword..." style="max-width:200px;" oninput="loadAllReports()">
       <button class="btn btn-secondary btn-sm" onclick="clearFilters()">CLEAR</button>
       <span id="filter-count" style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-left:auto;"></span>
     </div>
-    <div id="all-reports-container">
-      <div class="loading"><div class="spinner"></div>&nbsp;LOADING...</div>
-    </div>
+    <div id="all-reports-container"><div class="loading"><div class="spinner"></div>&nbsp;LOADING...</div></div>
   </div>
 
-</div><!-- /app -->
+  <!-- FAULT TRACKER -->
+  <div class="main" id="tab-faults" style="display:none;">
+    <div class="section-title">FAULT TRACKER</div>
+    <div class="section-sub">// ALL FAULTY EQUIPMENT ACROSS FLEET — LATEST REPORTS</div>
+    <div id="fault-tracker-container"><div class="loading"><div class="spinner"></div>&nbsp;LOADING...</div></div>
+  </div>
+</div>
 
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
@@ -580,1160 +365,731 @@ select option{background:var(--card);}
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// CONFIG
-// ═══════════════════════════════════════════════════════
-const SUPABASE_URL     = 'https://amzyfqcxmaorvrhlplms.supabase.co';
-const SUPABASE_ANON_KEY= 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtenlmcWN4bWFvcnZyaGxwbG1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDIwMDIsImV4cCI6MjA4NzY3ODAwMn0.orFPAjE3vnF07i-RDiMQM6ky55tqZ30qEprGAqYWh6Q';
-// Anyone with @oldendorff.com email = office access
-// Everyone else = crew access
-function checkIsOffice(email){ return email?.toLowerCase().endsWith('@oldendorff.com'); }
+const SUPABASE_URL='https://amzyfqcxmaorvrhlplms.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtenlmcWN4bWFvcnZyaGxwbG1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDIwMDIsImV4cCI6MjA4NzY3ODAwMn0.orFPAjE3vnF07i-RDiMQM6ky55tqZ30qEprGAqYWh6Q';
+function checkIsOffice(email){return email?.toLowerCase().endsWith('@oldendorff.com');}
 
-// ═══════════════════════════════════════════════════════
-// VESSEL LIST — add/remove your vessels here
-// ═══════════════════════════════════════════════════════
-const VESSELS = [
-  'Magnus Oldendorff',
-  'Martha Oldendorff',
-  'Mina Oldendorff',
-  'Magdalena Oldendorff',
-  'Margret Oldendorff',
-  'Marlene Oldendorff',
-  'Helga Oldendorff',
-  'Hille Oldendorff',
-  'Hermine Oldendorff',
-  'Hedwig Oldendorff',
-  'Hanna Oldendorff',
-  'Hannes Oldendorff',
-  'Hugo Oldendorff',
-  'Heide Oldendorff',
-  'Hauke Oldendorff',
-  'Henry Oldendorff',
-  'Rik Oldendorff',
-  'Regina Oldendorff',
-  'Rixta Oldendorff',
-  'Richard Oldendorff ',
-  'Patricia Oldendorff',
-  'Paul Oldendorff',
-  'Penelope Oldendorff',
-  'Philipp Oldendorff',
-  'Kim Oldendorff',
-  'Klara Oldendorff',
-  'Kirsten Oldendorff',
-  'Eckert Oldendorff',
-  'Emma Oldendorff',
-  'Erna Oldendorff',
-  'Edgar Oldendorff',
-  'Eike Oldendorff',
-  'Eva Oldendorff',
-  'Georg Oldendorff',
-  'Gebe Oldendorff',
-  'Gretke Oldendorff',
-  'Gisela Oldendorff',
-  'Clivia Oldendorff',
-  'Chiara Oldendorff',
-  'Other'
+const VESSELS=[
+  'Magnus Oldendorff','Martha Oldendorff','Mina Oldendorff','Magdalena Oldendorff',
+  'Margret Oldendorff','Marlene Oldendorff','Helga Oldendorff','Hille Oldendorff',
+  'Hermine Oldendorff','Hedwig Oldendorff','Hanna Oldendorff','Hannes Oldendorff',
+  'Hugo Oldendorff','Heide Oldendorff','Hauke Oldendorff','Henry Oldendorff',
+  'Rik Oldendorff','Regina Oldendorff','Rixta Oldendorff','Richard Oldendorff',
+  'Patricia Oldendorff','Paul Oldendorff','Penelope Oldendorff','Philipp Oldendorff',
+  'Kim Oldendorff','Klara Oldendorff','Kirsten Oldendorff',
+  'Eckert Oldendorff','Emma Oldendorff','Erna Oldendorff','Edgar Oldendorff','Eike Oldendorff','Eva Oldendorff',
+  'Georg Oldendorff','Gebe Oldendorff','Gretke Oldendorff','Gisela Oldendorff',
+  'Clivia Oldendorff','Chiara Oldendorff','Other'
 ];
 
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    persistSession: true,
-    storageKey: 'vessellog-auth',
-    storage: window.localStorage,
-    autoRefreshToken: true,
-    detectSessionInUrl: false
-  }
-});
+const {createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,storageKey:'vessellog-auth',storage:window.localStorage,autoRefreshToken:true,detectSessionInUrl:false}});
 
-// ═══════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════
-let currentUser = null;
-let isOffice    = false;
-let uploadedPhotos = [];
-let planCount   = 0;
-let realtimeSub = null;
+let currentUser=null,isOffice=false,uploadedPhotos=[],planCount=0,realtimeSub=null;
 
-// ═══════════════════════════════════════════════════════
-// AUTH
-// ═══════════════════════════════════════════════════════
-let authMode = 'signin';
-
+// ═══ AUTH ═══
+let authMode='signin';
 function setAuthMode(mode){
-  authMode = mode;
-  document.getElementById('tab-signin').classList.toggle('active', mode==='signin');
-  document.getElementById('tab-register').classList.toggle('active', mode==='register');
-  const isReg = mode==='register';
-  document.getElementById('name-field').style.display   = isReg ? 'flex' : 'none';
-  document.getElementById('vessel-field').style.display = isReg ? 'flex' : 'none';
-  document.getElementById('remember-wrap').style.display= isReg ? 'none' : 'flex';
-  document.getElementById('auth-btn').textContent = isReg ? 'CREATE ACCOUNT' : 'SIGN IN';
-  document.getElementById('auth-msg').textContent = '';
-
-  // Populate vessel dropdown on first open
+  authMode=mode;
+  document.getElementById('tab-signin').classList.toggle('active',mode==='signin');
+  document.getElementById('tab-register').classList.toggle('active',mode==='register');
+  const isReg=mode==='register';
+  document.getElementById('name-field').style.display=isReg?'flex':'none';
+  document.getElementById('vessel-field').style.display=isReg?'flex':'none';
+  document.getElementById('remember-wrap').style.display=isReg?'none':'flex';
+  document.getElementById('auth-btn').textContent=isReg?'CREATE ACCOUNT':'SIGN IN';
+  document.getElementById('auth-msg').textContent='';
   if(isReg){
-    const sel = document.getElementById('auth-vessel');
-    if(sel.options.length <= 1){
-      VESSELS.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); });
-    }
+    const sel=document.getElementById('auth-vessel');
+    if(sel.options.length<=1){VESSELS.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o);});}
   }
 }
 
 async function doAuth(){
-  const email = document.getElementById('auth-email').value.trim();
-  const pwd   = document.getElementById('auth-pwd').value;
-  const name  = document.getElementById('auth-name').value.trim();
-  const btn   = document.getElementById('auth-btn');
-  const msg   = document.getElementById('auth-msg');
-
-  if(!email || !pwd){ msg.textContent='Please enter email and password.'; return; }
-  if(authMode==='register' && !name){ msg.textContent='Please enter your name.'; return; }
-  if(authMode==='register' && !checkIsOffice(email)){
-    const vessel = document.getElementById('auth-vessel').value;
-    if(!vessel){ msg.textContent='Please select your vessel.'; return; }
+  const email=document.getElementById('auth-email').value.trim();
+  const pwd=document.getElementById('auth-pwd').value;
+  const name=document.getElementById('auth-name').value.trim();
+  const btn=document.getElementById('auth-btn');
+  const msg=document.getElementById('auth-msg');
+  if(!email||!pwd){msg.textContent='Please enter email and password.';return;}
+  if(authMode==='register'&&!name){msg.textContent='Please enter your name.';return;}
+  if(authMode==='register'&&!checkIsOffice(email)){
+    const vessel=document.getElementById('auth-vessel').value;
+    if(!vessel){msg.textContent='Please select your vessel.';return;}
   }
-
-  btn.textContent = authMode==='signin' ? 'SIGNING IN...' : 'CREATING...';
-  btn.disabled = true; msg.textContent = '';
-
+  btn.textContent=authMode==='signin'?'SIGNING IN...':'CREATING...';
+  btn.disabled=true;msg.textContent='';
   let result;
   if(authMode==='register'){
-    const vessel = document.getElementById('auth-vessel').value;
-    result = await sb.auth.signUp({
-      email, password:pwd,
-      options:{ data:{
-        full_name: name,
-        vessel: checkIsOffice(email) ? null : vessel
-      }}
-    });
+    const vessel=document.getElementById('auth-vessel').value;
+    result=await sb.auth.signUp({email,password:pwd,options:{data:{full_name:name,vessel:checkIsOffice(email)?null:vessel}}});
     if(!result.error){
       msg.style.color='var(--accent)';
       msg.textContent='Account created! Please check your email to confirm, then sign in.';
-      btn.disabled=false; btn.textContent='CREATE ACCOUNT';
-      setAuthMode('signin'); return;
+      btn.disabled=false;btn.textContent='CREATE ACCOUNT';
+      setAuthMode('signin');return;
     }
   } else {
-    const remember = document.getElementById('remember-me')?.checked !== false;
-    result = await sb.auth.signInWithPassword({ email, password:pwd });
-    if(!result.error && !remember){
-      // If not remember me - clear localStorage on tab close
-      window.addEventListener('beforeunload', ()=> sb.auth.signOut(), { once:true });
-    }
+    result=await sb.auth.signInWithPassword({email,password:pwd});
+    const remember=document.getElementById('remember-me')?.checked!==false;
+    if(!result.error&&!remember){window.addEventListener('beforeunload',()=>sb.auth.signOut(),{once:true});}
   }
-
   if(result.error){
     msg.style.color='var(--warn)';
-    msg.textContent = result.error.message;
+    msg.textContent=result.error.message;
     btn.disabled=false;
-    btn.textContent = authMode==='signin' ? 'SIGN IN' : 'CREATE ACCOUNT';
+    btn.textContent=authMode==='signin'?'SIGN IN':'CREATE ACCOUNT';
   }
 }
 
 async function signOut(){
-  if(realtimeSub) sb.removeChannel(realtimeSub);
+  if(realtimeSub)sb.removeChannel(realtimeSub);
   await sb.auth.signOut();
-  // Full page reload guarantees clean state — no stale flags or DOM
   window.location.reload();
 }
 
-// Auth state listener
-sb.auth.onAuthStateChange((event, session) => {
-  if(event === 'SIGNED_IN' && session?.user){
-    currentUser = session.user;
-    isOffice = checkIsOffice(currentUser.email);
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
+sb.auth.onAuthStateChange((event,session)=>{
+  if((event==='SIGNED_IN'||event==='INITIAL_SESSION')&&session?.user){
+    currentUser=session.user;isOffice=checkIsOffice(currentUser.email);
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='block';
     initApp();
-  } else if(event === 'SIGNED_OUT'){
-    currentUser = null;
-    document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('app').style.display = 'none';
-  } else if(event === 'INITIAL_SESSION' && session?.user){
-    currentUser = session.user;
-    isOffice = checkIsOffice(currentUser.email);
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    initApp();
-  } else if(event === 'INITIAL_SESSION' && !session){
-    document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('app').style.display = 'none';
+  } else if(event==='SIGNED_OUT'||(event==='INITIAL_SESSION'&&!session)){
+    currentUser=null;
+    document.getElementById('login-screen').style.display='flex';
+    document.getElementById('app').style.display='none';
   }
 });
 
-// ═══════════════════════════════════════════════════════
-// INIT APP
-// ═══════════════════════════════════════════════════════
-let appInitialized = false;
-
+// ═══ INIT APP ═══
+let appInitialized=false;
 function initApp(){
-  if(appInitialized) return;
-  appInitialized = true;
-  // Set user display
-  const name = currentUser.user_metadata?.full_name || currentUser.email;
-  document.getElementById('user-display').textContent = name;
+  if(appInitialized)return;
+  appInitialized=true;
+  const name=currentUser.user_metadata?.full_name||currentUser.email;
+  document.getElementById('user-display').textContent=name;
   document.getElementById('user-display').style.color='';
   document.getElementById('user-display').style.fontStyle='';
-
-  // Pre-fill reported by from user name
-  const nameField = document.getElementById('f-submitter');
-  if(!nameField.value && currentUser.user_metadata?.full_name){
-    nameField.value = currentUser.user_metadata.full_name;
+  const nameField=document.getElementById('f-submitter');
+  if(!nameField.value&&currentUser.user_metadata?.full_name){
+    nameField.value=currentUser.user_metadata.full_name;
     updateReportedBy(nameField.value);
   }
-
-  // Handle vessel field — crew get locked to their vessel
-  const userVessel = currentUser.user_metadata?.vessel;
-  const vesselField = document.getElementById('f-vessel');
-
-  if(!isOffice){
-    // Populate vessel dropdown for crew and pre-select their assigned vessel
-    VESSELS.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; if(v===userVessel) o.selected=true; vesselField.appendChild(o); });
-    if(userVessel){ vesselField.disabled=true; vesselField.style.cssText+=';background:var(--surface);color:var(--accent);cursor:not-allowed;border-color:rgba(0,200,150,.3);'; }
-  } else if(isOffice){
-    // Office gets dropdown of all vessels
-    const wrap = vesselField.parentNode;
-    const sel = document.createElement('select');
-    sel.id = 'f-vessel';
-    sel.innerHTML = '<option value="">— Select vessel —</option>' +
-      VESSELS.map(v=>`<option value="${v}">${v}</option>`).join('');
-    sel.style.cssText = vesselField.style.cssText;
-    wrap.replaceChild(sel, vesselField);
+  const userVessel=currentUser.user_metadata?.vessel;
+  const vesselField=document.getElementById('f-vessel');
+  // Populate vessel dropdown
+  VESSELS.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;if(v===userVessel)o.selected=true;vesselField.appendChild(o);});
+  if(!isOffice&&userVessel){
+    vesselField.disabled=true;
+    vesselField.style.cssText+=';background:var(--surface);color:var(--accent);cursor:not-allowed;border-color:rgba(0,200,150,.3);';
   }
-
-  // Tab visibility — office sees only Dashboard + All Reports, crew sees Submit + My Reports
+  // Populate All Reports vessel filter
+  const fv=document.getElementById('filter-vessel');
+  if(fv&&fv.options.length<=1){VESSELS.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;fv.appendChild(o);});}
+  // Tab visibility
   if(isOffice){
     document.querySelectorAll('.office-only').forEach(el=>el.style.display='block');
     document.querySelectorAll('.crew-only').forEach(el=>el.style.display='none');
     switchTab('dashboard');
+  } else {
+    loadMyReportsBadge();
+    setTimeout(loadDraft,800);
   }
-
-  // Populate All Reports vessel filter dropdown
-  const fv = document.getElementById('filter-vessel');
-  if(fv && fv.options.length <= 1){
-    VESSELS.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; fv.appendChild(o); });
-  }
-
-  // Date
-  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
-
-  // Clock
-  updateClock(); setInterval(updateClock,1000);
-
-  // Default rows
-  if(document.querySelectorAll('#equip-list .equip-row').length===0) addEquip();
-  if(document.querySelectorAll('#plan-list .plan-row').length===0) addPlan();
+  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  updateClock();setInterval(updateClock,1000);
+  if(document.querySelectorAll('#equip-list .equip-row').length===0)addEquip();
+  if(document.querySelectorAll('#plan-list .plan-row').length===0)addPlan();
   autoCalcPct();
-
-  // Real-time for office — unique channel per session to support concurrent users
   if(isOffice){
-    const channelName = 'reports-live-' + currentUser.id.slice(0,8);
-    realtimeSub = sb.channel(channelName)
+    const channelName='reports-live-'+currentUser.id.slice(0,8);
+    realtimeSub=sb.channel(channelName)
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'daily_reports'},()=>{
-        const dash = document.getElementById('tab-dashboard');
-        const all  = document.getElementById('tab-all-reports');
-        if(dash.style.display!=='none') loadDashboard();
-        if(all.style.display!=='none')  loadAllReports();
+        const dash=document.getElementById('tab-dashboard');
+        const all=document.getElementById('tab-all-reports');
+        if(dash.style.display!=='none')loadDashboard();
+        if(all.style.display!=='none')loadAllReports();
         showToast('📡 New report received!');
       }).subscribe();
   }
 }
 
-// ═══════════════════════════════════════════════════════
-// CLOCK & HELPERS
-// ═══════════════════════════════════════════════════════
-function updateClock(){
-  document.getElementById('live-clock').textContent = new Date().toUTCString().replace('GMT','UTC');
-}
-
+// ═══ HELPERS ═══
+function updateClock(){document.getElementById('live-clock').textContent=new Date().toUTCString().replace('GMT','UTC');}
 function updateReportedBy(val){
-  const el = document.getElementById('user-display');
-  if(val.trim()){ el.textContent=val.trim(); el.style.color=''; el.style.fontStyle=''; }
-  else { el.textContent='Not set'; el.style.color='var(--muted)'; el.style.fontStyle='italic'; }
+  const el=document.getElementById('user-display');
+  if(val.trim()){el.textContent=val.trim();el.style.color='';el.style.fontStyle='';}
+  else{el.textContent='Not set';el.style.color='var(--muted)';el.style.fontStyle='italic';}
 }
-
 function showToast(msg,err=false){
   const t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast'+(err?' err':''); t.classList.add('show');
+  t.textContent=msg;t.className='toast'+(err?' err':'');t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3500);
 }
 
-// ═══════════════════════════════════════════════════════
-// TABS
-// ═══════════════════════════════════════════════════════
+// ═══ TABS ═══
 function switchTab(tab){
-  ['submit','history','dashboard','all-reports'].forEach(t=>{
-    document.getElementById('tab-'+t).style.display = t===tab?'block':'none';
+  ['submit','history','dashboard','all-reports','faults'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=t===tab?'block':'none';
   });
   document.querySelectorAll('.nav-tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));
-  if(tab==='history')    loadMyReports();
-  if(tab==='dashboard')  loadDashboard();
-  if(tab==='all-reports') loadAllReports();
+  if(tab==='history')loadMyReports();
+  if(tab==='dashboard')loadDashboard();
+  if(tab==='all-reports')loadAllReports();
+  if(tab==='faults')loadFaultTracker();
 }
 
-// ═══════════════════════════════════════════════════════
-// AUTO COMPLETION %
-// ═══════════════════════════════════════════════════════
+// ═══ VESSEL CLASS ═══
+function getVesselClass(name){
+  if(!name)return'Other';
+  const words=name.trim().split(/\s+/);
+  const map={C:'C-Class',E:'E-Class',G:'G-Class',H:'H-Class',M:'M-Class',P:'P-Class',R:'R-Class'};
+  for(const w of words){const c=map[w[0]?.toUpperCase()];if(c)return c;}
+  return'Other';
+}
+
+// ═══ COMPLETION % ═══
 function autoCalcPct(){
-  const rows = document.querySelectorAll('#equip-list .equip-row');
-  const total = rows.length;
-  if(!total){
-    document.getElementById('pct-live').textContent='—';
-    document.getElementById('pct-bar').style.width='0%';
-    document.getElementById('pct-breakdown').textContent='Add equipment to calculate';
-    return;
-  }
+  const rows=document.querySelectorAll('#equip-list .equip-row');
+  const total=rows.length;
+  if(!total){document.getElementById('pct-live').textContent='—';document.getElementById('pct-bar').style.width='0%';document.getElementById('pct-breakdown').textContent='Add equipment to calculate';return;}
   let done=0,faulty=0,pending=0,preparing=0,testing=0;
   rows.forEach(row=>{
-    const v = row.querySelector('select')?.value||'';
-    if(v==='Operational') done++;
-    else if(v==='Ready for Testing') testing++;
-    else if(v==='Faulty') faulty++;
-    else if(v==='Pending') pending++;
-    else if(v==='Preparing') preparing++;
+    const v=row.querySelector('select')?.value||'';
+    if(v==='Operational')done++;else if(v==='Ready for Testing')testing++;
+    else if(v==='Faulty')faulty++;else if(v==='Pending')pending++;else if(v==='Preparing')preparing++;
   });
-  const pct = Math.round(((done+testing)/total)*100);
+  const pct=Math.round(((done+testing)/total)*100);
   document.getElementById('pct-live').textContent=pct+'%';
   document.getElementById('pct-bar').style.width=pct+'%';
-  document.getElementById('pct-breakdown').innerHTML=
-    `✅ Operational: ${done} &nbsp;🔬 Testing: ${testing}<br>⚙️ Preparing: ${preparing} &nbsp;⏳ Pending: ${pending} &nbsp;❌ Faulty: ${faulty}`;
+  document.getElementById('pct-breakdown').innerHTML=`✅ Operational: ${done} &nbsp;🔬 Testing: ${testing}<br>⚙️ Preparing: ${preparing} &nbsp;⏳ Pending: ${pending} &nbsp;❌ Faulty: ${faulty}`;
   const bar=document.getElementById('pct-bar');
-  if(pct===100) bar.style.background='linear-gradient(90deg,#00c896,#00e0aa)';
-  else if(faulty>0&&pct<50) bar.style.background='linear-gradient(90deg,#ff6b35,#ffc800)';
+  if(pct===100)bar.style.background='linear-gradient(90deg,#00c896,#00e0aa)';
+  else if(faulty>0&&pct<50)bar.style.background='linear-gradient(90deg,#ff6b35,#ffc800)';
   else bar.style.background='linear-gradient(90deg,#00c896,#0088ff)';
 }
 
-// ═══════════════════════════════════════════════════════
-// EQUIPMENT ROWS
-// ═══════════════════════════════════════════════════════
+// ═══ EQUIPMENT ═══
 function addEquip(){
-  const row=document.createElement('div'); row.className='equip-row';
-  row.innerHTML=`
-    <div class="field"><label>Equipment / Material Name</label><input type="text" placeholder="e.g. Mobile Crane A, Paint Stock..."></div>
-    <div class="field"><label>Status</label>
-      <select onchange="autoCalcPct()">
-        <option>Operational</option><option>Preparing</option>
-        <option>Pending</option><option>Faulty</option><option>Ready for Testing</option>
-      </select>
-    </div>
+  const row=document.createElement('div');row.className='equip-row';
+  row.innerHTML=`<div class="field"><label>Equipment / Material Name</label><input type="text" placeholder="e.g. Mobile Crane A, Paint Stock..."></div>
+    <div class="field"><label>Status</label><select onchange="autoCalcPct()"><option>Operational</option><option>Preparing</option><option>Pending</option><option>Faulty</option><option>Ready for Testing</option></select></div>
     <div class="field"><label>Issues / Notes</label><input type="text" placeholder="Any issues or notes..."></div>
     <button class="remove-btn" onclick="this.closest('.equip-row').remove();autoCalcPct()">✕</button>`;
   document.getElementById('equip-list').appendChild(row);
   autoCalcPct();
 }
-
 function getEquipData(){
-  return [...document.querySelectorAll('#equip-list .equip-row')].map(row=>({
-    equipment_name: row.querySelector('input[type=text]')?.value.trim()||'',
-    status: row.querySelector('select')?.value||'',
-    issues_noted: row.querySelectorAll('input[type=text]')[1]?.value.trim()||''
+  return[...document.querySelectorAll('#equip-list .equip-row')].map(row=>({
+    equipment_name:row.querySelector('input[type=text]')?.value.trim()||'',
+    status:row.querySelector('select')?.value||'',
+    issues_noted:row.querySelectorAll('input[type=text]')[1]?.value.trim()||''
   })).filter(e=>e.equipment_name);
 }
 
-// ═══════════════════════════════════════════════════════
-// JOB PLAN ROWS
-// ═══════════════════════════════════════════════════════
+// ═══ JOB PLAN ═══
 function addPlan(){
   planCount++;
-  const row=document.createElement('div'); row.className='plan-row';
-  row.innerHTML=`
-    <div class="plan-num">${planCount}</div>
+  const row=document.createElement('div');row.className='plan-row';
+  row.innerHTML=`<div class="plan-num">${planCount}</div>
     <div class="field"><label>Planned Task</label><input type="text" placeholder="Describe the task for tomorrow..."></div>
     <button class="remove-btn" onclick="removePlan(this)">✕</button>`;
   document.getElementById('plan-list').appendChild(row);
 }
-function removePlan(btn){ btn.closest('.plan-row').remove(); reNumberPlans(); }
-function reNumberPlans(){
-  document.querySelectorAll('#plan-list .plan-num').forEach((el,i)=>el.textContent=i+1);
-  planCount=document.querySelectorAll('#plan-list .plan-row').length;
-}
-function getPlanData(){
-  return [...document.querySelectorAll('#plan-list .plan-row input')].map(i=>i.value.trim()).filter(Boolean);
-}
+function removePlan(btn){btn.closest('.plan-row').remove();reNumberPlans();}
+function reNumberPlans(){document.querySelectorAll('#plan-list .plan-num').forEach((el,i)=>el.textContent=i+1);planCount=document.querySelectorAll('#plan-list .plan-row').length;}
+function getPlanData(){return[...document.querySelectorAll('#plan-list .plan-row input')].map(i=>i.value.trim()).filter(Boolean);}
 
-// ═══════════════════════════════════════════════════════
-// PHOTOS
-// ═══════════════════════════════════════════════════════
+// ═══ PHOTOS ═══
 function handlePhotos(files){
   [...files].forEach(f=>{
-    if(!f.type.startsWith('image/')) return;
+    if(!f.type.startsWith('image/'))return;
     const r=new FileReader();
-    r.onload=e=>{ uploadedPhotos.push({src:e.target.result,caption:f.name.replace(/\.[^.]+$/,'')}); renderPhotos(); };
+    r.onload=e=>{uploadedPhotos.push({src:e.target.result,caption:f.name.replace(/\.[^.]+$/,'')});renderPhotos();};
     r.readAsDataURL(f);
   });
   document.getElementById('photo-input').value='';
 }
 function renderPhotos(){
   const g=document.getElementById('photo-grid');
-  g.innerHTML=uploadedPhotos.map((p,i)=>`
-    <div class="photo-item">
-      <img src="${p.src}" alt="${p.caption}">
-      <button class="photo-remove" onclick="removePhoto(${i})">✕</button>
-      <div class="photo-caption"><input type="text" value="${p.caption}" placeholder="Caption..." onchange="uploadedPhotos[${i}].caption=this.value"></div>
-    </div>`).join('');
+  g.innerHTML=uploadedPhotos.map((p,i)=>`<div class="photo-item"><img src="${p.src}" alt="${p.caption}"><button class="photo-remove" onclick="removePhoto(${i})">✕</button><div class="photo-caption"><input type="text" value="${p.caption}" placeholder="Caption..." onchange="uploadedPhotos[${i}].caption=this.value"></div></div>`).join('');
   document.getElementById('photo-count').textContent=uploadedPhotos.length?`${uploadedPhotos.length} photo${uploadedPhotos.length!==1?'s':''} attached`:'';
 }
-function removePhoto(i){ uploadedPhotos.splice(i,1); renderPhotos(); }
-function onDragOver(e){ e.preventDefault(); document.getElementById('drop-zone').classList.add('drag-over'); }
-function onDragLeave(){ document.getElementById('drop-zone').classList.remove('drag-over'); }
-function onDrop(e){ e.preventDefault(); document.getElementById('drop-zone').classList.remove('drag-over'); handlePhotos(e.dataTransfer.files); }
+function removePhoto(i){uploadedPhotos.splice(i,1);renderPhotos();}
+function onDragOver(e){e.preventDefault();document.getElementById('drop-zone').classList.add('drag-over');}
+function onDragLeave(){document.getElementById('drop-zone').classList.remove('drag-over');}
+function onDrop(e){e.preventDefault();document.getElementById('drop-zone').classList.remove('drag-over');handlePhotos(e.dataTransfer.files);}
 
-// ═══════════════════════════════════════════════════════
-// SUBMIT REPORT
-// ═══════════════════════════════════════════════════════
+// ═══ SUBMIT ═══
 async function submitReport(){
-  const vessel   = document.getElementById('f-vessel').value.trim();
-  const date     = document.getElementById('f-date').value;
-  const reporter = document.getElementById('f-submitter').value.trim();
-  const acts     = document.getElementById('f-activities').value.trim();
-
-  if(!vessel||!date||!reporter){
-    showToast('Please fill in Vessel Name, Date and Reported By',true); return;
-  }
-
+  const vessel=document.getElementById('f-vessel').value.trim();
+  const date=document.getElementById('f-date').value;
+  const reporter=document.getElementById('f-submitter').value.trim();
+  if(!vessel||!date||!reporter){showToast('Please fill in Vessel Name, Date and Reported By',true);return;}
   const btn=document.getElementById('submit-btn');
-  btn.textContent='SUBMITTING...'; btn.disabled=true;
-
-  // Calculate pct
+  btn.textContent='SUBMITTING...';btn.disabled=true;
   const rows=document.querySelectorAll('#equip-list .equip-row');
-  const total=rows.length;
-  let done=0,testing=0;
+  const total=rows.length;let done=0,testing=0;
   rows.forEach(r=>{const v=r.querySelector('select')?.value||'';if(v==='Operational')done++;if(v==='Ready for Testing')testing++;});
   const pct=total?Math.round(((done+testing)/total)*100):null;
-
-  const payload = {
-    vessel_name:    vessel,
-    date:           date,
-    submitted_by:   reporter,
-    user_id:        currentUser.id,
-    location:       document.getElementById('f-location').value.trim()||null,
-    hours_worked:   parseFloat(document.getElementById('f-hours').value)||null,
-    completion_pct: pct,
-    work_activities:acts||null,
-    status:         'submitted'
-  };
-
-  // Add optional columns — these require the ALTER TABLE to have been run
-  const concerns    = document.getElementById('f-concerns').value.trim()||null;
-  const remarks     = document.getElementById('f-remarks').value.trim()||null;
-  const planJson    = getPlanData().length ? JSON.stringify(getPlanData()) : null;
-  const photosJson  = uploadedPhotos.length ? JSON.stringify(uploadedPhotos.map(p=>({src:p.src,caption:p.caption}))) : null;
-
-  // First try with all columns
-  let {data:report, error} = await sb.from('daily_reports').insert({
-    ...payload, concerns, remarks, next_day_plan:planJson, photos_json:photosJson
-  }).select().single();
-
-  // If schema error — retry with base columns only
-  if(error && error.message.includes('schema cache')){
-    const res = await sb.from('daily_reports').insert(payload).select().single();
-    report = res.data; error = res.error;
-    if(!error) showToast('⚠ Note: Run the ALTER TABLE SQL in Supabase to save concerns & photos');
+  const payload={vessel_name:vessel,date,submitted_by:reporter,user_id:currentUser.id,
+    location:document.getElementById('f-location').value.trim()||null,
+    hours_worked:parseFloat(document.getElementById('f-hours').value)||null,
+    completion_pct:pct,work_activities:document.getElementById('f-activities').value.trim()||null,status:'submitted'};
+  const concerns=document.getElementById('f-concerns').value.trim()||null;
+  const remarks=document.getElementById('f-remarks').value.trim()||null;
+  const planJson=getPlanData().length?JSON.stringify(getPlanData()):null;
+  const photosJson=uploadedPhotos.length?JSON.stringify(uploadedPhotos.map(p=>({src:p.src,caption:p.caption}))):null;
+  let{data:report,error}=await sb.from('daily_reports').insert({...payload,concerns,remarks,next_day_plan:planJson,photos_json:photosJson}).select().single();
+  if(error&&error.message.includes('schema cache')){
+    const res=await sb.from('daily_reports').insert(payload).select().single();
+    report=res.data;error=res.error;
+    if(!error)showToast('⚠ Note: Run the ALTER TABLE SQL to save concerns & photos');
   }
-  if(error){ showToast('Error: '+error.message,true); btn.textContent='SUBMIT REPORT →'; btn.disabled=false; return; }
+  if(error){showToast('Error: '+error.message,true);btn.textContent='SUBMIT REPORT →';btn.disabled=false;return;}
   const equip=getEquipData();
-  if(equip.length){
-    await sb.from('equipment_status').insert(equip.map(e=>({...e,report_id:report.id})));
-  }
-
-  // ── Email notification via Resend API ──
-  try {
-    const _vessel   = currentUser.user_metadata?.vessel || document.getElementById('f-vessel')?.value.trim() || vessel || '—';
-    const _reporter = currentUser.user_metadata?.full_name || document.getElementById('f-submitter')?.value.trim() || reporter || '—';
-    const _date     = document.getElementById('f-date').value || date || '—';
-    await fetch('https://amzyfqcxmaorvrhlplms.supabase.co/functions/v1/notify-office', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtenlmcWN4bWFvcnZyaGxwbG1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDIwMDIsImV4cCI6MjA4NzY3ODAwMn0.orFPAjE3vnF07i-RDiMQM6ky55tqZ30qEprGAqYWh6Q'
-      },
-      body: JSON.stringify({
-        vessel_name:    _vessel,
-        date:           _date,
-        submitted_by:   _reporter,
-        location:       document.getElementById('f-location').value.trim()||'—',
-        hours:          document.getElementById('f-hours').value||'—',
-        completion_pct: pct,
-        concerns:       document.getElementById('f-concerns').value.trim()||null
-      })
+  if(equip.length){await sb.from('equipment_status').insert(equip.map(e=>({...e,report_id:report.id})));}
+  try{
+    await fetch('https://amzyfqcxmaorvrhlplms.supabase.co/functions/v1/notify-office',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtenlmcWN4bWFvcnZyaGxwbG1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDIwMDIsImV4cCI6MjA4NzY3ODAwMn0.orFPAjE3vnF07i-RDiMQM6ky55tqZ30qEprGAqYWh6Q'},
+      body:JSON.stringify({record:{id:report.id,vessel_name:vessel,submitted_by:reporter,date,location:document.getElementById('f-location').value.trim()||'—',hours_worked:document.getElementById('f-hours').value||'—',completion_pct:pct,concerns}})
     });
-  } catch(e){ /* silent — email failure does not block report submission */ }
+  }catch(e){}
   showToast('✓ Report submitted successfully.');
-  btn.textContent='SUBMIT REPORT →'; btn.disabled=false;
+  btn.textContent='SUBMIT REPORT →';btn.disabled=false;
   clearForm();
+  window.scrollTo({top:0,behavior:'smooth'});
+  loadMyReportsBadge();
 }
-// ═══════════════════════════════════════════════════════
-// CLEAR FORM
-// ═══════════════════════════════════════════════════════
-// clearForm defined below
 
-// ═══════════════════════════════════════════════════════
-// PDF EXPORT
-// ═══════════════════════════════════════════════════════
-async function exportWord(){
-  const _docx = window.docx || (typeof docx !== 'undefined' ? docx : null);
-  if(!_docx){ showToast('Word library not loaded. Please refresh the page and try again.', true); return; }
-  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, AlignmentType, BorderStyle, WidthType, ShadingType, PageBreak, ImageRun } = _docx;
-
-  const vessel   = document.getElementById('f-vessel').value || '—';
-  const date     = document.getElementById('f-date').value || '—';
-  const reporter = document.getElementById('f-submitter').value || '—';
-  const location = document.getElementById('f-location').value || '—';
-  const hours    = document.getElementById('f-hours').value || '—';
-  const acts     = document.getElementById('f-activities').value || '';
-  const concerns = document.getElementById('f-concerns').value || '';
-  const remarks  = document.getElementById('f-remarks').value || '';
-  const pct      = document.getElementById('pct-live').textContent || '—';
-  const equip    = getEquipData();
-  const plan     = getPlanData();
-
-  const border   = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
-  const borders  = { top: border, bottom: border, left: border, right: border };
-  const cellMargins = { top: 80, bottom: 80, left: 120, right: 120 };
-  const tblWidth = { size: 9026, type: WidthType.DXA };
-
-  function heading(text, level='section'){
-    return new Paragraph({
-      children: [new TextRun({ text, bold: true, size: level==='main'?36:26, font:'Arial',
-        color: level==='main'?'1a6b4a': level==='warn'?'cc4400': level==='blue'?'0055cc':'1a2230' })],
-      spacing: { before: level==='main'?0:280, after: 120 }
-    });
+// ═══ CLEAR FORM ═══
+function clearForm(){
+  ['f-location','f-hours','f-activities','f-concerns','f-remarks'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('equip-list').innerHTML='';
+  document.getElementById('plan-list').innerHTML='';planCount=0;
+  uploadedPhotos=[];renderPhotos();
+  addEquip();addPlan();autoCalcPct();
+  const userVessel=currentUser?.user_metadata?.vessel;
+  if(!isOffice&&userVessel){
+    const vf=document.getElementById('f-vessel');
+    if(vf){vf.value=userVessel;vf.disabled=true;}
   }
-  function body(text){
-    return new Paragraph({ children: [new TextRun({ text, size: 22, font:'Arial' })],
-      spacing: { after: 80 } });
-  }
-  function labelVal(label, val){
-    return new TableRow({ children: [
-      new TableCell({ borders, width:{ size:2500, type:WidthType.DXA }, margins: cellMargins,
-        shading:{ fill:'F0F4F8', type:ShadingType.CLEAR },
-        children:[new Paragraph({ children:[new TextRun({ text:label, bold:true, size:20, font:'Arial', color:'444444' })] })] }),
-      new TableCell({ borders, width:{ size:6526, type:WidthType.DXA }, margins: cellMargins,
-        children:[new Paragraph({ children:[new TextRun({ text:String(val), size:20, font:'Arial' })] })] })
-    ]});
-  }
+}
 
-  const children = [
-    // Title
-    new Paragraph({ children:[new TextRun({ text:'VFD RETROFIT DAILY REPORT', font:'Arial', size:56, bold:true, color:'00c896' })], spacing:{ after:60 } }),
-    new Paragraph({ children:[new TextRun({ text:'Daily Operations Report', font:'Arial', size:24, color:'666666' })], spacing:{ after:40 } }),
-    new Paragraph({ children:[new TextRun({ text:`Generated: ${new Date().toLocaleString()}`, font:'Arial', size:18, color:'888888' })], spacing:{ after:400 } }),
+// ═══ MY REPORTS BADGE ═══
+async function loadMyReportsBadge(){
+  if(isOffice)return;
+  const userVessel=currentUser?.user_metadata?.vessel;if(!userVessel)return;
+  const{count}=await sb.from('daily_reports').select('id',{count:'exact',head:true}).eq('vessel_name',userVessel);
+  const badge=document.getElementById('history-badge');
+  if(badge&&count>0){badge.textContent=count;badge.style.display='inline';}
+}
 
-    // Vessel & Shift Info
-    heading('VESSEL & SHIFT INFO', 'main'),
-    new Table({ width: tblWidth, columnWidths:[2500,6526], rows:[
-      labelVal('Vessel Name', vessel),
-      labelVal('Report Date', date),
-      labelVal('Reported By', reporter),
-      labelVal('Location / Port', location),
-      labelVal('Hours Worked', hours + (hours!=='—'?'h':'')),
-      labelVal('Completion %', pct),
-    ]}),
-
-    // Work Activities
-    new Paragraph({ spacing:{ before:360, after:120 } }),
-    heading('DAILY WORK ACTIVITIES', 'main'),
-    ...acts.split('\n').filter(Boolean).map(line => body(line)),
-    ...(acts?[]:[body('—')]),
-  ];
-
-  // Equipment
-  if(equip.length){
-    children.push(new Paragraph({ spacing:{ before:360, after:120 } }));
-    children.push(heading('EQUIPMENT / MATERIALS STATUS', 'main'));
-    children.push(new Table({ width: tblWidth, columnWidths:[3500,2000,3526],
-      rows:[
-        new TableRow({ children:[
-          new TableCell({ borders, width:{size:3500,type:WidthType.DXA}, margins:cellMargins,
-            shading:{fill:'1a6b4a',type:ShadingType.CLEAR},
-            children:[new Paragraph({children:[new TextRun({text:'Equipment / Material',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] }),
-          new TableCell({ borders, width:{size:2000,type:WidthType.DXA}, margins:cellMargins,
-            shading:{fill:'1a6b4a',type:ShadingType.CLEAR},
-            children:[new Paragraph({children:[new TextRun({text:'Status',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] }),
-          new TableCell({ borders, width:{size:3526,type:WidthType.DXA}, margins:cellMargins,
-            shading:{fill:'1a6b4a',type:ShadingType.CLEAR},
-            children:[new Paragraph({children:[new TextRun({text:'Issues / Notes',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] }),
-        ]}),
-        ...equip.map(e => new TableRow({ children:[
-          new TableCell({ borders, width:{size:3500,type:WidthType.DXA}, margins:cellMargins,
-            children:[new Paragraph({children:[new TextRun({text:e.equipment_name,size:20,font:'Arial'})]})] }),
-          new TableCell({ borders, width:{size:2000,type:WidthType.DXA}, margins:cellMargins,
-            shading:{fill: e.status==='Faulty'?'fff2ee': e.status==='Operational'?'e8fff8':'fffbee', type:ShadingType.CLEAR},
-            children:[new Paragraph({children:[new TextRun({text:e.status,size:20,font:'Arial',
-              color: e.status==='Faulty'?'cc3300': e.status==='Operational'?'006644':'996600'})]})] }),
-          new TableCell({ borders, width:{size:3526,type:WidthType.DXA}, margins:cellMargins,
-            children:[new Paragraph({children:[new TextRun({text:e.issues_noted||'—',size:20,font:'Arial',color:'666666'})]})] }),
-        ]}))
-      ]
-    }));
-  }
-
-  // Concerns
-  if(concerns.trim()){
-    children.push(new Paragraph({ spacing:{ before:360, after:120 } }));
-    children.push(heading('⚠ AREAS OF CONCERN / FINDINGS', 'warn'));
-    concerns.split('\n').filter(Boolean).forEach(line => children.push(body(line)));
-  }
-
-  // Next Day Plan
-  if(plan.length){
-    children.push(new Paragraph({ spacing:{ before:360, after:120 } }));
-    children.push(heading('JOB PLANNING — NEXT DAY', 'blue'));
-    plan.forEach((p,i) => children.push(
-      new Paragraph({ children:[new TextRun({text:`${i+1}.  ${p}`, size:22, font:'Arial'})], spacing:{after:80} })
-    ));
-  }
-
-  // Remarks
-  if(remarks.trim()){
-    children.push(new Paragraph({ spacing:{ before:360, after:120 } }));
-    children.push(heading('REMARKS', 'main'));
-    remarks.split('\n').filter(Boolean).forEach(line => children.push(body(line)));
-  }
-
-  // Photos — embed as actual images
-  if(uploadedPhotos.length){
-    children.push(new Paragraph({ spacing:{ before:360, after:120 } }));
-    children.push(heading('PICTURES', 'main'));
-    for(const p of uploadedPhotos){
-      try {
-        const base64 = p.src.split(',')[1];
-        const mimeMatch = p.src.match(/data:([^;]+);/);
-        const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
-        const imgType = mimeType.includes('png') ? 'png' : 'jpg';
-        const binaryStr = atob(base64);
-        const bytes = new Uint8Array(binaryStr.length);
-        for(let i=0;i<binaryStr.length;i++) bytes[i]=binaryStr.charCodeAt(i);
-        children.push(new Paragraph({ children:[new ImageRun({ data: bytes.buffer, transformation:{ width:400, height:300 }, type: imgType })], spacing:{ after:80 } }));
-        if(p.caption) children.push(body(p.caption));
-        children.push(new Paragraph({ spacing:{ after:120 } }));
-      } catch(e){ children.push(body(`[Photo: ${p.caption||'image'}]`)); }
+// ═══ OFFLINE DRAFT ═══
+function saveDraft(){
+  const draft={vessel:document.getElementById('f-vessel')?.value||'',location:document.getElementById('f-location')?.value||'',hours:document.getElementById('f-hours')?.value||'',activities:document.getElementById('f-activities')?.value||'',concerns:document.getElementById('f-concerns')?.value||'',remarks:document.getElementById('f-remarks')?.value||'',equip:getEquipData(),plan:getPlanData(),savedAt:new Date().toISOString()};
+  localStorage.setItem('vessellog-draft',JSON.stringify(draft));
+}
+function loadDraft(){
+  const raw=localStorage.getItem('vessellog-draft');if(!raw)return;
+  try{
+    const d=JSON.parse(raw);
+    if(Date.now()-new Date(d.savedAt).getTime()>86400000){localStorage.removeItem('vessellog-draft');return;}
+    if(!confirm('You have an unsaved draft from '+new Date(d.savedAt).toLocaleString()+'. Restore it?'))return;
+    if(d.location)document.getElementById('f-location').value=d.location;
+    if(d.hours)document.getElementById('f-hours').value=d.hours;
+    if(d.activities)document.getElementById('f-activities').value=d.activities;
+    if(d.concerns&&document.getElementById('f-concerns'))document.getElementById('f-concerns').value=d.concerns;
+    if(d.remarks)document.getElementById('f-remarks').value=d.remarks;
+    if(d.equip?.length){
+      document.getElementById('equip-list').innerHTML='';
+      d.equip.forEach(e=>{addEquip();const rows=document.querySelectorAll('#equip-list .equip-row');const last=rows[rows.length-1];last.querySelectorAll('input[type=text]')[0].value=e.equipment_name||'';last.querySelector('select').value=e.status||'Operational';last.querySelectorAll('input[type=text]')[1].value=e.issues_noted||'';});
+      autoCalcPct();
     }
-  }
-
-  const doc = new Document({
-    styles:{ default:{ document:{ run:{ font:'Arial', size:22 } } } },
-    sections:[{
-      properties:{ page:{ size:{ width:11906, height:16838 }, margin:{ top:1134, right:1134, bottom:1134, left:1134 } } },
-      children
-    }]
-  });
-
-  try {
-    const blob = await Packer.toBlob(doc);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `VesselLog_${vessel.replace(/\s+/g,'_')}_${date}.docx`;
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast('✓ Word document downloaded!');
-  } catch(err){
-    showToast('Export failed: ' + err.message, true);
-    console.error('Word export error:', err);
-  }
+    if(d.plan?.length){document.getElementById('plan-list').innerHTML='';planCount=0;d.plan.forEach(p=>{addPlan();const rows=document.querySelectorAll('#plan-list .plan-row input');rows[rows.length-1].value=p;});}
+    showToast('✓ Draft restored');
+    localStorage.removeItem('vessellog-draft');
+  }catch(e){localStorage.removeItem('vessellog-draft');}
 }
+setInterval(()=>{
+  if(currentUser&&!isOffice&&document.getElementById('tab-submit')?.style.display!=='none'){
+    const hasContent=document.getElementById('f-activities')?.value||document.getElementById('f-concerns')?.value||document.getElementById('f-location')?.value;
+    if(hasContent)saveDraft();
+  }
+},60000);
 
-// ═══════════════════════════════════════════════════════
-// LOAD MY REPORTS
-// ═══════════════════════════════════════════════════════
+// ═══ MY REPORTS ═══
 async function loadMyReports(){
   const el=document.getElementById('my-reports-container');
   el.innerHTML='<div class="loading"><div class="spinner"></div>&nbsp;LOADING...</div>';
-
-  let q = sb.from('daily_reports').select('*,equipment_status(*)').order('date',{ascending:false}).limit(100);
-
-  if(!isOffice){
-    // Crew sees all reports from their vessel only
-    const userVessel = currentUser.user_metadata?.vessel;
-    if(userVessel) q = q.eq('vessel_name', userVessel);
-    else q = q.eq('user_id', currentUser.id); // fallback — own reports only
-  }
-
-  const {data,error}=await q;
-  if(error||!data?.length){
-    el.innerHTML='<div class="empty-state">📋<br>No reports found for your vessel.<br>Submit the first report above.</div>'; return;
-  }
+  let q=sb.from('daily_reports').select('*,equipment_status(*)').order('date',{ascending:false}).limit(100);
+  if(!isOffice){const userVessel=currentUser.user_metadata?.vessel;if(userVessel)q=q.eq('vessel_name',userVessel);else q=q.eq('user_id',currentUser.id);}
+  const{data,error}=await q;
+  if(error||!data?.length){el.innerHTML='<div class="empty-state">📋<br>No reports found for your vessel.<br>Submit the first report above.</div>';return;}
   el.innerHTML='<div class="report-list">'+data.map((r,i)=>reportCard(r,i*50)).join('')+'</div>';
 }
 
-// ═══════════════════════════════════════════════════════
-// LOAD DASHBOARD
-// ═══════════════════════════════════════════════════════
-function getVesselClass(name){
-  if(!name) return 'Other';
-  const words = name.trim().split(/\s+/);
-  const map = {E:'E-Class',H:'H-Class',M:'M-Class',P:'P-Class',G:'G-Class'};
-  for(const w of words){ const c=map[w[0]?.toUpperCase()]; if(c) return c; }
-  return 'Other';
-}
-
+// ═══ DASHBOARD ═══
 async function loadDashboard(){
   const today=new Date().toISOString().split('T')[0];
-  const {data}=await sb.from('daily_reports').select('*,equipment_status(*)').eq('date',today).order('created_at',{ascending:false});
+  const{data}=await sb.from('daily_reports').select('*,equipment_status(*)').eq('date',today).order('created_at',{ascending:false});
   const d=data||[];
-
   document.getElementById('stat-total').textContent=d.length;
   document.getElementById('stat-vessels').textContent=new Set(d.map(r=>r.vessel_name)).size;
   document.getElementById('stat-faults').textContent=d.reduce((s,r)=>s+(r.equipment_status?.filter(e=>e.status==='Faulty').length||0),0);
   document.getElementById('stat-hours').textContent=d.reduce((s,r)=>s+(r.hours_worked||0),0).toFixed(1);
-
   const el=document.getElementById('dashboard-container');
-  if(!d.length){ el.innerHTML='<div class="empty-state">📡<br>No reports submitted today yet.</div>'; return; }
-
-  const classColors={'E-Class':'#00c896','H-Class':'#0088ff','M-Class':'#ffc800','P-Class':'#ff6b35','G-Class':'#a78bfa','Other':'#6a7a90'};
-  const classOrder=['E-Class','H-Class','M-Class','P-Class','G-Class','Other'];
+  if(!d.length){el.innerHTML='<div class="empty-state">📡<br>No reports submitted today yet.</div>';return;}
+  const classColors={'C-Class':'#ff4d9e','E-Class':'#00c896','G-Class':'#a78bfa','H-Class':'#0088ff','M-Class':'#ffc800','P-Class':'#ff6b35','R-Class':'#00d4ff','Other':'#6a7a90'};
+  const classOrder=['C-Class','E-Class','G-Class','H-Class','M-Class','P-Class','R-Class','Other'];
   const groups={};
-  d.forEach(r=>{ const c=getVesselClass(r.vessel_name); if(!groups[c]) groups[c]=[]; groups[c].push(r); });
-
+  d.forEach(r=>{const c=getVesselClass(r.vessel_name);if(!groups[c])groups[c]=[];groups[c].push(r);});
   let html='';
   classOrder.forEach(cls=>{
-    if(!groups[cls]) return;
+    if(!groups[cls])return;
     const col=classColors[cls];
-    html+=`<div style="margin-bottom:32px;">
-      <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:3px;
-        color:${col};padding:10px 16px;background:rgba(0,0,0,.15);border-left:3px solid ${col};
-        border-radius:0 3px 3px 0;margin-bottom:14px;">
-        // ${cls} &nbsp;<span style="color:var(--muted);font-weight:400;">${groups[cls].length} report${groups[cls].length!==1?'s':''}</span>
-      </div>
-      <div class="report-list">${groups[cls].map((r,i)=>reportCard(r,i*40)).join('')}</div>
-    </div>`;
+    html+=`<div style="margin-bottom:32px;"><div style="font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:3px;color:${col};padding:10px 16px;background:rgba(0,0,0,.15);border-left:3px solid ${col};border-radius:0 3px 3px 0;margin-bottom:14px;">// ${cls} <span style="color:var(--muted);font-weight:400;">${groups[cls].length} report${groups[cls].length!==1?'s':''}</span></div><div class="report-list">${groups[cls].map((r,i)=>reportCard(r,i*40)).join('')}</div></div>`;
   });
   el.innerHTML=html;
 }
 
-// ═══════════════════════════════════════════════════════
-// LOAD ALL REPORTS
-// ═══════════════════════════════════════════════════════
+// ═══ ALL REPORTS ═══
 async function loadAllReports(){
   const el=document.getElementById('all-reports-container');
   el.innerHTML='<div class="loading"><div class="spinner"></div>&nbsp;LOADING...</div>';
   let q=sb.from('daily_reports').select('*,equipment_status(*)').order('date',{ascending:false}).limit(200);
   const df=document.getElementById('filter-date')?.value;
   const vf=document.getElementById('filter-vessel')?.value;
-  if(df) q=q.eq('date',df);
-  if(vf) q=q.eq('vessel_name',vf);
-  const {data}=await q;
-  const d=data||[];
-  if(!d.length){ el.innerHTML='<div class="empty-state">📂<br>No reports found.</div>'; return; }
+  const kw=(document.getElementById('filter-keyword')?.value||'').trim().toLowerCase();
+  if(df)q=q.eq('date',df);
+  if(vf)q=q.eq('vessel_name',vf);
+  const{data}=await q;
+  let d=data||[];
+  if(kw)d=d.filter(r=>(r.work_activities||'').toLowerCase().includes(kw)||(r.concerns||'').toLowerCase().includes(kw)||(r.vessel_name||'').toLowerCase().includes(kw)||(r.submitted_by||'').toLowerCase().includes(kw)||(r.location||'').toLowerCase().includes(kw));
+  if(!d.length){el.innerHTML='<div class="empty-state">📂<br>No reports found.</div>';return;}
   document.getElementById('filter-count').textContent=`Showing ${d.length} report${d.length!==1?'s':''}`;
-  if(vf){
-    el.innerHTML='<div class="report-list">'+d.map((r,i)=>reportCard(r,i*40)).join('')+'</div>';
-    return;
-  }
-  const classColors={'E-Class':'#00c896','H-Class':'#0088ff','M-Class':'#ffc800','P-Class':'#ff6b35','G-Class':'#a78bfa','C-Class':'#ff4d9e','R-Class':'#00d4ff','Other':'#6a7a90'};
+  if(vf||kw){el.innerHTML='<div class="report-list">'+d.map((r,i)=>reportCard(r,i*40)).join('')+'</div>';return;}
+  const classColors={'C-Class':'#ff4d9e','E-Class':'#00c896','G-Class':'#a78bfa','H-Class':'#0088ff','M-Class':'#ffc800','P-Class':'#ff6b35','R-Class':'#00d4ff','Other':'#6a7a90'};
   const classOrder=['C-Class','E-Class','G-Class','H-Class','M-Class','P-Class','R-Class','Other'];
   const groups={};
-  d.forEach(r=>{
-    const c=getVesselClass(r.vessel_name);
-    if(!groups[c]) groups[c]=[];
-    groups[c].push(r);
-  });
+  d.forEach(r=>{const c=getVesselClass(r.vessel_name);if(!groups[c])groups[c]=[];groups[c].push(r);});
   let html='';
   classOrder.forEach(cls=>{
-    if(!groups[cls]) return;
+    if(!groups[cls])return;
     const col=classColors[cls];
-    const header=`<div style="font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:3px;color:${col};padding:10px 16px;background:rgba(0,0,0,.15);border-left:3px solid ${col};border-radius:0 3px 3px 0;margin-bottom:14px;">// ${cls} <span style="color:var(--muted);font-weight:400;">${groups[cls].length} report${groups[cls].length!==1?'s':''}</span></div>`;
-    const cards=groups[cls].map((r,i)=>reportCard(r,i*40)).join('');
-    html+=`<div style="margin-bottom:32px;">${header}<div class="report-list">${cards}</div></div>`;
+    html+=`<div style="margin-bottom:32px;"><div style="font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:3px;color:${col};padding:10px 16px;background:rgba(0,0,0,.15);border-left:3px solid ${col};border-radius:0 3px 3px 0;margin-bottom:14px;">// ${cls} <span style="color:var(--muted);font-weight:400;">${groups[cls].length} report${groups[cls].length!==1?'s':''}</span></div><div class="report-list">${groups[cls].map((r,i)=>reportCard(r,i*40)).join('')}</div></div>`;
   });
   el.innerHTML=html;
 }
+
 function clearFilters(){
   document.getElementById('filter-date').value='';
   document.getElementById('filter-vessel').value='';
+  const kw=document.getElementById('filter-keyword');if(kw)kw.value='';
   loadAllReports();
 }
-function getVesselClass(name){
-  if(!name) return 'Other';
-  const words=name.trim().split(/\s+/);
-  const map={C:'C-Class',E:'E-Class',G:'G-Class',H:'H-Class',M:'M-Class',P:'P-Class',R:'R-Class'};
-  for(const w of words){
-    const c=map[w[0]?.toUpperCase()];
-    if(c) return c;
-  }
-  return 'Other';
+
+// ═══ FAULT TRACKER ═══
+async function loadFaultTracker(){
+  const el=document.getElementById('fault-tracker-container');if(!el)return;
+  el.innerHTML='<div class="loading"><div class="spinner"></div>&nbsp;LOADING...</div>';
+  const{data}=await sb.from('equipment_status').select('*,daily_reports(vessel_name,date,submitted_by)').eq('status','Faulty').order('created_at',{ascending:false}).limit(100);
+  const d=data||[];
+  if(!d.length){el.innerHTML='<div class="empty-state">✅<br>No active faults across fleet.</div>';return;}
+  const byVessel={};
+  d.forEach(e=>{const v=e.daily_reports?.vessel_name||'Unknown';if(!byVessel[v])byVessel[v]=[];byVessel[v].push(e);});
+  let html='';
+  Object.entries(byVessel).forEach(([vessel,faults])=>{
+    html+=`<div style="margin-bottom:24px;">
+      <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:2px;color:var(--warn);padding:8px 14px;background:rgba(255,107,53,.08);border-left:3px solid var(--warn);border-radius:0 3px 3px 0;margin-bottom:10px;">⚠ ${vessel} — ${faults.length} fault${faults.length>1?'s':''}</div>
+      ${faults.map(f=>`<div style="background:var(--card);border:1px solid rgba(255,107,53,.2);border-radius:3px;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
+        <div><div style="font-weight:600;margin-bottom:2px;">${f.equipment_name}</div><div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);">${f.daily_reports?.date||'—'} · ${f.issues_noted||'No notes'}</div></div>
+        <span style="background:rgba(255,107,53,.15);color:var(--warn);font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:2px;border:1px solid rgba(255,107,53,.2);white-space:nowrap;">FAULTY</span>
+      </div>`).join('')}
+    </div>`;
+  });
+  el.innerHTML=html;
 }
-  
-// ═══════════════════════════════════════════════════════
-// REPORT CARD (list view)
-// ═══════════════════════════════════════════════════════
+
+// ═══ COMMENTS ═══
+async function loadComments(reportId){const{data}=await sb.from('report_comments').select('*').eq('report_id',reportId).order('created_at',{ascending:true});return data||[];}
+async function addComment(reportId){
+  const input=document.getElementById('comment-input');const text=input?.value.trim();if(!text)return;
+  const name=currentUser.user_metadata?.full_name||currentUser.email;
+  const{error}=await sb.from('report_comments').insert({report_id:reportId,author:name,content:text,user_id:currentUser.id});
+  if(error){showToast('Error: '+error.message,true);return;}
+  input.value='';const comments=await loadComments(reportId);renderComments(comments,reportId);
+}
+function renderComments(comments,reportId){
+  const el=document.getElementById('comments-section');if(!el)return;
+  el.innerHTML=`<div class="divider"></div>
+    <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">💬 Comments (${comments.length})</div>
+    ${comments.map(c=>`<div class="comment-bubble"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-family:var(--font-mono);font-size:10px;font-weight:600;color:${isOffice?'var(--accent2)':'var(--accent)'};">${c.author}</span><span style="font-family:var(--font-mono);font-size:10px;color:var(--muted);">${new Date(c.created_at).toLocaleString()}</span></div><div style="font-size:13px;line-height:1.6;">${c.content}</div></div>`).join('')}
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <input id="comment-input" type="text" placeholder="Add a comment..." style="flex:1;" onkeydown="if(event.key==='Enter')addComment('${reportId}')">
+      <button onclick="addComment('${reportId}')" class="btn btn-secondary btn-sm">POST</button>
+    </div>`;
+}
+
+// ═══ EDIT REPORT ═══
+function openEditModal(r){
+  const canEdit=isOffice||r.user_id===currentUser?.id;
+  if(!canEdit){showToast('You can only edit your own reports',true);return;}
+  document.getElementById('detail-modal').classList.add('open');
+  document.getElementById('modal-content').innerHTML=`
+    <div style="font-family:var(--font-display);font-size:24px;letter-spacing:2px;margin-bottom:20px;">EDIT REPORT</div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:16px;">${r.vessel_name} · ${r.date}</div>
+    <div class="field" style="margin-bottom:14px;"><label>Location</label><input id="edit-location" value="${r.location||''}"></div>
+    <div class="field" style="margin-bottom:14px;"><label>Hours Worked</label><input id="edit-hours" type="number" value="${r.hours_worked||''}"></div>
+    <div class="field" style="margin-bottom:14px;"><label>Daily Work Activities</label><textarea id="edit-activities" rows="6">${r.work_activities||''}</textarea></div>
+    <div class="field" style="margin-bottom:14px;"><label>Areas of Concern</label><textarea id="edit-concerns" rows="4">${r.concerns||''}</textarea></div>
+    <div class="field" style="margin-bottom:20px;"><label>Remarks</label><textarea id="edit-remarks" rows="2">${r.remarks||''}</textarea></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-secondary" onclick="closeModal()">CANCEL</button>
+      <button class="btn btn-primary" onclick="saveEdit('${r.id}')">SAVE CHANGES</button>
+    </div>`;
+}
+async function saveEdit(id){
+  const updates={location:document.getElementById('edit-location')?.value.trim()||null,hours_worked:parseFloat(document.getElementById('edit-hours')?.value)||null,work_activities:document.getElementById('edit-activities')?.value.trim()||null,concerns:document.getElementById('edit-concerns')?.value.trim()||null,remarks:document.getElementById('edit-remarks')?.value.trim()||null};
+  const{error}=await sb.from('daily_reports').update(updates).eq('id',id);
+  if(error){showToast('Error: '+error.message,true);return;}
+  showToast('✓ Report updated.');closeModal();
+  const activeTab=document.querySelector('.nav-tab.active')?.dataset?.tab;
+  if(activeTab==='all-reports')loadAllReports();else if(activeTab==='dashboard')loadDashboard();else if(activeTab==='history')loadMyReports();
+}
+
+// ═══ REPORT CARD ═══
 function reportCard(r,delay){
   const equip=r.equipment_status||[];
   const faults=equip.filter(e=>e.status==='Faulty');
   const hasConcerns=r.concerns?.trim().length>0;
-  return `
-    <div class="report-item" style="animation-delay:${delay||0}ms" onclick='openDetail("${r.id}")'>
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
-        <div>
-          <div class="report-vessel">${r.vessel_name}</div>
-          <div class="report-meta">📅 ${r.date} &nbsp;·&nbsp; 👤 ${r.submitted_by} &nbsp;·&nbsp; ⏱ ${r.hours_worked||'—'}h &nbsp;·&nbsp; 📍 ${r.location||'—'}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
-          <span class="status-badge badge-submitted">SUBMITTED</span>
-          ${faults.length?`<span class="status-badge badge-faulty">⚠ ${faults.length} FAULT${faults.length>1?'S':''}</span>`:''}
-          ${hasConcerns?`<span class="status-badge badge-concerns">⚠ CONCERNS</span>`:''}
-        </div>
+  return `<div class="report-item" style="animation-delay:${delay||0}ms" onclick='openDetail("${r.id}")'>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+      <div>
+        <div class="report-vessel">${r.vessel_name}</div>
+        <div class="report-meta">📅 ${r.date} &nbsp;·&nbsp; 👤 ${r.submitted_by} &nbsp;·&nbsp; ⏱ ${r.hours_worked||'—'}h &nbsp;·&nbsp; 📍 ${r.location||'—'}</div>
       </div>
-      ${r.completion_pct!=null?`
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-          <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:1px;">COMPLETION</span>
-          <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent);">${r.completion_pct}%</span>
-        </div>
-        <div class="progress-wrap" style="margin-bottom:10px;"><div class="progress-fill" style="width:${r.completion_pct}%"></div></div>`:''}
-      <div style="font-size:14px;color:var(--muted);line-height:1.6;">${(r.work_activities||'').slice(0,140)}${(r.work_activities||'').length>140?'…':''}</div>
-      ${equip.length?`<div class="equip-tags">${equip.map(e=>`<span class="equip-tag${e.status==='Faulty'?' fault':''}">${e.equipment_name} · ${e.status}</span>`).join('')}</div>`:''}
-      <div style="display:flex;justify-content:flex-end;margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">
-        ${isOffice ? '<button onclick="event.stopPropagation();confirmDelete(\''+r.id+'\',\''+r.vessel_name.replace(/'/g,'')+'\',\''+r.date+'\')" style="background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);color:var(--warn);font-family:var(--font-mono);font-size:11px;padding:6px 14px;border-radius:3px;cursor:pointer;letter-spacing:1px;">🗑 DELETE</button>' : ''}
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
+        <span class="status-badge badge-submitted">SUBMITTED</span>
+        ${faults.length?`<span class="status-badge badge-faulty">⚠ ${faults.length} FAULT${faults.length>1?'S':''}</span>`:''}
+        ${hasConcerns?`<span class="status-badge badge-concerns">⚠ CONCERNS</span>`:''}
       </div>
-    </div>`;
+    </div>
+    ${r.completion_pct!=null?`<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:1px;">COMPLETION</span><span style="font-family:var(--font-mono);font-size:10px;color:var(--accent);">${r.completion_pct}%</span></div><div class="progress-wrap" style="margin-bottom:10px;"><div class="progress-fill" style="width:${r.completion_pct}%"></div></div>`:''}
+    <div style="font-size:14px;color:var(--muted);line-height:1.6;">${(r.work_activities||'').slice(0,140)}${(r.work_activities||'').length>140?'…':''}</div>
+    ${equip.length?`<div class="equip-tags">${equip.map(e=>`<span class="equip-tag${e.status==='Faulty'?' fault':''}">${e.equipment_name} · ${e.status}</span>`).join('')}</div>`:''}
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">
+      ${isOffice?`<button onclick="event.stopPropagation();confirmDelete('${r.id}','${r.vessel_name.replace(/'/g,"\\'")}','${r.date}')" style="background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);color:var(--warn);font-family:var(--font-mono);font-size:11px;padding:6px 14px;border-radius:3px;cursor:pointer;letter-spacing:1px;">🗑 DELETE</button>`:''}
+    </div>
+  </div>`;
 }
 
-// ═══════════════════════════════════════════════════════
-// DETAIL MODAL
-// ═══════════════════════════════════════════════════════
+// ═══ DETAIL MODAL ═══
 async function openDetail(id){
   document.getElementById('detail-modal').classList.add('open');
   document.getElementById('modal-content').innerHTML='<div class="loading"><div class="spinner"></div>&nbsp;LOADING...</div>';
-
-  const {data:r}=await sb.from('daily_reports').select('*,equipment_status(*)').eq('id',id).single();
-  if(!r){ document.getElementById('modal-content').innerHTML='<p>Could not load report.</p>'; return; }
-  // Store current report for export and lightbox
-  window._currentModalReport = r;
-  window._modalPhotos = r.photos_json ? JSON.parse(r.photos_json) : [];
-
+  const{data:r}=await sb.from('daily_reports').select('*,equipment_status(*)').eq('id',id).single();
+  if(!r){document.getElementById('modal-content').innerHTML='<p>Could not load report.</p>';return;}
+  window._currentModalReport=r;
+  window._modalPhotos=r.photos_json?JSON.parse(r.photos_json):[];
   const equip=r.equipment_status||[];
   const plan=r.next_day_plan?JSON.parse(r.next_day_plan):[];
   const photos=window._modalPhotos;
-  const sColor={'Operational':'badge-operational','Faulty':'badge-faulty','Pending':'badge-pending',
-                'Preparing':'badge-preparing','Ready for Testing':'badge-testing'};
-
+  const sColor={'Operational':'badge-operational','Faulty':'badge-faulty','Pending':'badge-pending','Preparing':'badge-preparing','Ready for Testing':'badge-testing'};
   document.getElementById('modal-content').innerHTML=`
     <div style="font-family:var(--font-display);font-size:28px;letter-spacing:2px;margin-bottom:2px;">${r.vessel_name}</div>
-    <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:20px;">
-      ${r.date} &nbsp;·&nbsp; ${r.submitted_by} &nbsp;·&nbsp; ${r.location||'No location'}
-    </div>
-
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:20px;">${r.date} &nbsp;·&nbsp; ${r.submitted_by} &nbsp;·&nbsp; ${r.location||'No location'}</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;">
       ${mini('HOURS',(r.hours_worked||'—')+'h','var(--accent)')}
       ${mini('COMPLETION',r.completion_pct!=null?r.completion_pct+'%':'—',r.completion_pct===100?'var(--accent)':'var(--accent2)')}
       ${mini('EQUIPMENT',equip.length+' items','var(--muted)')}
     </div>
     ${r.completion_pct!=null?`<div class="progress-wrap" style="height:6px;margin-bottom:20px;"><div class="progress-fill" style="width:${r.completion_pct}%"></div></div>`:''}
-
     <div class="divider"></div>
-
     <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Daily Work Activities</div>
-    <div style="font-size:14px;line-height:1.8;white-space:pre-line;margin-bottom:4px;">${r.work_activities}</div>
-
-    ${r.concerns?`
-      <div class="divider"></div>
-      <div style="font-family:var(--font-mono);font-size:10px;color:var(--warn);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">⚠ Areas of Concern / Findings</div>
-      <div style="font-size:14px;line-height:1.8;white-space:pre-line;background:rgba(255,107,53,.04);border:1px solid rgba(255,107,53,.15);border-radius:3px;padding:16px;">${r.concerns}</div>`:''}
-
-    ${plan.length?`
-      <div class="divider"></div>
-      <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">📋 Next Day Plan</div>
-      ${plan.map((p,i)=>`
-        <div style="display:flex;align-items:center;gap:12px;background:rgba(0,136,255,.05);border:1px solid rgba(0,136,255,.15);border-radius:3px;padding:10px 14px;margin-bottom:8px;">
-          <span style="font-family:var(--font-display);font-size:22px;color:var(--accent2);min-width:24px;">${i+1}</span>
-          <span style="font-size:13px;">${p}</span>
-        </div>`).join('')}`:''}
-
-    ${equip.length?`
-      <div class="divider"></div>
-      <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">Equipment / Materials Status</div>
-      ${equip.map(e=>`
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:12px 16px;margin-bottom:8px;">
-          <div>
-            <div style="font-weight:500;margin-bottom:${e.issues_noted?'3px':'0'};">${e.equipment_name}</div>
-            ${e.issues_noted?`<div style="font-size:12px;color:var(--muted);">${e.issues_noted}</div>`:''}
-          </div>
-          <span class="status-badge ${sColor[e.status]||'badge-operational'}" style="white-space:nowrap;">${e.status}</span>
-        </div>`).join('')}`:''}
-
-    ${r.remarks?`
-      <div class="divider"></div>
-      <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Remarks</div>
-      <div style="font-size:14px;line-height:1.7;background:rgba(255,200,0,.04);border:1px solid rgba(255,200,0,.12);border-radius:3px;padding:14px;color:var(--caution);">${r.remarks}</div>`:''}
-
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);">
-      <button onclick="exportWordFromReport(window._currentModalReport)"
-        style="background:rgba(255,200,0,.1);border:1px solid rgba(255,200,0,.3);color:var(--caution);
-        font-family:var(--font-mono);font-size:11px;padding:10px 20px;border-radius:3px;cursor:pointer;letter-spacing:1px;">
-        ⬇ EXPORT WORD
-      </button>
-      ${isOffice?`
-      <button onclick="confirmDeleteModal(window._currentModalReport?.id, window._currentModalReport?.vessel_name, window._currentModalReport?.date)"
-        style="background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.25);color:var(--warn);
-        font-family:var(--font-mono);font-size:11px;padding:10px 20px;border-radius:3px;cursor:pointer;letter-spacing:1px;">
-        🗑 DELETE REPORT
-      </button>`:''}
+    <div style="font-size:14px;line-height:1.8;white-space:pre-line;margin-bottom:4px;">${r.work_activities||'—'}</div>
+    ${r.concerns?`<div class="divider"></div><div style="font-family:var(--font-mono);font-size:10px;color:var(--warn);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">⚠ Areas of Concern / Findings</div><div style="font-size:14px;line-height:1.8;white-space:pre-line;background:rgba(255,107,53,.04);border:1px solid rgba(255,107,53,.15);border-radius:3px;padding:16px;">${r.concerns}</div>`:''}
+    ${plan.length?`<div class="divider"></div><div style="font-family:var(--font-mono);font-size:10px;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">📋 Next Day Plan</div>${plan.map((p,i)=>`<div style="display:flex;align-items:center;gap:12px;background:rgba(0,136,255,.05);border:1px solid rgba(0,136,255,.15);border-radius:3px;padding:10px 14px;margin-bottom:8px;"><span style="font-family:var(--font-display);font-size:22px;color:var(--accent2);min-width:24px;">${i+1}</span><span style="font-size:13px;">${p}</span></div>`).join('')}`:''}
+    ${equip.length?`<div class="divider"></div><div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">Equipment / Materials Status</div>${equip.map(e=>`<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:12px 16px;margin-bottom:8px;"><div><div style="font-weight:500;margin-bottom:${e.issues_noted?'3px':'0'};">${e.equipment_name}</div>${e.issues_noted?`<div style="font-size:12px;color:var(--muted);">${e.issues_noted}</div>`:''}</div><span class="status-badge ${sColor[e.status]||'badge-operational'}" style="white-space:nowrap;">${e.status}</span></div>`).join('')}`:''}
+    ${r.remarks?`<div class="divider"></div><div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Remarks</div><div style="font-size:14px;line-height:1.7;background:rgba(255,200,0,.04);border:1px solid rgba(255,200,0,.12);border-radius:3px;padding:14px;color:var(--caution);">${r.remarks}</div>`:''}
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);">
+      <button onclick="exportWordFromReport(window._currentModalReport)" style="background:rgba(255,200,0,.1);border:1px solid rgba(255,200,0,.3);color:var(--caution);font-family:var(--font-mono);font-size:11px;padding:10px 20px;border-radius:3px;cursor:pointer;letter-spacing:1px;">⬇ EXPORT WORD</button>
+      <div style="display:flex;gap:8px;">
+        <button onclick="openEditModal(window._currentModalReport)" style="background:rgba(0,136,255,.08);border:1px solid rgba(0,136,255,.25);color:var(--accent2);font-family:var(--font-mono);font-size:11px;padding:10px 20px;border-radius:3px;cursor:pointer;letter-spacing:1px;">✏ EDIT</button>
+        ${isOffice?`<button onclick="confirmDeleteModal(window._currentModalReport?.id,window._currentModalReport?.vessel_name,window._currentModalReport?.date)" style="background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.25);color:var(--warn);font-family:var(--font-mono);font-size:11px;padding:10px 20px;border-radius:3px;cursor:pointer;letter-spacing:1px;">🗑 DELETE</button>`:''}
+      </div>
     </div>
-
-    ${photos.length?`
-      <div class="divider"></div>
-      <div style="font-family:var(--font-mono);font-size:10px;color:var(--caution);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">📷 Pictures (${photos.length})</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;">
-        ${photos.map((p,pi)=>`
-          <div style="border-radius:3px;overflow:hidden;border:1px solid var(--border);aspect-ratio:4/3;position:relative;background:var(--bg);cursor:zoom-in;"
-            onclick="openLightbox(${pi})">
-            <img src="${p.src}" alt="${p.caption}" style="width:100%;height:100%;object-fit:cover;">
-            <div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);border-radius:2px;padding:2px 5px;font-family:var(--font-mono);font-size:9px;color:#fff;">🔍</div>
-            ${p.caption?`<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);font-family:var(--font-mono);font-size:9px;color:#fff;padding:4px 6px;">${p.caption}</div>`:''}
-          </div>`).join('')}
-      </div>`:''}
+    <div id="comments-section"></div>
+    ${photos.length?`<div class="divider"></div><div style="font-family:var(--font-mono);font-size:10px;color:var(--caution);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">📷 Pictures (${photos.length})</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;">${photos.map((p,pi)=>`<div style="border-radius:3px;overflow:hidden;border:1px solid var(--border);aspect-ratio:4/3;position:relative;background:var(--bg);cursor:zoom-in;" onclick="openLightbox(${pi})"><img src="${p.src}" alt="${p.caption}" style="width:100%;height:100%;object-fit:cover;"><div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);border-radius:2px;padding:2px 5px;font-family:var(--font-mono);font-size:9px;color:#fff;">🔍</div>${p.caption?`<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);font-family:var(--font-mono);font-size:9px;color:#fff;padding:4px 6px;">${p.caption}</div>`:''}</div>`).join('')}</div>`:''}
   `;
+  setTimeout(async()=>{const comments=await loadComments(r.id);renderComments(comments,r.id);},100);
 }
 
 function mini(label,val,color){
-  return `<div style="background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:12px 14px;">
-    <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">${label}</div>
-    <div style="font-family:var(--font-display);font-size:26px;color:${color};line-height:1;">${val}</div>
-  </div>`;
+  return `<div style="background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:12px 14px;"><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">${label}</div><div style="font-family:var(--font-display);font-size:26px;color:${color};line-height:1;">${val}</div></div>`;
 }
 
-
-// ═══════════════════════════════════════════════════════
-// LIGHTBOX
-// ═══════════════════════════════════════════════════════
-let lightboxPhotos = [];
-let lightboxIndex  = 0;
-
+// ═══ LIGHTBOX ═══
+let lightboxPhotos=[],lightboxIndex=0;
 function openLightbox(index){
-  lightboxPhotos = window._modalPhotos || [];
-  lightboxIndex  = index;
+  lightboxPhotos=window._modalPhotos||[];
+  lightboxIndex=index;
   showLightboxImage();
   document.getElementById('lightbox').classList.add('open');
-  document.addEventListener('keydown', lightboxKeyHandler);
+  document.addEventListener('keydown',lightboxKeyHandler);
 }
-
 function showLightboxImage(){
-  const p = lightboxPhotos[lightboxIndex];
-  document.getElementById('lightbox-img').src = p.src;
-  document.getElementById('lightbox-caption').textContent =
-    p.caption ? `${p.caption}  (${lightboxIndex+1} / ${lightboxPhotos.length})` : `${lightboxIndex+1} / ${lightboxPhotos.length}`;
+  const p=lightboxPhotos[lightboxIndex];
+  document.getElementById('lightbox-img').src=p.src;
+  document.getElementById('lightbox-caption').textContent=p.caption?`${p.caption}  (${lightboxIndex+1} / ${lightboxPhotos.length})`:`${lightboxIndex+1} / ${lightboxPhotos.length}`;
 }
-
-function lightboxNav(dir){
-  lightboxIndex = (lightboxIndex + dir + lightboxPhotos.length) % lightboxPhotos.length;
-  showLightboxImage();
-}
-
+function lightboxNav(dir){lightboxIndex=(lightboxIndex+dir+lightboxPhotos.length)%lightboxPhotos.length;showLightboxImage();}
 function closeLightbox(e){
-  if(e && e.target !== e.currentTarget && !e.target.classList.contains('lightbox-close')) return;
+  if(e&&e.target!==e.currentTarget&&!e.target.classList.contains('lightbox-close'))return;
   document.getElementById('lightbox').classList.remove('open');
-  document.removeEventListener('keydown', lightboxKeyHandler);
+  document.removeEventListener('keydown',lightboxKeyHandler);
 }
-
 function lightboxKeyHandler(e){
-  if(e.key === 'ArrowRight') lightboxNav(1);
-  else if(e.key === 'ArrowLeft') lightboxNav(-1);
-  else if(e.key === 'Escape') closeLightbox({target: document.getElementById('lightbox'), currentTarget: document.getElementById('lightbox')});
+  if(e.key==='ArrowRight')lightboxNav(1);
+  else if(e.key==='ArrowLeft')lightboxNav(-1);
+  else if(e.key==='Escape')closeLightbox({target:document.getElementById('lightbox'),currentTarget:document.getElementById('lightbox')});
 }
 
-// ═══════════════════════════════════════════════════════
-// EXPORT WORD FROM SAVED REPORT (modal)
-// ═══════════════════════════════════════════════════════
+// ═══ EXPORT WORD (form) ═══
+async function exportWord(){
+  const _docx=window.docx||(typeof docx!=='undefined'?docx:null);
+  if(!_docx){showToast('Word library not loaded. Please refresh.',true);return;}
+  const{Document,Packer,Paragraph,TextRun,Table,TableRow,TableCell,BorderStyle,WidthType,ShadingType,ImageRun}=_docx;
+  const vessel=document.getElementById('f-vessel').value||'—';
+  const date=document.getElementById('f-date').value||'—';
+  const reporter=document.getElementById('f-submitter').value||'—';
+  const location=document.getElementById('f-location').value||'—';
+  const hours=document.getElementById('f-hours').value||'—';
+  const acts=document.getElementById('f-activities').value||'';
+  const concerns=document.getElementById('f-concerns').value||'';
+  const remarks=document.getElementById('f-remarks').value||'';
+  const pct=document.getElementById('pct-live').textContent||'—';
+  const equip=getEquipData();
+  const plan=getPlanData();
+  const border={style:BorderStyle.SINGLE,size:1,color:'CCCCCC'};
+  const borders={top:border,bottom:border,left:border,right:border};
+  const cellMargins={top:80,bottom:80,left:120,right:120};
+  const tblWidth={size:9026,type:WidthType.DXA};
+  function heading(text,level='section'){return new Paragraph({children:[new TextRun({text,bold:true,size:level==='main'?36:26,font:'Arial',color:level==='main'?'1a6b4a':level==='warn'?'cc4400':level==='blue'?'0055cc':'1a2230'})],spacing:{before:level==='main'?0:280,after:120}});}
+  function body(text){return new Paragraph({children:[new TextRun({text,size:22,font:'Arial'})],spacing:{after:80}});}
+  function labelVal(label,val){return new TableRow({children:[new TableCell({borders,width:{size:2500,type:WidthType.DXA},margins:cellMargins,shading:{fill:'F0F4F8',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:label,bold:true,size:20,font:'Arial',color:'444444'})]})] }),new TableCell({borders,width:{size:6526,type:WidthType.DXA},margins:cellMargins,children:[new Paragraph({children:[new TextRun({text:String(val),size:20,font:'Arial'})]})] })]});}
+  const children=[
+    new Paragraph({children:[new TextRun({text:'VFD RETROFIT DAILY REPORT',font:'Arial',size:56,bold:true,color:'00c896'})],spacing:{after:60}}),
+    new Paragraph({children:[new TextRun({text:'Daily Work Report',font:'Arial',size:24,color:'666666'})],spacing:{after:40}}),
+    new Paragraph({children:[new TextRun({text:`Generated: ${new Date().toLocaleString()}`,font:'Arial',size:18,color:'888888'})],spacing:{after:400}}),
+    heading('VESSEL & SHIFT INFO','main'),
+    new Table({width:tblWidth,columnWidths:[2500,6526],rows:[labelVal('Vessel Name',vessel),labelVal('Report Date',date),labelVal('Reported By',reporter),labelVal('Location / Port',location),labelVal('Hours Worked',hours+(hours!=='—'?'h':'')),labelVal('Completion %',pct)]}),
+    new Paragraph({spacing:{before:360,after:120}}),
+    heading('DAILY WORK ACTIVITIES','main'),
+    ...acts.split('\n').filter(Boolean).map(line=>body(line)),
+    ...(acts?[]:[body('—')]),
+  ];
+  if(equip.length){
+    children.push(new Paragraph({spacing:{before:360,after:120}}));
+    children.push(heading('EQUIPMENT / MATERIALS STATUS','main'));
+    children.push(new Table({width:tblWidth,columnWidths:[3500,2000,3526],rows:[
+      new TableRow({children:[new TableCell({borders,width:{size:3500,type:WidthType.DXA},margins:cellMargins,shading:{fill:'1a6b4a',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:'Equipment / Material',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] }),new TableCell({borders,width:{size:2000,type:WidthType.DXA},margins:cellMargins,shading:{fill:'1a6b4a',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:'Status',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] }),new TableCell({borders,width:{size:3526,type:WidthType.DXA},margins:cellMargins,shading:{fill:'1a6b4a',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:'Issues / Notes',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] })]}),
+      ...equip.map(e=>new TableRow({children:[new TableCell({borders,width:{size:3500,type:WidthType.DXA},margins:cellMargins,children:[new Paragraph({children:[new TextRun({text:e.equipment_name,size:20,font:'Arial'})]})] }),new TableCell({borders,width:{size:2000,type:WidthType.DXA},margins:cellMargins,shading:{fill:e.status==='Faulty'?'fff2ee':e.status==='Operational'?'e8fff8':'fffbee',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:e.status,size:20,font:'Arial',color:e.status==='Faulty'?'cc3300':e.status==='Operational'?'006644':'996600'})]})] }),new TableCell({borders,width:{size:3526,type:WidthType.DXA},margins:cellMargins,children:[new Paragraph({children:[new TextRun({text:e.issues_noted||'—',size:20,font:'Arial',color:'666666'})]})] })]}))
+    ]}));
+  }
+  if(concerns.trim()){children.push(new Paragraph({spacing:{before:360,after:120}}));children.push(heading('⚠ AREAS OF CONCERN / FINDINGS','warn'));concerns.split('\n').filter(Boolean).forEach(line=>children.push(body(line)));}
+  if(plan.length){children.push(new Paragraph({spacing:{before:360,after:120}}));children.push(heading('JOB PLANNING — NEXT DAY','blue'));plan.forEach((p,i)=>children.push(new Paragraph({children:[new TextRun({text:`${i+1}.  ${p}`,size:22,font:'Arial'})],spacing:{after:80}})));}
+  if(remarks.trim()){children.push(new Paragraph({spacing:{before:360,after:120}}));children.push(heading('REMARKS','main'));remarks.split('\n').filter(Boolean).forEach(line=>children.push(body(line)));}
+  if(uploadedPhotos.length){
+    children.push(new Paragraph({spacing:{before:360,after:120}}));
+    children.push(heading('PICTURES','main'));
+    for(const p of uploadedPhotos){
+      try{const base64=p.src.split(',')[1];const mimeMatch=p.src.match(/data:([^;]+);/);const mimeType=mimeMatch?mimeMatch[1]:'image/jpeg';const imgType=mimeType.includes('png')?'png':'jpg';const binaryStr=atob(base64);const bytes=new Uint8Array(binaryStr.length);for(let i=0;i<binaryStr.length;i++)bytes[i]=binaryStr.charCodeAt(i);children.push(new Paragraph({children:[new ImageRun({data:bytes.buffer,transformation:{width:400,height:300},type:imgType})],spacing:{after:80}}));if(p.caption)children.push(body(p.caption));children.push(new Paragraph({spacing:{after:120}}));}
+      catch(e){children.push(body(`[Photo: ${p.caption||'image'}]`));}
+    }
+  }
+  const doc=new Document({styles:{default:{document:{run:{font:'Arial',size:22}}}},sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1134,right:1134,bottom:1134,left:1134}}},children}]});
+  try{const blob=await Packer.toBlob(doc);const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`VFDRetrofit_${vessel.replace(/\s+/g,'_')}_${date}.docx`;a.click();URL.revokeObjectURL(url);showToast('✓ Word document downloaded!');}
+  catch(err){showToast('Export failed: '+err.message,true);}
+}
+
+// ═══ EXPORT WORD (saved report) ═══
 async function exportWordFromReport(r){
-  if(!r){ showToast('No report loaded', true); return; }
-  const equip = r.equipment_status || [];
-  const plan  = r.next_day_plan ? JSON.parse(r.next_day_plan) : [];
-  const photos = r.photos_json ? JSON.parse(r.photos_json) : [];
-
-  const _docx = window.docx || (typeof docx !== 'undefined' ? docx : null);
-  if(!_docx){ showToast('Word library not loaded. Please refresh the page and try again.', true); return; }
-  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, BorderStyle, WidthType, ShadingType, ImageRun } = _docx;
-
-  const border   = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
-  const borders  = { top: border, bottom: border, left: border, right: border };
-  const cellMargins = { top: 80, bottom: 80, left: 120, right: 120 };
-  const tblWidth = { size: 9026, type: WidthType.DXA };
-
-  function heading(text, color='1a6b4a'){
-    return new Paragraph({ children:[new TextRun({ text, bold:true, size:26, font:'Arial', color })], spacing:{ before:280, after:120 } });
-  }
-  function body(text){
-    return new Paragraph({ children:[new TextRun({ text, size:22, font:'Arial' })], spacing:{ after:80 } });
-  }
-  function labelVal(label, val){
-    return new TableRow({ children:[
-      new TableCell({ borders, width:{size:2500,type:WidthType.DXA}, margins:cellMargins,
-        shading:{fill:'F0F4F8',type:ShadingType.CLEAR},
-        children:[new Paragraph({children:[new TextRun({text:label,bold:true,size:20,font:'Arial',color:'444444'})]})] }),
-      new TableCell({ borders, width:{size:6526,type:WidthType.DXA}, margins:cellMargins,
-        children:[new Paragraph({children:[new TextRun({text:String(val||'—'),size:20,font:'Arial'})]})] })
-    ]});
-  }
-
-  const children = [
-    new Paragraph({ children:[new TextRun({text:'VESSELLOG',font:'Arial',size:56,bold:true,color:'00c896'})], spacing:{after:60} }),
-    new Paragraph({ children:[new TextRun({text:'Daily Operations Report',font:'Arial',size:24,color:'666666'})], spacing:{after:40} }),
-    new Paragraph({ children:[new TextRun({text:`Generated: ${new Date().toLocaleString()}`,font:'Arial',size:18,color:'888888'})], spacing:{after:400} }),
+  if(!r){showToast('No report loaded',true);return;}
+  const equip=r.equipment_status||[];
+  const plan=r.next_day_plan?JSON.parse(r.next_day_plan):[];
+  const photos=r.photos_json?JSON.parse(r.photos_json):[];
+  const _docx=window.docx||(typeof docx!=='undefined'?docx:null);
+  if(!_docx){showToast('Word library not loaded. Please refresh.',true);return;}
+  const{Document,Packer,Paragraph,TextRun,Table,TableRow,TableCell,BorderStyle,WidthType,ShadingType,ImageRun}=_docx;
+  const border={style:BorderStyle.SINGLE,size:1,color:'CCCCCC'};
+  const borders={top:border,bottom:border,left:border,right:border};
+  const cellMargins={top:80,bottom:80,left:120,right:120};
+  const tblWidth={size:9026,type:WidthType.DXA};
+  function heading(text,color='1a6b4a'){return new Paragraph({children:[new TextRun({text,bold:true,size:26,font:'Arial',color})],spacing:{before:280,after:120}});}
+  function body(text){return new Paragraph({children:[new TextRun({text,size:22,font:'Arial'})],spacing:{after:80}});}
+  function labelVal(label,val){return new TableRow({children:[new TableCell({borders,width:{size:2500,type:WidthType.DXA},margins:cellMargins,shading:{fill:'F0F4F8',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:label,bold:true,size:20,font:'Arial',color:'444444'})]})] }),new TableCell({borders,width:{size:6526,type:WidthType.DXA},margins:cellMargins,children:[new Paragraph({children:[new TextRun({text:String(val||'—'),size:20,font:'Arial'})]})] })]});}
+  const children=[
+    new Paragraph({children:[new TextRun({text:'VFD RETROFIT DAILY REPORT',font:'Arial',size:56,bold:true,color:'00c896'})],spacing:{after:60}}),
+    new Paragraph({children:[new TextRun({text:'Daily Work Report',font:'Arial',size:24,color:'666666'})],spacing:{after:40}}),
+    new Paragraph({children:[new TextRun({text:`Generated: ${new Date().toLocaleString()}`,font:'Arial',size:18,color:'888888'})],spacing:{after:400}}),
     heading('VESSEL & SHIFT INFO'),
-    new Table({ width:tblWidth, columnWidths:[2500,6526], rows:[
-      labelVal('Vessel Name', r.vessel_name),
-      labelVal('Report Date', r.date),
-      labelVal('Reported By', r.submitted_by),
-      labelVal('Location / Port', r.location),
-      labelVal('Hours Worked', r.hours_worked ? r.hours_worked+'h' : '—'),
-      labelVal('Completion %', r.completion_pct != null ? r.completion_pct+'%' : '—'),
-    ]}),
-    new Paragraph({ spacing:{before:360,after:120} }),
+    new Table({width:tblWidth,columnWidths:[2500,6526],rows:[labelVal('Vessel Name',r.vessel_name),labelVal('Report Date',r.date),labelVal('Reported By',r.submitted_by),labelVal('Location / Port',r.location),labelVal('Hours Worked',r.hours_worked?r.hours_worked+'h':'—'),labelVal('Completion %',r.completion_pct!=null?r.completion_pct+'%':'—')]}),
+    new Paragraph({spacing:{before:360,after:120}}),
     heading('DAILY WORK ACTIVITIES'),
     ...(r.work_activities||'').split('\n').filter(Boolean).map(l=>body(l)),
   ];
-
   if(equip.length){
     children.push(new Paragraph({spacing:{before:360,after:120}}));
     children.push(heading('EQUIPMENT / MATERIALS STATUS'));
-    children.push(new Table({ width:tblWidth, columnWidths:[3500,2000,3526],
-      rows:[
-        new TableRow({children:[
-          new TableCell({borders,width:{size:3500,type:WidthType.DXA},margins:cellMargins,shading:{fill:'1a6b4a',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:'Equipment / Material',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] }),
-          new TableCell({borders,width:{size:2000,type:WidthType.DXA},margins:cellMargins,shading:{fill:'1a6b4a',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:'Status',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] }),
-          new TableCell({borders,width:{size:3526,type:WidthType.DXA},margins:cellMargins,shading:{fill:'1a6b4a',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:'Issues / Notes',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] }),
-        ]}),
-        ...equip.map(e=>new TableRow({children:[
-          new TableCell({borders,width:{size:3500,type:WidthType.DXA},margins:cellMargins,children:[new Paragraph({children:[new TextRun({text:e.equipment_name,size:20,font:'Arial'})]})] }),
-          new TableCell({borders,width:{size:2000,type:WidthType.DXA},margins:cellMargins,shading:{fill:e.status==='Faulty'?'fff2ee':e.status==='Operational'?'e8fff8':'fffbee',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:e.status,size:20,font:'Arial',color:e.status==='Faulty'?'cc3300':e.status==='Operational'?'006644':'996600'})]})] }),
-          new TableCell({borders,width:{size:3526,type:WidthType.DXA},margins:cellMargins,children:[new Paragraph({children:[new TextRun({text:e.issues_noted||'—',size:20,font:'Arial',color:'666666'})]})] }),
-        ]}))
-      ]
-    }));
+    children.push(new Table({width:tblWidth,columnWidths:[3500,2000,3526],rows:[
+      new TableRow({children:[new TableCell({borders,width:{size:3500,type:WidthType.DXA},margins:cellMargins,shading:{fill:'1a6b4a',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:'Equipment / Material',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] }),new TableCell({borders,width:{size:2000,type:WidthType.DXA},margins:cellMargins,shading:{fill:'1a6b4a',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:'Status',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] }),new TableCell({borders,width:{size:3526,type:WidthType.DXA},margins:cellMargins,shading:{fill:'1a6b4a',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:'Issues / Notes',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})] })]}),
+      ...equip.map(e=>new TableRow({children:[new TableCell({borders,width:{size:3500,type:WidthType.DXA},margins:cellMargins,children:[new Paragraph({children:[new TextRun({text:e.equipment_name,size:20,font:'Arial'})]})] }),new TableCell({borders,width:{size:2000,type:WidthType.DXA},margins:cellMargins,shading:{fill:e.status==='Faulty'?'fff2ee':e.status==='Operational'?'e8fff8':'fffbee',type:ShadingType.CLEAR},children:[new Paragraph({children:[new TextRun({text:e.status,size:20,font:'Arial',color:e.status==='Faulty'?'cc3300':e.status==='Operational'?'006644':'996600'})]})] }),new TableCell({borders,width:{size:3526,type:WidthType.DXA},margins:cellMargins,children:[new Paragraph({children:[new TextRun({text:e.issues_noted||'—',size:20,font:'Arial',color:'666666'})]})] })]}))
+    ]}));
   }
-
-  if(r.concerns?.trim()){
-    children.push(new Paragraph({spacing:{before:360,after:120}}));
-    children.push(heading('⚠ AREAS OF CONCERN / FINDINGS','cc4400'));
-    r.concerns.split('\n').filter(Boolean).forEach(l=>children.push(body(l)));
-  }
-
-  if(plan.length){
-    children.push(new Paragraph({spacing:{before:360,after:120}}));
-    children.push(heading('JOB PLANNING — NEXT DAY','0055cc'));
-    plan.forEach((p,i)=>children.push(new Paragraph({children:[new TextRun({text:`${i+1}.  ${p}`,size:22,font:'Arial'})],spacing:{after:80}})));
-  }
-
-  if(r.remarks?.trim()){
-    children.push(new Paragraph({spacing:{before:360,after:120}}));
-    children.push(heading('REMARKS'));
-    r.remarks.split('\n').filter(Boolean).forEach(l=>children.push(body(l)));
-  }
-
+  if(r.concerns?.trim()){children.push(new Paragraph({spacing:{before:360,after:120}}));children.push(heading('⚠ AREAS OF CONCERN / FINDINGS','cc4400'));r.concerns.split('\n').filter(Boolean).forEach(l=>children.push(body(l)));}
+  if(plan.length){children.push(new Paragraph({spacing:{before:360,after:120}}));children.push(heading('JOB PLANNING — NEXT DAY','0055cc'));plan.forEach((p,i)=>children.push(new Paragraph({children:[new TextRun({text:`${i+1}.  ${p}`,size:22,font:'Arial'})],spacing:{after:80}})));}
+  if(r.remarks?.trim()){children.push(new Paragraph({spacing:{before:360,after:120}}));children.push(heading('REMARKS'));r.remarks.split('\n').filter(Boolean).forEach(l=>children.push(body(l)));}
   if(photos.length){
-    children.push(new Paragraph({spacing:{before:360,after:120}}));
-    children.push(heading('PICTURES'));
+    children.push(new Paragraph({spacing:{before:360,after:120}}));children.push(heading('PICTURES'));
     for(const p of photos){
-      try {
-        const base64 = p.src.split(',')[1];
-        const mimeMatch = p.src.match(/data:([^;]+);/);
-        const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
-        const imgType = mimeType.includes('png') ? 'png' : 'jpg';
-        const binaryStr = atob(base64);
-        const bytes = new Uint8Array(binaryStr.length);
-        for(let i=0;i<binaryStr.length;i++) bytes[i]=binaryStr.charCodeAt(i);
-        children.push(new Paragraph({ children:[new ImageRun({ data: bytes.buffer, transformation:{ width:400, height:300 }, type: imgType })], spacing:{ after:80 } }));
-        if(p.caption) children.push(body(p.caption));
-        children.push(new Paragraph({ spacing:{ after:120 } }));
-      } catch(e){ children.push(body(`[Photo: ${p.caption||'image'}]`)); }
+      try{const base64=p.src.split(',')[1];const mimeMatch=p.src.match(/data:([^;]+);/);const mimeType=mimeMatch?mimeMatch[1]:'image/jpeg';const imgType=mimeType.includes('png')?'png':'jpg';const binaryStr=atob(base64);const bytes=new Uint8Array(binaryStr.length);for(let i=0;i<binaryStr.length;i++)bytes[i]=binaryStr.charCodeAt(i);children.push(new Paragraph({children:[new ImageRun({data:bytes.buffer,transformation:{width:400,height:300},type:imgType})],spacing:{after:80}}));if(p.caption)children.push(body(p.caption));children.push(new Paragraph({spacing:{after:120}}));}
+      catch(e){children.push(body(`[Photo: ${p.caption||'image'}]`));}
     }
   }
-
-  const doc = new Document({
-    styles:{default:{document:{run:{font:'Arial',size:22}}}},
-    sections:[{ properties:{page:{size:{width:11906,height:16838},margin:{top:1134,right:1134,bottom:1134,left:1134}}}, children }]
-  });
-
-  try {
-    const blob = await Packer.toBlob(doc);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `VesselLog_${(r.vessel_name||'Report').replace(/\s+/g,'_')}_${r.date}.docx`;
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast('✓ Word document downloaded!');
-  } catch(err){
-    showToast('Export failed: ' + err.message, true);
-    console.error('Word export error:', err);
-  }
+  const doc=new Document({styles:{default:{document:{run:{font:'Arial',size:22}}}},sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1134,right:1134,bottom:1134,left:1134}}},children}]});
+  try{const blob=await Packer.toBlob(doc);const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`VFDRetrofit_${(r.vessel_name||'Report').replace(/\s+/g,'_')}_${r.date}.docx`;a.click();URL.revokeObjectURL(url);showToast('✓ Word document downloaded!');}
+  catch(err){showToast('Export failed: '+err.message,true);}
 }
 
-// ═══════════════════════════════════════════════════════
-// DAY / NIGHT TOGGLE
-// ═══════════════════════════════════════════════════════
+// ═══ THEME ═══
 function toggleTheme(){
-  const isLight = document.body.classList.toggle('light-mode');
-  document.getElementById('theme-toggle').textContent = isLight ? '🌑' : '🌙';
-  localStorage.setItem('vessellog-theme', isLight ? 'light' : 'dark');
+  const isLight=document.body.classList.toggle('light-mode');
+  document.getElementById('theme-toggle').textContent=isLight?'🌑':'🌙';
+  localStorage.setItem('vessellog-theme',isLight?'light':'dark');
 }
-// Restore theme on load
 (function(){
-  if(localStorage.getItem('vessellog-theme') === 'light'){
+  if(localStorage.getItem('vessellog-theme')==='light'){
     document.body.classList.add('light-mode');
-    // Button set after DOM ready
-    document.addEventListener('DOMContentLoaded', ()=>{
-      const btn = document.getElementById('theme-toggle');
-      if(btn) btn.textContent = '🌑';
-    });
+    document.addEventListener('DOMContentLoaded',()=>{const btn=document.getElementById('theme-toggle');if(btn)btn.textContent='🌑';});
   }
 })();
 
-// ═══════════════════════════════════════════════════════
-// DELETE REPORT (office only)
-// ═══════════════════════════════════════════════════════
-function confirmDeleteModal(id, vessel, date){
-  if(!id) return;
-  confirmDelete(id, vessel, date);
-  closeModal();
-}
-
-function confirmDelete(id, vessel, date){
-  const confirmed = window.confirm(`DELETE this report?\n\nVessel: ${vessel}\nDate: ${date}\n\nThis cannot be undone.`);
-  if(confirmed) deleteReport(id);
-}
-
+// ═══ DELETE ═══
+function confirmDeleteModal(id,vessel,date){if(!id)return;confirmDelete(id,vessel,date);closeModal();}
+function confirmDelete(id,vessel,date){if(window.confirm(`DELETE this report?\n\nVessel: ${vessel}\nDate: ${date}\n\nThis cannot be undone.`))deleteReport(id);}
 async function deleteReport(id){
-  // Delete equipment first (cascade should handle it, but explicit is safer)
-  await sb.from('equipment_status').delete().eq('report_id', id);
-  const { error } = await sb.from('daily_reports').delete().eq('id', id);
-  if(error){ showToast('Delete failed: ' + error.message, true); return; }
+  await sb.from('equipment_status').delete().eq('report_id',id);
+  const{error}=await sb.from('daily_reports').delete().eq('id',id);
+  if(error){showToast('Delete failed: '+error.message,true);return;}
   showToast('✓ Report deleted.');
-  // Refresh whichever tab is active
-  const activeTab = document.querySelector('.nav-tab.active')?.dataset?.tab;
-  if(activeTab === 'all-reports') loadAllReports();
-  else if(activeTab === 'dashboard') loadDashboard();
-  else if(activeTab === 'history') loadMyReports();
+  const activeTab=document.querySelector('.nav-tab.active')?.dataset?.tab;
+  if(activeTab==='all-reports')loadAllReports();else if(activeTab==='dashboard')loadDashboard();else if(activeTab==='history')loadMyReports();
 }
 
-function closeModal(){ document.getElementById('detail-modal').classList.remove('open'); }
-document.getElementById('detail-modal').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeModal(); });
-
-// ═══════════════════════════════════════════════════════
-// CLEAR FORM — also restores vessel lock after clear
-// ═══════════════════════════════════════════════════════
-function clearForm(){
-  ['f-location','f-hours','f-activities','f-concerns','f-remarks'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value='';
-  });
-  // Restore vessel for crew (locked field stays, just clear others)
-  const vesselEl = document.getElementById('f-vessel');
-  if(vesselEl && !vesselEl.readOnly && vesselEl.tagName==='INPUT') vesselEl.value='';
-
-    document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
-  document.getElementById('equip-list').innerHTML='';
-  document.getElementById('plan-list').innerHTML=''; planCount=0;
-  uploadedPhotos=[]; renderPhotos();
-  addEquip(); addPlan(); autoCalcPct();
-  // Re-lock vessel field for crew after clear
-  const userVessel = currentUser?.user_metadata?.vessel;
-  if(!isOffice && userVessel){
-    const vf = document.getElementById('f-vessel');
-    if(vf){ vf.value=userVessel; vf.disabled=true; }
-  }
-}
-
+function closeModal(){document.getElementById('detail-modal').classList.remove('open');}
+document.getElementById('detail-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
 </script>
 </body>
 </html>
