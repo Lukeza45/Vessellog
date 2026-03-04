@@ -491,6 +491,7 @@ function initApp(){
   if(appInitialized)return;
   appInitialized=true;
   const name=currentUser.user_metadata?.full_name||currentUser.email;
+  const userVessel=currentUser.user_metadata?.vessel;
   document.getElementById('user-display').textContent=name;
   document.getElementById('user-display').style.color='';
   document.getElementById('user-display').style.fontStyle='';
@@ -500,7 +501,6 @@ function initApp(){
     nameField.value=currentUser.user_metadata.full_name;
     updateReportedBy(nameField.value);
   }
-  const userVessel=currentUser.user_metadata?.vessel;
   const vesselField=document.getElementById('f-vessel');
   // Populate vessel dropdown
   VESSELS.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;if(v===userVessel)o.selected=true;vesselField.appendChild(o);});
